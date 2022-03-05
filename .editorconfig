@@ -1,0 +1,52 @@
+########################################################################################################################
+# Core                                                                                                                 #
+########################################################################################################################
+root = true
+
+[*]
+end_of_line = lf
+indent_style = space
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{csproj,json,props,targets,plantuml}]
+indent_size = 2
+
+[*.cs]
+indent_size = 4
+
+########################################################################################################################
+# StyleCop Analyzers                                                                                                   #
+# https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/DOCUMENTATION.md                                    #
+########################################################################################################################
+
+# Disabled StyleCop Analyzers
+dotnet_diagnostic.SA0001.severity = none # XmlCommentAnalysisDisabled
+dotnet_diagnostic.SA1101.severity = none # PrefixLocalCallsWithThis
+dotnet_diagnostic.SA1309.severity = none # FieldNamesMustNotBeginWithUnderscore
+dotnet_diagnostic.SA1413.severity = none # UseTrailingCommasInMultiLineInitializers
+dotnet_diagnostic.SA1600.severity = none # ElementsMustBeDocumented
+dotnet_diagnostic.SA1601.severity = none # PartialElementsMustBeDocumented
+dotnet_diagnostic.SA1602.severity = none # EnumerationItemsMustBeDocumented
+dotnet_diagnostic.SA1633.severity = none # FileMustHaveHeader
+
+########################################################################################################################
+# Roslyn Analyzers - .NET code style language rules                                                                    #
+# https://docs.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/language-rules                        #
+########################################################################################################################
+
+csharp_using_directive_placement = outside_namespace:warning
+
+csharp_style_var_elsewhere = true:warning
+csharp_style_var_for_built_in_types = true:warning
+csharp_style_var_when_type_is_apparent = true:warning
+
+file_header_template = Copyright (c) Arjen Post. See LICENSE in the project root for license information.
+dotnet_diagnostic.IDE0073.severity = warning
+
+########################################################################################################################
+# Roslyn Analyzers - .NET code style formatting rules                                                                  #
+# https://docs.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/formatting-rules                      #
+########################################################################################################################
+
+csharp_style_namespace_declarations = file_scoped:warning

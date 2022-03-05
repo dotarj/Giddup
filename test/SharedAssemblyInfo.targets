@@ -1,0 +1,16 @@
+<Project>
+  <PropertyGroup>
+    <Configurations>Debug;Release</Configurations>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <Optimize Condition="'$(Configuration)' != 'Debug'">true</Optimize>
+    <ProjectToTest>$(AssemblyName.Replace('.Tests',''))</ProjectToTest>
+    <TargetFramework>net6.0</TargetFramework>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/$(ProjectToTest)/$(ProjectToTest).csproj" />
+  </ItemGroup>
+</Project>
