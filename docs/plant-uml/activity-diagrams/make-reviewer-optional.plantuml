@@ -1,0 +1,28 @@
+@startuml make reviewer optional
+
+(*) --> if "is created?" then
+  ->[false] "not created error"
+else
+  -->[true] if "status is active?" then
+    ->[false] "not active error"
+  else
+    [true] if "reviewer exists?" then
+      ->[false] "reviewer not found error"
+    else
+      [true] if "reviewer already optional?" then
+        ->[true] "reviewer already optional error"
+      else
+        -->[false] "reviewer made optional event"
+        --> if "should auto-complete?" then
+        note right: see should-auto-complete.plantuml for details
+          --> [true] "completed event"
+          --> (*)
+        else
+          -> [false] (*)
+        endif
+      endif
+    endif
+  endif
+endif
+
+@enduml

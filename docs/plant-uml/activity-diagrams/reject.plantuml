@@ -1,0 +1,19 @@
+@startuml reject
+
+(*) --> if "is created?" then
+  ->[false] "not created error"
+else
+  -->[true] if "status is active?" then
+    ->[false] "not active error"
+  else
+    [true] if "reviewer exists?" then
+      ->[false] "optional reviewer added event"
+      --> "rejected event"
+    else
+      --> [true] "rejected event"
+      --> (*)
+    endif
+  endif
+endif
+
+@enduml

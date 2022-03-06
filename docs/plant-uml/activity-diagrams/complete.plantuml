@@ -1,0 +1,30 @@
+@startuml complete
+
+(*) --> if "is created?" then
+  ->[false] "not created error"
+else
+  -->[true] if "status is active?" then
+    ->[false] "not active error"
+  else
+    --> [true] if "feedback contains waiting for author or reject?" then
+      -> [true] "feedback contains wait for author or reject error"
+    else
+      --> [false] if "all required reviewers approved or approved with suggestions?" then
+        -> [false] "not all required reviewers approved error"
+      else
+        --> [true] if "check for linked work items?" then
+          -> [false] "complete"
+        else
+          --> [true] if "work items linked?" then
+            -> [false] "no work item linked error"
+          else
+            --> [true] "complete"
+            --> (*)
+          endif
+        endif
+      endif
+    endif
+  endif
+endif
+
+@enduml

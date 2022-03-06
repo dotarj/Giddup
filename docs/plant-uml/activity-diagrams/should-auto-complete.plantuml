@@ -1,0 +1,27 @@
+@startuml should auto-complete
+
+(*) -->  if "auto-complete enabled?" then
+  --> [true] if "feedback contains waiting for author or reject?" then
+    --> [false] if "all required reviewers approved or approved with suggestions?" then
+      --> [true] if "check for linked work items?" then
+        --> [true] if "work items linked?" then
+          --> [true] "auto-complete"
+          --> (*)
+          else
+          -> [false] "do not auto-complete"
+          endif
+        else
+        -> [false] "do not auto-complete"
+        endif
+      else
+      -> [false] "do not auto-complete"
+      endif
+    else
+    -> [true] "do not auto-complete"
+    endif
+else
+  -> [false] "do not auto-complete"
+  --> (*)
+endif
+
+@enduml

@@ -1,0 +1,14 @@
+@startuml reactivate
+
+(*) --> if "is created?" then
+  ->[false] "not created error"
+else
+  -->[true] if "status is not abandoned?" then
+    ->[true] "not abandoned error"
+  else
+    --> [false] "reactivated event"
+    --> (*)
+  endif
+endif
+
+@enduml

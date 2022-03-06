@@ -1,0 +1,18 @@
+@startuml remove work item
+
+(*) --> if "is created?" then
+  ->[false] "not created error"
+else
+  -->[true] if "status is active?" then
+    ->[false] "not active error"
+  else
+    [true] if "work item exists?" then
+      ->[true] "work item not found error"
+    else
+      --> [false] "work item removed event"
+      --> (*)
+    endif
+  endif
+endif
+
+@enduml

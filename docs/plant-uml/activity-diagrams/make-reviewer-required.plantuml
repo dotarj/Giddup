@@ -1,0 +1,22 @@
+@startuml make reviewer required
+
+(*) --> if "is created?" then
+  ->[false] "not created error"
+else
+  -->[true] if "status is active?" then
+    ->[false] "not active error"
+  else
+    [true] if "reviewer exists?" then
+      ->[false] "reviewer not found error"
+    else
+      [true] if "reviewer already required?" then
+        ->[true] "reviewer already required error"
+      else
+        -->[false] "reviewer made required event"
+        --> (*)
+      endif
+    endif
+  endif
+endif
+
+@enduml

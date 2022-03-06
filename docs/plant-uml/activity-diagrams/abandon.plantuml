@@ -1,0 +1,14 @@
+@startuml abandon
+
+(*) --> if "is created?" then
+  ->[false] "not created error"
+else
+  -->[true] if "status is active?" then
+    ->[false] "not active error"
+  else
+    --> [true] "abandoned event"
+    --> (*)
+  endif
+endif
+
+@enduml

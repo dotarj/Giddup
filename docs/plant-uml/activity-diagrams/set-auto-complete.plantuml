@@ -1,0 +1,25 @@
+@startuml set auto-complete
+
+
+(*) --> if "is created?" then
+  ->[false] "not created error"
+else
+  -->[true] if "status is active?" then
+    ->[false] "not active error"
+  else
+    [true] if "auto-complete already enabled?" then
+      ->[true] "auto-complete already enabled error"
+    else
+      --> [false] "auto-complete set event"
+      --> if "should auto-complete?" then
+      note right: see should-auto-complete.plantuml for details
+        --> [true] "completed event"
+        --> (*)
+      else
+        -> [false] (*)
+      endif
+    endif
+  endif
+endif
+
+@enduml

@@ -1,0 +1,10 @@
+@startuml create
+
+(*) --> if "already created?" then
+  ->[true] "already created error"
+else
+  -->[false] "created event"
+  --> (*)
+endif
+
+@enduml

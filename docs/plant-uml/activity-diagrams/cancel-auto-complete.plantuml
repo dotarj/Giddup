@@ -1,0 +1,18 @@
+@startuml cancel auto-complete
+
+(*) --> if "is created?" then
+  ->[false] "not created error"
+else
+  -->[true] if "status is active?" then
+    ->[false] "not active error"
+  else
+    [true] if "auto-complete already disabled?" then
+      ->[true] "auto-complete already disabled error"
+    else
+      --> [false] "rejected event"
+      --> (*)
+    endif
+  endif
+endif
+
+@enduml

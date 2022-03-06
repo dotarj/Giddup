@@ -1,0 +1,18 @@
+@startuml change title
+
+(*) --> if "is created?" then
+  ->[false] "not created error"
+else
+  -->[true] if "status is active?" then
+    ->[false] "not active error"
+  else
+    [true] if "title equals old title?" then
+      ->[true] "no event"
+    else
+      -->[false] "title changed event"
+      --> (*)
+    endif
+  endif
+endif
+
+@enduml

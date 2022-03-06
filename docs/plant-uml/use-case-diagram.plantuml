@@ -1,0 +1,43 @@
+@startuml use case diagram
+
+left to right direction
+
+actor user
+actor reviewer
+
+rectangle "pull request" {
+  user --> (create)
+  user --> (change title)
+  user --> (change description)
+}
+
+rectangle reviewers {
+  user --> (add required reviewer)
+  user --> (add optional reviewer)
+  user --> (make reviewer required)
+  user --> (make reviewer optional)
+  user --> (remove reviewer)
+}
+
+rectangle feedback {
+  user --> (approve)
+  user --> (approve with suggestions)
+  user --> (wait for author)
+  user --> (reject)
+  reviewer --> (reset feedback)
+}
+
+rectangle "work items" {
+  user --> (link work item)
+  user --> (remove work item)
+}
+
+rectangle status {
+  user --> (complete)
+  user --> (set auto-complete)
+  user --> (cancel auto-complete)
+  user --> (abandon)
+  user --> (reactivate)
+}
+
+@enduml
