@@ -32,6 +32,10 @@ builder.Services
     {
         options.MapType(typeof(BranchName), () => new OpenApiSchema { Type = "string" });
         options.MapType(typeof(Title), () => new OpenApiSchema { Type = "string" });
+
+        options.SupportNonNullableReferenceTypes();
+
+        options.SwaggerDoc("v1", new OpenApiInfo { Version = "v1", Title = "Giddup API" });
     });
 
 var app = builder.Build();
@@ -39,7 +43,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options => options.SwaggerEndpoint("/swagger/v1/swagger.json", "Giddup API v1"));
 }
 
 app.MapControllers();
