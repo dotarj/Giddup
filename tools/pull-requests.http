@@ -1,0 +1,131 @@
+# https://marketplace.visualstudio.com/items?itemName=humao.rest-client
+
+@host = http://localhost:5000
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJnaWRkdXAuYXBpIiwiZXhwIjoyMTQ1OTE2ODAwLCJzdWIiOiI2ZTc2ZGMzOS02MzNhLTQyMmQtYTkyMi02MjZjM2MyMjBlNmIifQ.xj5EZCihbnt1n1v32zANVim5cvBvvz_j6f9dJ2DA8lA
+
+######
+# @name createPullRequest
+POST {{host}}/pull-requests/create
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "SourceBranch": "refs/heads/foo",
+    "TargetBranch": "refs/heads/bar",
+    "Title": "baz"
+}
+
+######
+# @name changeTitle
+POST {{host}}{{createPullRequest.response.headers.Location}}/change-title
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "Title": "qux"
+}
+
+######
+# @name changeDescription
+POST {{host}}{{createPullRequest.response.headers.Location}}/change-description
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "Description": "foo"
+}
+
+######
+# @name addRequiredReviewer
+POST {{host}}{{createPullRequest.response.headers.Location}}/add-required-reviewer
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "UserId": "769f1cfe-eaab-4a4f-9776-755b89dfb973"
+}
+
+######
+# @name addOptionalReviewer
+POST {{host}}{{createPullRequest.response.headers.Location}}/add-optional-reviewer
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "UserId": "769f1cfe-eaab-4a4f-9776-755b89dfb973"
+}
+
+######
+# @name makeReviewerRequired
+POST {{host}}{{createPullRequest.response.headers.Location}}/make-reviewer-required
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "UserId": "769f1cfe-eaab-4a4f-9776-755b89dfb973"
+}
+
+######
+# @name makeReviewerOptional
+POST {{host}}{{createPullRequest.response.headers.Location}}/make-reviewer-optional
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "UserId": "769f1cfe-eaab-4a4f-9776-755b89dfb973"
+}
+
+######
+# @name removeReviewer
+POST {{host}}{{createPullRequest.response.headers.Location}}/remove-reviewer
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "UserId": "769f1cfe-eaab-4a4f-9776-755b89dfb973"
+}
+
+######
+# @name approve
+POST {{host}}{{createPullRequest.response.headers.Location}}/approve
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+}
+
+######
+# @name approveWithSuggestions
+POST {{host}}{{createPullRequest.response.headers.Location}}/approve-with-suggestions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+}
+
+######
+# @name waitForAuthor
+POST {{host}}{{createPullRequest.response.headers.Location}}/wait-for-author
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+}
+
+######
+# @name reject
+POST {{host}}{{createPullRequest.response.headers.Location}}/reject
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+}
+
+######
+# @name resetFeedback
+POST {{host}}{{createPullRequest.response.headers.Location}}/reset-feedback
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+}
