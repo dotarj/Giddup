@@ -11,7 +11,7 @@ public partial class PullRequestTests
     public void Create_AlreadyCreated_ReturnsAlreadyCreatedError()
     {
         // Arrange
-        var command = new CreateCommand(BranchName.Create("refs/heads/foo").AsT1, BranchName.Create("refs/heads/bar").AsT1, Title.Create("baz").AsT1);
+        var command = new CreateCommand(Guid.NewGuid(), BranchName.Create("refs/heads/foo").AsT1, BranchName.Create("refs/heads/bar").AsT1, Title.Create("baz").AsT1);
         var state = GetPullRequestState();
 
         // Act
@@ -26,7 +26,7 @@ public partial class PullRequestTests
     public void Create_ReturnsCreatedEvent()
     {
         // Arrange
-        var command = new CreateCommand(BranchName.Create("refs/heads/foo").AsT1, BranchName.Create("refs/heads/bar").AsT1, Title.Create("baz").AsT1);
+        var command = new CreateCommand(Guid.NewGuid(), BranchName.Create("refs/heads/foo").AsT1, BranchName.Create("refs/heads/bar").AsT1, Title.Create("baz").AsT1);
         var state = PullRequest.InitialState;
 
         // Act
@@ -36,6 +36,7 @@ public partial class PullRequestTests
         Assert.True(result.TryGetEvents(out var events, out _));
         var @event = Assert.Single(events);
         var createdEvent = Assert.IsType<CreatedEvent>(@event);
+        Assert.Equal(command.Owner, createdEvent.Owner);
         Assert.Equal(command.SourceBranch, createdEvent.SourceBranch);
         Assert.Equal(command.TargetBranch, createdEvent.TargetBranch);
         Assert.Equal(command.Title, createdEvent.Title);

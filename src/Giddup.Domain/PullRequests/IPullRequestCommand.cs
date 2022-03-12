@@ -6,7 +6,7 @@ public interface IPullRequestCommand
 {
 }
 
-public record CreateCommand(BranchName SourceBranch, BranchName TargetBranch, Title Title) : IPullRequestCommand;
+public record CreateCommand(Guid Owner, BranchName SourceBranch, BranchName TargetBranch, Title Title) : IPullRequestCommand;
 
 public record ChangeTitleCommand(Title Title) : IPullRequestCommand;
 

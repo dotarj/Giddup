@@ -3,7 +3,7 @@
 using Giddup.Domain.PullRequests;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Giddup.Presentation.Api.Controllers;
+namespace Giddup.Presentation.Api.Endpoints.PullRequests;
 
 public static class PullRequestsPresenter
 {

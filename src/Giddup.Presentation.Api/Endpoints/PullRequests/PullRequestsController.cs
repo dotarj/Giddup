@@ -5,7 +5,7 @@ using Giddup.Domain.PullRequests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Giddup.Presentation.Api.Controllers;
+namespace Giddup.Presentation.Api.Endpoints.PullRequests;
 
 [Authorize]
 [ApiController]
@@ -17,11 +17,11 @@ public class PullRequestsController : ControllerBase
 
     [HttpPost]
     [Route("/pull-requests/create")]
-    public async Task<IActionResult> Create(ExternalCommands.CreateCommand command)
+    public async Task<IActionResult> Create(CreateCommand command)
     {
         var pullRequestId = Guid.NewGuid();
 
-        var error = await _pullRequestService.Execute(pullRequestId, new CreateCommand(User.GetUserId(), command.SourceBranch, command.TargetBranch, command.Title));
+        var error = await _pullRequestService.Execute(pullRequestId, new Domain.PullRequests.CreateCommand(User.GetUserId(), command.SourceBranch, command.TargetBranch, command.Title));
 
         return PullRequestsPresenter.Present(error, Request.Path, () => Created($"/pull-requests/{pullRequestId}", null));
     }
@@ -56,23 +56,23 @@ public class PullRequestsController : ControllerBase
 
     [HttpPost]
     [Route("/pull-requests/{pullRequestId:guid}/approve")]
-    public Task<IActionResult> Approve(Guid pullRequestId, ExternalCommands.ApproveCommand command) => ExecuteAndPresent(pullRequestId, new ApproveCommand(User.GetUserId()));
+    public Task<IActionResult> Approve(Guid pullRequestId) => ExecuteAndPresent(pullRequestId, new ApproveCommand(User.GetUserId()));
 
     [HttpPost]
     [Route("/pull-requests/{pullRequestId:guid}/approve-with-suggestions")]
-    public Task<IActionResult> ApproveWithSuggestions(Guid pullRequestId, ExternalCommands.ApproveWithSuggestionsCommand command) => ExecuteAndPresent(pullRequestId, new ApproveWithSuggestionsCommand(User.GetUserId()));
+    public Task<IActionResult> ApproveWithSuggestions(Guid pullRequestId) => ExecuteAndPresent(pullRequestId, new ApproveWithSuggestionsCommand(User.GetUserId()));
 
     [HttpPost]
     [Route("/pull-requests/{pullRequestId:guid}/wait-for-author")]
-    public Task<IActionResult> WaitForAuthor(Guid pullRequestId, ExternalCommands.WaitForAuthorCommand command) => ExecuteAndPresent(pullRequestId, new WaitForAuthorCommand(User.GetUserId()));
+    public Task<IActionResult> WaitForAuthor(Guid pullRequestId) => ExecuteAndPresent(pullRequestId, new WaitForAuthorCommand(User.GetUserId()));
 
     [HttpPost]
     [Route("/pull-requests/{pullRequestId:guid}/reject")]
-    public Task<IActionResult> Reject(Guid pullRequestId, ExternalCommands.RejectCommand command) => ExecuteAndPresent(pullRequestId, new RejectCommand(User.GetUserId()));
+    public Task<IActionResult> Reject(Guid pullRequestId) => ExecuteAndPresent(pullRequestId, new RejectCommand(User.GetUserId()));
 
     [HttpPost]
     [Route("/pull-requests/{pullRequestId:guid}/reset-feedback")]
-    public Task<IActionResult> ResetFeedback(Guid pullRequestId, ExternalCommands.ResetFeedbackCommand command) => ExecuteAndPresent(pullRequestId, new ResetFeedbackCommand(User.GetUserId()));
+    public Task<IActionResult> ResetFeedback(Guid pullRequestId) => ExecuteAndPresent(pullRequestId, new ResetFeedbackCommand(User.GetUserId()));
 
     [HttpPost]
     [Route("/pull-requests/{pullRequestId:guid}/link-work-item")]
@@ -108,4 +108,6 @@ public class PullRequestsController : ControllerBase
 
         return PullRequestsPresenter.Present(error, Request.Path);
     }
+
+    public record CreateCommand(BranchName SourceBranch, BranchName TargetBranch, Title Title);
 }

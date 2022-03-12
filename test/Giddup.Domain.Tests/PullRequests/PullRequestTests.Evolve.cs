@@ -11,7 +11,7 @@ public partial class PullRequestTests
     public void Evolve_Created_ReturnsPullRequestCreatedState()
     {
         // Arrange
-        var @event = new CreatedEvent(BranchName.Create("refs/heads/foo").AsT1, BranchName.Create("refs/heads/bar").AsT1, Title.Create("baz").AsT1);
+        var @event = new CreatedEvent(Guid.NewGuid(), BranchName.Create("refs/heads/foo").AsT1, BranchName.Create("refs/heads/bar").AsT1, Title.Create("baz").AsT1);
         var state = PullRequest.InitialState;
 
         // Act
@@ -19,6 +19,7 @@ public partial class PullRequestTests
 
         // Assert
         Assert.True(result.TryPickT1(out var createdState, out _));
+        Assert.Equal(@event.Owner, createdState.Owner);
         Assert.Equal(@event.SourceBranch, createdState.SourceBranch);
         Assert.Equal(@event.TargetBranch, createdState.TargetBranch);
         Assert.Equal(@event.Title, createdState.Title);
@@ -66,10 +67,10 @@ public partial class PullRequestTests
 
         // Assert
         Assert.True(result.TryPickT1(out var createdState, out _));
-        Assert.Single(createdState.Reviewers);
-        Assert.Equal(@event.UserId, createdState.Reviewers.First().UserId);
-        Assert.Equal(ReviewerType.Required, createdState.Reviewers.First().Type);
-        Assert.Equal(ReviewerFeedback.None, createdState.Reviewers.First().Feedback);
+        var reviewer = Assert.Single(createdState.Reviewers);
+        Assert.Equal(@event.UserId, reviewer.UserId);
+        Assert.Equal(ReviewerType.Required, reviewer.Type);
+        Assert.Equal(ReviewerFeedback.None, reviewer.Feedback);
     }
 
     [Fact]
@@ -84,10 +85,10 @@ public partial class PullRequestTests
 
         // Assert
         Assert.True(result.TryPickT1(out var createdState, out _));
-        Assert.Single(createdState.Reviewers);
-        Assert.Equal(@event.UserId, createdState.Reviewers.First().UserId);
-        Assert.Equal(ReviewerType.Optional, createdState.Reviewers.First().Type);
-        Assert.Equal(ReviewerFeedback.None, createdState.Reviewers.First().Feedback);
+        var reviewer = Assert.Single(createdState.Reviewers);
+        Assert.Equal(@event.UserId, reviewer.UserId);
+        Assert.Equal(ReviewerType.Optional, reviewer.Type);
+        Assert.Equal(ReviewerFeedback.None, reviewer.Feedback);
     }
 
     [Fact]
@@ -222,8 +223,8 @@ public partial class PullRequestTests
 
         // Assert
         Assert.True(result.TryPickT1(out var createdState, out _));
-        Assert.Single(createdState.WorkItems);
-        Assert.Equal(@event.WorkItemId, createdState.WorkItems.First());
+        var workItemId = Assert.Single(createdState.WorkItems);
+        Assert.Equal(@event.WorkItemId, workItemId);
     }
 
     [Fact]

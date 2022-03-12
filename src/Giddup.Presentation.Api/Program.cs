@@ -2,23 +2,20 @@
 
 using Giddup.Application;
 using Giddup.Application.PullRequests;
-using Giddup.Domain.PullRequests;
 using Giddup.Infrastructure;
 using Giddup.Infrastructure.JsonConverters;
-using Microsoft.OpenApi.Models;
+using Giddup.Presentation.Api.AppStartup;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services
+_ = builder.Services
     .AddSingleton<IPullRequestService, PullRequestService>()
     .AddSingleton<IEventStream, EventStream>();
 
-builder.Services
-    .AddOptions<EventStoreClientOptions>()
-    .Bind(builder.Configuration.GetSection(nameof(EventStoreClientOptions)))
-    .ValidateDataAnnotations();
-
-builder.Services
+_ = builder.Services
+    .AddAppStartupAuthentication()
+    .AddAppStartupOptions(builder.Configuration)
+    .AddAppStartupSwagger()
     .AddControllers()
     .AddJsonOptions(options =>
     {
@@ -26,26 +23,13 @@ builder.Services
         options.JsonSerializerOptions.Converters.Add(new TitleJsonConverter());
     });
 
-builder.Services
-    .AddEndpointsApiExplorer()
-    .AddSwaggerGen(options =>
-    {
-        options.MapType(typeof(BranchName), () => new OpenApiSchema { Type = "string" });
-        options.MapType(typeof(Title), () => new OpenApiSchema { Type = "string" });
-
-        options.SupportNonNullableReferenceTypes();
-
-        options.SwaggerDoc("v1", new OpenApiInfo { Version = "v1", Title = "Giddup API" });
-    });
-
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(options => options.SwaggerEndpoint("/swagger/v1/swagger.json", "Giddup API v1"));
-}
+_ = app
+    .UseAppStartupAuthentication()
+    .UseAppStartupSwagger()
+    .UseAuthorization();
 
-app.MapControllers();
+_ = app.MapControllers();
 
 app.Run();

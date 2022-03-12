@@ -11,7 +11,7 @@ public partial class PullRequestState : OneOfBase<PullRequestInitialState, PullR
 
 public record PullRequestInitialState;
 
-public record PullRequestCreatedState(BranchName SourceBranch, BranchName TargetBranch, Title Title, string Description, CheckForLinkedWorkItemsMode CheckForLinkedWorkItemsMode, AutoCompleteMode AutoCompleteMode, PullRequestStatus Status, IReadOnlyCollection<(Guid UserId, ReviewerType Type, ReviewerFeedback Feedback)> Reviewers, IReadOnlyCollection<Guid> WorkItems);
+public record PullRequestCreatedState(Guid Owner, BranchName SourceBranch, BranchName TargetBranch, Title Title, string Description, CheckForLinkedWorkItemsMode CheckForLinkedWorkItemsMode, AutoCompleteMode AutoCompleteMode, PullRequestStatus Status, IReadOnlyCollection<(Guid UserId, ReviewerType Type, ReviewerFeedback Feedback)> Reviewers, IReadOnlyCollection<Guid> WorkItems);
 
 public enum CheckForLinkedWorkItemsMode
 {

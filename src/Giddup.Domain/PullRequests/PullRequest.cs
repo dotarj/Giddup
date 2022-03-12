@@ -10,12 +10,12 @@ public static class PullRequest
     {
         if (state.TryPickT0(out _, out var createdState))
         {
-            if (command is not CreateCommand(var sourceBranch, var targetBranch, var title))
+            if (command is not CreateCommand(var owner, var sourceBranch, var targetBranch, var title))
             {
                 return new NotCreatedError();
             }
 
-            return new CreatedEvent(sourceBranch, targetBranch, title);
+            return new CreatedEvent(owner, sourceBranch, targetBranch, title);
         }
 
         return command switch
@@ -54,12 +54,12 @@ public static class PullRequest
     {
         if (state.TryPickT0(out _, out var createdState))
         {
-            if (@event is not CreatedEvent(var sourceBranch, var targetBranch, var title))
+            if (@event is not CreatedEvent(var owner, var sourceBranch, var targetBranch, var title))
             {
                 throw new InvalidOperationException($"State '{state.GetType().FullName}' and event '{@event.GetType().FullName}' not supported.");
             }
 
-            return new PullRequestCreatedState(sourceBranch, targetBranch, title, string.Empty, CheckForLinkedWorkItemsMode.Disabled, AutoCompleteMode.Disabled, PullRequestStatus.Active, new List<(Guid UserId, ReviewerType Type, ReviewerFeedback Feedback)>().AsReadOnly(), new List<Guid>().AsReadOnly());
+            return new PullRequestCreatedState(owner, sourceBranch, targetBranch, title, string.Empty, CheckForLinkedWorkItemsMode.Disabled, AutoCompleteMode.Disabled, PullRequestStatus.Active, new List<(Guid UserId, ReviewerType Type, ReviewerFeedback Feedback)>().AsReadOnly(), new List<Guid>().AsReadOnly());
         }
 
         return @event switch
