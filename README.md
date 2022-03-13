@@ -34,11 +34,17 @@ TODO: expand on tasks with screenshots
 
 ## Project structure
 
-The structure of the solution conforms to the ports and adapters architecture (hexagonal architecture) introduced by Alistair Cockburn [[2]](https://alistair.cockburn.us/hexagonal-architecture/ "Hexagonal architecture") and consists of four projects: presentation, infrastructure, application and domain.
+The structure of the solution conforms to the ports and adapters architecture (hexagonal architecture) introduced by Alistair Cockburn [[2]](https://alistair.cockburn.us/hexagonal-architecture/ "Hexagonal architecture"). In this architecture three main components are identified, each with their respective responsibility:
 
-Primary (driving) adapters are implemented in the presentation layer and secondary (driven) adapters are implemented in the infrastructure layer. The application core is divided in the application layer and the domain layer.
+* Presentation  
+Translates what comes from the delivery mechanism to the application core. This can be an HTTP request, a CRON job, a service bus consumer and so on.
 
-TODO: expand on layers with responsibilities  
+* Application core  
+Split up in two components: application and domain. Application contains application services, responsible for fetching an entity's state, executing domain logic using the entity's state and persisting the entity's state. Domain contains pure business logic.
+
+* Infrastructure  
+Enables the application core to interact with external systems like a data store, a service bus, an API and so on.
+
 TODO: expand on decider
 
 ## Acknowledgments
