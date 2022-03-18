@@ -1,3 +1,6 @@
+# overrides
+!.vscode/settings.json
+
 
 # Created by https://www.toptal.com/developers/gitignore/api/linux,macos,rider,vim,visualstudio,visualstudiocode,windows
 # Edit at https://www.toptal.com/developers/gitignore?templates=linux,macos,rider,vim,visualstudio,visualstudiocode,windows
