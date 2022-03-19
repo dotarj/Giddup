@@ -101,15 +101,18 @@ The implementation of the application core is inspired by the blog post Function
 └────────────────────────────────┘
 ```
 
-*Decide and evolve flow of control.*
+*Decide and evolve flow of control (courtesy of Jérémie Chassaing).*
 
-TODO: expand on decider
+The samples used in the blog post are created using F#, which has support for language features that C# does not (yet) have. The challenge was to implement deciders using C#. One important language feature that C# does not support is sum types (also known as discriminated unions), which is currently in proposal for C# [[4]](https://github.com/dotnet/csharplang/blob/main/proposals/discriminated-unions.md "Discriminated unions / enum class"). Because sum types are not available in C#, Giddup uses marker interfaces and switch statements with pattern matching.
 
 ## Acknowledgments
 
-* Azure DevOps screenshots used in this document are courtesy of Microsoft.
+* [@microsoft](https://github.com/microsoft) for the Azure DevOps screenshots used in this document.
+* [@rutgersc](https://github.com/rutgersc) for sharing the blog post Functional Event Sourcing Decider and having great discussions on software architecture.
+* [@thinkbeforecoding](https://github.com/thinkbeforecoding) for his excellent blog post Functional Event Sourcing Decider.
 
 ## References
 > - [1] Huachao Mao. [REST Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client).
 > - [2] Alistair Cockburn. [Hexagonal architecture](https://alistair.cockburn.us/hexagonal-architecture/).
 > - [3] Jérémie Chassaing. [Functional Event Sourcing Decider](https://thinkbeforecoding.com/post/2021/12/17/functional-event-sourcing-decider).
+> - [4] Microsoft. [Discriminated unions / enum class](https://github.com/dotnet/csharplang/blob/main/proposals/discriminated-unions.md).
