@@ -33,10 +33,10 @@ public class BranchNameTests
     public void Create_InvalidValue_ReturnsInvalidBranchNameError(string value)
     {
         // Act
-        var result = BranchName.Create(value);
+        var result = BranchName.TryCreate(value, out _, out var error);
 
         // Assert
-        Assert.True(result.TryPickT0(out var error, out _));
+        Assert.False(result);
         _ = Assert.IsType<InvalidBranchNameError>(error);
     }
 }

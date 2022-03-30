@@ -36,12 +36,12 @@ public record LinkWorkItemCommand(Guid WorkItemId) : IPullRequestCommand;
 
 public record RemoveWorkItemCommand(Guid WorkItemId) : IPullRequestCommand;
 
-public record CompleteCommand() : IPullRequestCommand;
+public record CompleteCommand : IPullRequestCommand;
 
-public record SetAutoCompleteCommand() : IPullRequestCommand;
+public record SetAutoCompleteCommand : IPullRequestCommand;
 
-public record CancelAutoCompleteCommand() : IPullRequestCommand;
+public record CancelAutoCompleteCommand : IPullRequestCommand;
 
-public record AbandonCommand() : IPullRequestCommand;
+public record AbandonCommand : IPullRequestCommand;
 
-public record ReactivateCommand() : IPullRequestCommand;
+public record ReactivateCommand : IPullRequestCommand;

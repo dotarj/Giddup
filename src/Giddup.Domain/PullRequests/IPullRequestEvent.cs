@@ -36,12 +36,12 @@ public record WorkItemLinkedEvent(Guid WorkItemId) : IPullRequestEvent;
 
 public record WorkItemRemovedEvent(Guid WorkItemId) : IPullRequestEvent;
 
-public record CompletedEvent() : IPullRequestEvent;
+public record CompletedEvent : IPullRequestEvent;
 
-public record AutoCompleteSetEvent() : IPullRequestEvent;
+public record AutoCompleteSetEvent : IPullRequestEvent;
 
-public record AutoCompleteCancelledEvent() : IPullRequestEvent;
+public record AutoCompleteCancelledEvent : IPullRequestEvent;
 
-public record AbandonedEvent() : IPullRequestEvent;
+public record AbandonedEvent : IPullRequestEvent;
 
-public record ReactivatedEvent() : IPullRequestEvent;
+public record ReactivatedEvent : IPullRequestEvent;

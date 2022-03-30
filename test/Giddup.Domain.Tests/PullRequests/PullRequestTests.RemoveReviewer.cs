@@ -44,7 +44,7 @@ public partial class PullRequestTests
     {
         // Arrange
         var command = new RemoveReviewerCommand(Guid.NewGuid());
-        var state = GetPullRequestState(reviewers: GetReviewers((Guid.NewGuid(), ReviewerType.Required, ReviewerFeedback.None)));;
+        var state = GetPullRequestState(reviewers: GetReviewers((Guid.NewGuid(), ReviewerType.Required, ReviewerFeedback.None)));
 
         // Act
         var result = PullRequest.Decide(state, command);

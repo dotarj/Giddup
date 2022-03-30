@@ -35,7 +35,7 @@ public class EventStream : IEventStream
     public async Task<(ulong? Revision, IReadOnlyCollection<TEvent> Events)> ReadStream<TEvent>(string name)
         where TEvent : notnull
     {
-        var result = _client.ReadStreamAsync(Direction.Forwards, name, EventStore.Client.StreamPosition.Start);
+        var result = _client.ReadStreamAsync(Direction.Forwards, name, StreamPosition.Start);
 
         if (await result.ReadState == ReadState.StreamNotFound)
         {

@@ -4,92 +4,92 @@ namespace Giddup.Domain.PullRequests;
 
 public static class PullRequest
 {
-    public static PullRequestState InitialState => new PullRequestInitialState();
+    public static IPullRequestState InitialState => new PullRequestInitialState();
 
-    public static DeciderResult<IPullRequestEvent, IPullRequestError> Decide(PullRequestState state, IPullRequestCommand command)
+    public static DeciderResult<IPullRequestEvent, IPullRequestError> Decide(IPullRequestState state, IPullRequestCommand command)
     {
-        if (state.TryPickT0(out _, out var createdState))
+        if (state is PullRequestCreatedState createdState)
         {
-            if (command is not CreateCommand(var owner, var sourceBranch, var targetBranch, var title))
+            return command switch
             {
-                return new NotCreatedError();
-            }
+                CreateCommand => new AlreadyCreatedError(),
 
-            return new CreatedEvent(owner, sourceBranch, targetBranch, title);
+                ChangeTitleCommand(var title) => ChangeTitle(title, createdState),
+                ChangeDescriptionCommand(var description) => ChangeDescription(description, createdState),
+
+                AddRequiredReviewerCommand(var userId) => AddRequiredReviewer(userId, createdState),
+                AddOptionalReviewerCommand(var userId) => AddOptionalReviewer(userId, createdState),
+                MakeReviewerRequiredCommand(var userId) => MakeReviewerRequired(userId, createdState),
+                MakeReviewerOptionalCommand(var userId) => MakeReviewerOptional(userId, createdState),
+                RemoveReviewerCommand(var userId) => RemoveReviewer(userId, createdState),
+
+                ApproveCommand(var userId) => Approve(userId, createdState),
+                ApproveWithSuggestionsCommand(var userId) => ApproveWithSuggestions(userId, createdState),
+                WaitForAuthorCommand(var userId) => WaitForAuthor(userId, createdState),
+                RejectCommand(var userId) => Reject(userId, createdState),
+                ResetFeedbackCommand(var userId) => ResetFeedback(userId, createdState),
+
+                LinkWorkItemCommand(var workItemId) => LinkWorkItem(workItemId, createdState),
+                RemoveWorkItemCommand(var workItemId) => RemoveWorkItem(workItemId, createdState),
+
+                CompleteCommand => Complete(createdState),
+                SetAutoCompleteCommand => SetAutoComplete(createdState),
+                CancelAutoCompleteCommand => CancelAutoComplete(createdState),
+                AbandonCommand => Abandon(createdState),
+                ReactivateCommand => Reactivate(createdState),
+
+                _ => throw new InvalidOperationException($"Command '{command.GetType().FullName}' not supported.")
+            };
         }
 
-        return command switch
+        if (command is not CreateCommand createCommand)
         {
-            CreateCommand => new AlreadyCreatedError(),
+            return new NotCreatedError();
+        }
 
-            ChangeTitleCommand(var title) => ChangeTitle(title, createdState),
-            ChangeDescriptionCommand(var description) => ChangeDescription(description, createdState),
-
-            AddRequiredReviewerCommand(var userId) => AddRequiredReviewer(userId, createdState),
-            AddOptionalReviewerCommand(var userId) => AddOptionalReviewer(userId, createdState),
-            MakeReviewerRequiredCommand(var userId) => MakeReviewerRequired(userId, createdState),
-            MakeReviewerOptionalCommand(var userId) => MakeReviewerOptional(userId, createdState),
-            RemoveReviewerCommand(var userId) => RemoveReviewer(userId, createdState),
-
-            ApproveCommand(var userId) => Approve(userId, createdState),
-            ApproveWithSuggestionsCommand(var userId) => ApproveWithSuggestions(userId, createdState),
-            WaitForAuthorCommand(var userId) => WaitForAuthor(userId, createdState),
-            RejectCommand(var userId) => Reject(userId, createdState),
-            ResetFeedbackCommand(var userId) => ResetFeedback(userId, createdState),
-
-            LinkWorkItemCommand(var workItemId) => LinkWorkItem(workItemId, createdState),
-            RemoveWorkItemCommand(var workItemId) => RemoveWorkItem(workItemId, createdState),
-
-            CompleteCommand => Complete(createdState),
-            SetAutoCompleteCommand => SetAutoComplete(createdState),
-            CancelAutoCompleteCommand => CancelAutoComplete(createdState),
-            AbandonCommand => Abandon(createdState),
-            ReactivateCommand => Reactivate(createdState),
-
-            _ => throw new InvalidOperationException($"Command '{command.GetType().FullName}' not supported.")
-        };
+        return new CreatedEvent(createCommand.Owner, createCommand.SourceBranch, createCommand.TargetBranch, createCommand.Title);
     }
 
-    public static PullRequestState Evolve(PullRequestState state, IPullRequestEvent @event)
+    public static IPullRequestState Evolve(IPullRequestState state, IPullRequestEvent @event)
     {
-        if (state.TryPickT0(out _, out var createdState))
+        if (state is PullRequestCreatedState createdState)
         {
-            if (@event is not CreatedEvent(var owner, var sourceBranch, var targetBranch, var title))
+            return @event switch
             {
-                throw new InvalidOperationException($"State '{state.GetType().FullName}' and event '{@event.GetType().FullName}' not supported.");
-            }
+                TitleChangedEvent(var title) => createdState with { Title = title },
+                DescriptionChangedEvent(var description) => createdState with { Description = description },
 
-            return new PullRequestCreatedState(owner, sourceBranch, targetBranch, title, string.Empty, CheckForLinkedWorkItemsMode.Disabled, AutoCompleteMode.Disabled, PullRequestStatus.Active, new List<(Guid UserId, ReviewerType Type, ReviewerFeedback Feedback)>().AsReadOnly(), new List<Guid>().AsReadOnly());
+                RequiredReviewerAddedEvent(var userId) => createdState with { Reviewers = createdState.Reviewers.WithReviewerAdded(userId, ReviewerType.Required) },
+                OptionalReviewerAddedEvent(var userId) => createdState with { Reviewers = createdState.Reviewers.WithReviewerAdded(userId, ReviewerType.Optional) },
+                ReviewerMadeRequiredEvent(var userId) => createdState with { Reviewers = createdState.Reviewers.WithReviewerTypeChanged(userId, ReviewerType.Required) },
+                ReviewerMadeOptionalEvent(var userId) => createdState with { Reviewers = createdState.Reviewers.WithReviewerTypeChanged(userId, ReviewerType.Optional) },
+                ReviewerRemovedEvent(var userId) => createdState with { Reviewers = createdState.Reviewers.WithReviewerRemoved(userId) },
+
+                ApprovedEvent(var userId) => createdState with { Reviewers = createdState.Reviewers.WithReviewerFeedbackChanged(userId, ReviewerFeedback.Approved) },
+                ApprovedWithSuggestionsEvent(var userId) => createdState with { Reviewers = createdState.Reviewers.WithReviewerFeedbackChanged(userId, ReviewerFeedback.ApprovedWithSuggestions) },
+                WaitingForAuthorEvent(var userId) => createdState with { Reviewers = createdState.Reviewers.WithReviewerFeedbackChanged(userId, ReviewerFeedback.WaitingForAuthor) },
+                RejectedEvent(var userId) => createdState with { Reviewers = createdState.Reviewers.WithReviewerFeedbackChanged(userId, ReviewerFeedback.Rejected) },
+                FeedbackResetEvent(var userId) => createdState with { Reviewers = createdState.Reviewers.WithReviewerFeedbackChanged(userId, ReviewerFeedback.None) },
+
+                WorkItemLinkedEvent(var workItemId) => createdState with { WorkItems = createdState.WorkItems.WithWorkItemLinked(workItemId) },
+                WorkItemRemovedEvent(var workItemId) => createdState with { WorkItems = createdState.WorkItems.WithWorkItemRemoved(workItemId) },
+
+                CompletedEvent => createdState with { Status = PullRequestStatus.Completed },
+                AutoCompleteSetEvent => createdState with { AutoCompleteMode = AutoCompleteMode.Enabled },
+                AutoCompleteCancelledEvent => createdState with { AutoCompleteMode = AutoCompleteMode.Disabled },
+                AbandonedEvent => createdState with { Status = PullRequestStatus.Abandoned },
+                ReactivatedEvent => createdState with { Status = PullRequestStatus.Active },
+
+                _ => throw new InvalidOperationException($"State '{state.GetType().FullName}' and event '{@event.GetType().FullName}' not supported.")
+            };
         }
 
-        return @event switch
+        if (@event is not CreatedEvent createdEvent)
         {
-            TitleChangedEvent(var title) => createdState with { Title = title },
-            DescriptionChangedEvent(var description) => createdState with { Description = description },
+            throw new InvalidOperationException($"State '{state.GetType().FullName}' and event '{@event.GetType().FullName}' not supported.");
+        }
 
-            RequiredReviewerAddedEvent(var userId) => createdState with { Reviewers = createdState.Reviewers.WithReviewerAdded(userId, ReviewerType.Required) },
-            OptionalReviewerAddedEvent(var userId) => createdState with { Reviewers = createdState.Reviewers.WithReviewerAdded(userId, ReviewerType.Optional) },
-            ReviewerMadeRequiredEvent(var userId) => createdState with { Reviewers = createdState.Reviewers.WithReviewerTypeChanged(userId, ReviewerType.Required) },
-            ReviewerMadeOptionalEvent(var userId) => createdState with { Reviewers = createdState.Reviewers.WithReviewerTypeChanged(userId, ReviewerType.Optional) },
-            ReviewerRemovedEvent(var userId) => createdState with { Reviewers = createdState.Reviewers.WithReviewerRemoved(userId) },
-
-            ApprovedEvent(var userId) => createdState with { Reviewers = createdState.Reviewers.WithReviewerFeedbackChanged(userId, ReviewerFeedback.Approved) },
-            ApprovedWithSuggestionsEvent(var userId) => createdState with { Reviewers = createdState.Reviewers.WithReviewerFeedbackChanged(userId, ReviewerFeedback.ApprovedWithSuggestions) },
-            WaitingForAuthorEvent(var userId) => createdState with { Reviewers = createdState.Reviewers.WithReviewerFeedbackChanged(userId, ReviewerFeedback.WaitingForAuthor) },
-            RejectedEvent(var userId) => createdState with { Reviewers = createdState.Reviewers.WithReviewerFeedbackChanged(userId, ReviewerFeedback.Rejected) },
-            FeedbackResetEvent(var userId) => createdState with { Reviewers = createdState.Reviewers.WithReviewerFeedbackChanged(userId, ReviewerFeedback.None) },
-
-            WorkItemLinkedEvent(var workItemId) => createdState with { WorkItems = createdState.WorkItems.WithWorkItemLinked(workItemId) },
-            WorkItemRemovedEvent(var workItemId) => createdState with { WorkItems = createdState.WorkItems.WithWorkItemRemoved(workItemId) },
-
-            CompletedEvent => createdState with { Status = PullRequestStatus.Completed },
-            AutoCompleteSetEvent => createdState with { AutoCompleteMode = AutoCompleteMode.Enabled },
-            AutoCompleteCancelledEvent => createdState with { AutoCompleteMode = AutoCompleteMode.Disabled },
-            AbandonedEvent => createdState with { Status = PullRequestStatus.Abandoned },
-            ReactivatedEvent => createdState with { Status = PullRequestStatus.Active },
-
-            _ => throw new InvalidOperationException($"State '{state.GetType().FullName}' and event '{@event.GetType().FullName}' not supported.")
-        };
+        return new PullRequestCreatedState(createdEvent.Owner, createdEvent.SourceBranch, createdEvent.TargetBranch, createdEvent.Title, string.Empty, CheckForLinkedWorkItemsMode.Disabled, AutoCompleteMode.Disabled, PullRequestStatus.Active, new List<(Guid UserId, ReviewerType Type, ReviewerFeedback Feedback)>().AsReadOnly(), new List<Guid>().AsReadOnly());
     }
 
     private static DeciderResult<IPullRequestEvent, IPullRequestError> ChangeTitle(Title title, PullRequestCreatedState state)

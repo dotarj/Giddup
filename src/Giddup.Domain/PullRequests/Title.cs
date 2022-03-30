@@ -1,6 +1,6 @@
 // Copyright (c) Arjen Post. See LICENSE in the project root for license information.
 
-using OneOf;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Giddup.Domain.PullRequests;
 
@@ -10,14 +10,20 @@ public class Title : ValueObject
 
     private Title(string value) => _value = value;
 
-    public static OneOf<ITitleError, Title> Create(string value)
+    public static bool TryCreate(string value, [NotNullWhen(true)]out Title? title, [NotNullWhen(false)]out ITitleError? error)
     {
         if (value.All(char.IsWhiteSpace))
         {
-            return new TitleEmptyOrWhitespaceError();
+            title = null;
+            error = new TitleEmptyOrWhitespaceError();
+
+            return false;
         }
 
-        return new Title(value);
+        title = new Title(value);
+        error = null;
+
+        return true;
     }
 
     public override string ToString() => _value;

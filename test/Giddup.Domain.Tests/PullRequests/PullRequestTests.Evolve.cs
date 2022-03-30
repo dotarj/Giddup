@@ -11,14 +11,17 @@ public partial class PullRequestTests
     public void Evolve_Created_ReturnsPullRequestCreatedState()
     {
         // Arrange
-        var @event = new CreatedEvent(Guid.NewGuid(), BranchName.Create("refs/heads/foo").AsT1, BranchName.Create("refs/heads/bar").AsT1, Title.Create("baz").AsT1);
+        _ = BranchName.TryCreate("refs/heads/foo", out var sourceBranch, out _);
+        _ = BranchName.TryCreate("refs/heads/bar", out var targetBranch, out _);
+        _ = Title.TryCreate("baz", out var title, out _);
+        var @event = new CreatedEvent(Guid.NewGuid(), sourceBranch!, targetBranch!, title!);
         var state = PullRequest.InitialState;
 
         // Act
         var result = PullRequest.Evolve(state, @event);
 
         // Assert
-        Assert.True(result.TryPickT1(out var createdState, out _));
+        var createdState = Assert.IsType<PullRequestCreatedState>(result);
         Assert.Equal(@event.Owner, createdState.Owner);
         Assert.Equal(@event.SourceBranch, createdState.SourceBranch);
         Assert.Equal(@event.TargetBranch, createdState.TargetBranch);
@@ -29,14 +32,15 @@ public partial class PullRequestTests
     public void Evolve_TitleChanged_AddsRequiredReviewer()
     {
         // Arrange
-        var @event = new TitleChangedEvent(Title.Create("baz").AsT1);
+        _ = Title.TryCreate("baz", out var title, out _);
+        var @event = new TitleChangedEvent(title!);
         var state = GetPullRequestState();
 
         // Act
         var result = PullRequest.Evolve(state, @event);
 
         // Assert
-        Assert.True(result.TryPickT1(out var createdState, out _));
+        var createdState = Assert.IsType<PullRequestCreatedState>(result);
         Assert.Equal(@event.Title, createdState.Title);
     }
 
@@ -51,7 +55,7 @@ public partial class PullRequestTests
         var result = PullRequest.Evolve(state, @event);
 
         // Assert
-        Assert.True(result.TryPickT1(out var createdState, out _));
+        var createdState = Assert.IsType<PullRequestCreatedState>(result);
         Assert.Equal(@event.Description, createdState.Description);
     }
 
@@ -66,7 +70,7 @@ public partial class PullRequestTests
         var result = PullRequest.Evolve(state, @event);
 
         // Assert
-        Assert.True(result.TryPickT1(out var createdState, out _));
+        var createdState = Assert.IsType<PullRequestCreatedState>(result);
         var reviewer = Assert.Single(createdState.Reviewers);
         Assert.Equal(@event.UserId, reviewer.UserId);
         Assert.Equal(ReviewerType.Required, reviewer.Type);
@@ -84,7 +88,7 @@ public partial class PullRequestTests
         var result = PullRequest.Evolve(state, @event);
 
         // Assert
-        Assert.True(result.TryPickT1(out var createdState, out _));
+        var createdState = Assert.IsType<PullRequestCreatedState>(result);
         var reviewer = Assert.Single(createdState.Reviewers);
         Assert.Equal(@event.UserId, reviewer.UserId);
         Assert.Equal(ReviewerType.Optional, reviewer.Type);
@@ -102,7 +106,7 @@ public partial class PullRequestTests
         var result = PullRequest.Evolve(state, @event);
 
         // Assert
-        Assert.True(result.TryPickT1(out var createdState, out _));
+        var createdState = Assert.IsType<PullRequestCreatedState>(result);
         Assert.Equal(ReviewerType.Required, createdState.Reviewers.First().Type);
     }
 
@@ -117,7 +121,7 @@ public partial class PullRequestTests
         var result = PullRequest.Evolve(state, @event);
 
         // Assert
-        Assert.True(result.TryPickT1(out var createdState, out _));
+        var createdState = Assert.IsType<PullRequestCreatedState>(result);
         Assert.Equal(ReviewerType.Optional, createdState.Reviewers.First().Type);
     }
 
@@ -132,7 +136,7 @@ public partial class PullRequestTests
         var result = PullRequest.Evolve(state, @event);
 
         // Assert
-        Assert.True(result.TryPickT1(out var createdState, out _));
+        var createdState = Assert.IsType<PullRequestCreatedState>(result);
         Assert.Empty(createdState.Reviewers);
     }
 
@@ -147,7 +151,7 @@ public partial class PullRequestTests
         var result = PullRequest.Evolve(state, @event);
 
         // Assert
-        Assert.True(result.TryPickT1(out var createdState, out _));
+        var createdState = Assert.IsType<PullRequestCreatedState>(result);
         Assert.Equal(ReviewerFeedback.Approved, createdState.Reviewers.First().Feedback);
     }
 
@@ -162,7 +166,7 @@ public partial class PullRequestTests
         var result = PullRequest.Evolve(state, @event);
 
         // Assert
-        Assert.True(result.TryPickT1(out var createdState, out _));
+        var createdState = Assert.IsType<PullRequestCreatedState>(result);
         Assert.Equal(ReviewerFeedback.ApprovedWithSuggestions, createdState.Reviewers.First().Feedback);
     }
 
@@ -177,7 +181,7 @@ public partial class PullRequestTests
         var result = PullRequest.Evolve(state, @event);
 
         // Assert
-        Assert.True(result.TryPickT1(out var createdState, out _));
+        var createdState = Assert.IsType<PullRequestCreatedState>(result);
         Assert.Equal(ReviewerFeedback.WaitingForAuthor, createdState.Reviewers.First().Feedback);
     }
 
@@ -192,7 +196,7 @@ public partial class PullRequestTests
         var result = PullRequest.Evolve(state, @event);
 
         // Assert
-        Assert.True(result.TryPickT1(out var createdState, out _));
+        var createdState = Assert.IsType<PullRequestCreatedState>(result);
         Assert.Equal(ReviewerFeedback.Rejected, createdState.Reviewers.First().Feedback);
     }
 
@@ -207,7 +211,7 @@ public partial class PullRequestTests
         var result = PullRequest.Evolve(state, @event);
 
         // Assert
-        Assert.True(result.TryPickT1(out var createdState, out _));
+        var createdState = Assert.IsType<PullRequestCreatedState>(result);
         Assert.Equal(ReviewerFeedback.None, createdState.Reviewers.First().Feedback);
     }
 
@@ -222,7 +226,7 @@ public partial class PullRequestTests
         var result = PullRequest.Evolve(state, @event);
 
         // Assert
-        Assert.True(result.TryPickT1(out var createdState, out _));
+        var createdState = Assert.IsType<PullRequestCreatedState>(result);
         var workItemId = Assert.Single(createdState.WorkItems);
         Assert.Equal(@event.WorkItemId, workItemId);
     }
@@ -238,7 +242,7 @@ public partial class PullRequestTests
         var result = PullRequest.Evolve(state, @event);
 
         // Assert
-        Assert.True(result.TryPickT1(out var createdState, out _));
+        var createdState = Assert.IsType<PullRequestCreatedState>(result);
         Assert.Empty(createdState.WorkItems);
     }
 
@@ -253,7 +257,7 @@ public partial class PullRequestTests
         var result = PullRequest.Evolve(state, @event);
 
         // Assert
-        Assert.True(result.TryPickT1(out var createdState, out _));
+        var createdState = Assert.IsType<PullRequestCreatedState>(result);
         Assert.Equal(PullRequestStatus.Completed, createdState.Status);
     }
 
@@ -268,7 +272,7 @@ public partial class PullRequestTests
         var result = PullRequest.Evolve(state, @event);
 
         // Assert
-        Assert.True(result.TryPickT1(out var createdState, out _));
+        var createdState = Assert.IsType<PullRequestCreatedState>(result);
         Assert.Equal(AutoCompleteMode.Enabled, createdState.AutoCompleteMode);
     }
 
@@ -283,7 +287,7 @@ public partial class PullRequestTests
         var result = PullRequest.Evolve(state, @event);
 
         // Assert
-        Assert.True(result.TryPickT1(out var createdState, out _));
+        var createdState = Assert.IsType<PullRequestCreatedState>(result);
         Assert.Equal(AutoCompleteMode.Disabled, createdState.AutoCompleteMode);
     }
 
@@ -298,7 +302,7 @@ public partial class PullRequestTests
         var result = PullRequest.Evolve(state, @event);
 
         // Assert
-        Assert.True(result.TryPickT1(out var createdState, out _));
+        var createdState = Assert.IsType<PullRequestCreatedState>(result);
         Assert.Equal(PullRequestStatus.Abandoned, createdState.Status);
     }
 
@@ -313,7 +317,7 @@ public partial class PullRequestTests
         var result = PullRequest.Evolve(state, @event);
 
         // Assert
-        Assert.True(result.TryPickT1(out var createdState, out _));
+        var createdState = Assert.IsType<PullRequestCreatedState>(result);
         Assert.Equal(PullRequestStatus.Active, createdState.Status);
     }
 }

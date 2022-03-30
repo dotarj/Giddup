@@ -11,7 +11,10 @@ public partial class PullRequestTests
     public void Create_AlreadyCreated_ReturnsAlreadyCreatedError()
     {
         // Arrange
-        var command = new CreateCommand(Guid.NewGuid(), BranchName.Create("refs/heads/foo").AsT1, BranchName.Create("refs/heads/bar").AsT1, Title.Create("baz").AsT1);
+        _ = BranchName.TryCreate("refs/heads/foo", out var sourceBranch, out _);
+        _ = BranchName.TryCreate("refs/heads/bar", out var targetBranch, out _);
+        _ = Title.TryCreate("baz", out var title, out _);
+        var command = new CreateCommand(Guid.NewGuid(), sourceBranch!, targetBranch!, title!);
         var state = GetPullRequestState();
 
         // Act
@@ -26,7 +29,10 @@ public partial class PullRequestTests
     public void Create_ReturnsCreatedEvent()
     {
         // Arrange
-        var command = new CreateCommand(Guid.NewGuid(), BranchName.Create("refs/heads/foo").AsT1, BranchName.Create("refs/heads/bar").AsT1, Title.Create("baz").AsT1);
+        _ = BranchName.TryCreate("refs/heads/foo", out var sourceBranch, out _);
+        _ = BranchName.TryCreate("refs/heads/bar", out var targetBranch, out _);
+        _ = Title.TryCreate("baz", out var title, out _);
+        var command = new CreateCommand(Guid.NewGuid(), sourceBranch!, targetBranch!, title!);
         var state = PullRequest.InitialState;
 
         // Act

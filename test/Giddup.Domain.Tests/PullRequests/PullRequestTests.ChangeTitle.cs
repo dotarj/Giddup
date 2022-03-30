@@ -11,7 +11,8 @@ public partial class PullRequestTests
     public void ChangeTitle_NotCreated_ReturnsNotCreatedError()
     {
         // Arrange
-        var command = new ChangeTitleCommand(Title.Create("baz").AsT1);
+        _ = Title.TryCreate("baz", out var title, out _);
+        var command = new ChangeTitleCommand(title!);
         var state = PullRequest.InitialState;
 
         // Act
@@ -28,7 +29,8 @@ public partial class PullRequestTests
     public void ChangeTitle_InvalidStatus_ReturnsNotActiveError(PullRequestStatus status)
     {
         // Arrange
-        var command = new ChangeTitleCommand(Title.Create("baz").AsT1);
+        _ = Title.TryCreate("baz", out var title, out _);
+        var command = new ChangeTitleCommand(title!);
         var state = GetPullRequestState(status: status);
 
         // Act
@@ -43,7 +45,8 @@ public partial class PullRequestTests
     public void ChangeTitle_SameTitle_ReturnsNoEvents()
     {
         // Arrange
-        var command = new ChangeTitleCommand(Title.Create("foo").AsT1);
+        _ = Title.TryCreate("baz", out var title, out _);
+        var command = new ChangeTitleCommand(title!);
         var state = GetPullRequestState(title: command.Title);
 
         // Act
@@ -58,7 +61,8 @@ public partial class PullRequestTests
     public void ChangeTitle_ReturnsRequiredReviewerAddedEvent()
     {
         // Arrange
-        var command = new ChangeTitleCommand(Title.Create("baz").AsT1);
+        _ = Title.TryCreate("baz", out var title, out _);
+        var command = new ChangeTitleCommand(title!);
         var state = GetPullRequestState();
 
         // Act

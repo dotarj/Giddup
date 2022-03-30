@@ -13,10 +13,10 @@ public class TitleTests
     public void Create_InvalidValue_ReturnsTitleEmptyOrWhitespaceError(string value)
     {
         // Act
-        var result = Title.Create(value);
+        var result = Title.TryCreate(value, out _, out var error);
 
         // Assert
-        Assert.True(result.TryPickT0(out var error, out _));
+        Assert.False(result);
         _ = Assert.IsType<TitleEmptyOrWhitespaceError>(error);
     }
 }

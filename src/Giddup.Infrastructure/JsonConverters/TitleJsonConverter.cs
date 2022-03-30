@@ -17,9 +17,7 @@ public class TitleJsonConverter : JsonConverter<Title>
             throw new JsonException("Error occurred");
         }
 
-        var result = Title.Create(value);
-
-        if (result.TryPickT0(out _, out var title))
+        if (!Title.TryCreate(value, out var title, out _))
         {
             throw new JsonException("Error occurred");
         }
