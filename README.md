@@ -40,16 +40,19 @@ TODO: expand on tasks with screenshots
 
 The structure of the solution conforms to the ports and adapters architecture (hexagonal architecture) introduced by Alistair Cockburn [[2]](https://alistair.cockburn.us/hexagonal-architecture/ "Hexagonal architecture"). In this architecture three main components are identified, each with their respective responsibility:
 
-* Domain
-Domain is what the application is all about, the crown jewels. It solely consists of business logic encapsulated in aggregates, value objects and domain services. Domain is the inner layer of the application core, has no references to other projects in the solution and references to third party libraries should be avoided as much as possible.
+* Application core  
+Application core is divided in the domain and application layer. Application core has no references to other projects in the solution and references to third party libraries should be avoided as much as possible.
 
-* Application
-Application is the outer layer of the application core and acts as a wrapper around the domain layer, providing ports (interfaces) which describe how the application core must be used, or how the application core uses external systems. Application references domain, has no references to other projects in the solution and references to third party libraries should be avoided as much as possible.
+  * Domain  
+Domain is the inner layer of the application core and is what the application is all about, the crown jewels. It solely consists of business logic encapsulated in aggregates, value objects and domain services.
 
-* Presentation
+  * Application  
+Application is the outer layer of the application core and acts as a wrapper around the domain layer, providing ports (interfaces) which describe how the application core must be used, or how the application core uses external systems.
+
+* Presentation  
 Presentation translates what comes from the delivery mechanism to the application core. The delivery mechanism can be an HTTP request, a console window, a CRON job, a service bus consumer and so on. These delivery mechanisms are called primary adapters (or driving adapters) which use the ports defined in the application core to tell the application core what to do.
 
-* Infrastructure
+* Infrastructure  
 Infrastructure enables the application core to interact with external systems. The external system can be a data store, a service bus, an API, an SMTP server and so on. These implementations are called secondary adapters (or driven adapters) which implement ports defined in the application core.
 
 #### Compared to three-tier architecture
