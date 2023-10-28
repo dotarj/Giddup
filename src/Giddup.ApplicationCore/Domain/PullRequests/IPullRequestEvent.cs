@@ -8,6 +8,8 @@ public interface IPullRequestEvent
 
 public record CreatedEvent(Guid Owner, BranchName SourceBranch, BranchName TargetBranch, Title Title) : IPullRequestEvent;
 
+public record TargetBranchChangedEvent(BranchName TargetBranch) : IPullRequestEvent;
+
 public record TitleChangedEvent(Title Title) : IPullRequestEvent;
 
 public record DescriptionChangedEvent(string Description) : IPullRequestEvent;

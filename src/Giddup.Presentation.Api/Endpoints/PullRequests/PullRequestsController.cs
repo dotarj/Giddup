@@ -29,6 +29,11 @@ public class PullRequestsController : ControllerBase
     }
 
     [HttpPost]
+    [Route("/pull-requests/{pullRequestId:guid}/change-target-branch")]
+    public Task<IActionResult> ChangeTargetBranch(Guid pullRequestId, ChangeTargetBranchCommand command)
+        => ProcessCommand(pullRequestId, command);
+
+    [HttpPost]
     [Route("/pull-requests/{pullRequestId:guid}/change-title")]
     public Task<IActionResult> ChangeTitle(Guid pullRequestId, ChangeTitleCommand command)
         => ProcessCommand(pullRequestId, command);

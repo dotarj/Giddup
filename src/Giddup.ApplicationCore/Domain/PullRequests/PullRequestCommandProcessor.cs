@@ -12,6 +12,7 @@ public static class PullRequestCommandProcessor
             {
                 CreateCommand => new AlreadyCreatedError(),
 
+                ChangeTargetBranchCommand(var targetBranch) => ChangeTargetBranch(targetBranch, createdState),
                 ChangeTitleCommand(var title) => ChangeTitle(title, createdState),
                 ChangeDescriptionCommand(var description) => ChangeDescription(description, createdState),
 
@@ -46,6 +47,21 @@ public static class PullRequestCommandProcessor
         }
 
         return new CreatedEvent(createCommand.Owner, createCommand.SourceBranch, createCommand.TargetBranch, createCommand.Title);
+    }
+
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> ChangeTargetBranch(BranchName targetBranch, PullRequestCreatedState state)
+    {
+        if (state.Status != PullRequestStatus.Active)
+        {
+            return new NotActiveError();
+        }
+
+        if (targetBranch == state.TargetBranch)
+        {
+            return Array.Empty<IPullRequestEvent>();
+        }
+
+        return new TargetBranchChangedEvent(targetBranch);
     }
 
     private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> ChangeTitle(Title title, PullRequestCreatedState state)

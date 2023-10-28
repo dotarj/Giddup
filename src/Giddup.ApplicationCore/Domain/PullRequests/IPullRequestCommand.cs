@@ -8,6 +8,8 @@ public interface IPullRequestCommand
 
 public record CreateCommand(Guid Owner, BranchName SourceBranch, BranchName TargetBranch, Title Title) : IPullRequestCommand;
 
+public record ChangeTargetBranchCommand(BranchName TargetBranch) : IPullRequestCommand;
+
 public record ChangeTitleCommand(Title Title) : IPullRequestCommand;
 
 public record ChangeDescriptionCommand(string Description) : IPullRequestCommand;
