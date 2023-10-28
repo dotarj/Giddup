@@ -1,7 +1,7 @@
 // Copyright (c) Arjen Post. See LICENSE in the project root for license information.
 
-using Giddup.Application.PullRequests;
-using Giddup.Domain.PullRequests;
+using Giddup.ApplicationCore.Domain.PullRequests;
+using Giddup.ApplicationCore.PullRequests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,7 +21,7 @@ public class PullRequestsController : ControllerBase
     {
         var pullRequestId = Guid.NewGuid();
 
-        var error = await _pullRequestService.Execute(pullRequestId, new Domain.PullRequests.CreateCommand(User.GetUserId(), command.SourceBranch, command.TargetBranch, command.Title));
+        var error = await _pullRequestService.ProcessCommand(pullRequestId, new ApplicationCore.Domain.PullRequests.CreateCommand(User.GetUserId(), command.SourceBranch, command.TargetBranch, command.Title));
 
         return CreateResult(error, Request.Path, () => Created($"/pull-requests/{pullRequestId}", null));
     }
@@ -156,7 +156,7 @@ public class PullRequestsController : ControllerBase
 
     private async Task<IActionResult> ProcessCommand(Guid pullRequestId, IPullRequestCommand command)
     {
-        var error = await _pullRequestService.Execute(pullRequestId, command);
+        var error = await _pullRequestService.ProcessCommand(pullRequestId, command);
 
         return CreateResult(error, Request.Path, () => new OkResult());
     }

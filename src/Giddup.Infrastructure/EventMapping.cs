@@ -1,7 +1,7 @@
 // Copyright (c) Arjen Post. See LICENSE in the project root for license information.
 
 using System.Collections;
-using Giddup.Domain.PullRequests;
+using Giddup.ApplicationCore.Domain.PullRequests;
 
 namespace Giddup.Infrastructure;
 

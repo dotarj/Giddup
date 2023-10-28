@@ -10,7 +10,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="../Giddup.Application/Giddup.Application.csproj" />
+    <ProjectReference Include="../Giddup.ApplicationCore/Giddup.ApplicationCore.csproj" />
   </ItemGroup>
   <Import Project="../SharedAssemblyInfo.targets" />
 </Project>

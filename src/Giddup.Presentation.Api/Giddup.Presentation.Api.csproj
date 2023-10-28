@@ -16,7 +16,7 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="../Giddup.Application/Giddup.Application.csproj" />
+    <ProjectReference Include="../Giddup.ApplicationCore/Giddup.ApplicationCore.csproj" />
     <ProjectReference Include="../Giddup.Infrastructure/Giddup.Infrastructure.csproj" />
   </ItemGroup>
   <Import Project="../SharedAssemblyInfo.targets" />

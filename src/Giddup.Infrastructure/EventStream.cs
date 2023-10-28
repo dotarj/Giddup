@@ -2,7 +2,6 @@
 
 using System.Text.Json;
 using EventStore.Client;
-using Giddup.Application;
 using Giddup.Infrastructure.JsonConverters;
 using Microsoft.Extensions.Options;
 

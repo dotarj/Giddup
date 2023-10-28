@@ -2,7 +2,7 @@
 
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Giddup.Domain.PullRequests;
+using Giddup.ApplicationCore.Domain.PullRequests;
 
 namespace Giddup.Infrastructure.JsonConverters;
 
