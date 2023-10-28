@@ -15,9 +15,9 @@ public class PullRequestService : IPullRequestService
         var streamName = $"pull-request-{pullRequestId}";
         var (streamRevision, streamEvents) = await _eventStream.ReadStream<IPullRequestEvent>(streamName);
 
-        var state = streamEvents.Aggregate(PullRequest.InitialState, PullRequest.Evolve);
+        var state = streamEvents.Aggregate(IPullRequestState.InitialState, IPullRequestState.ProcessEvent);
 
-        var result = PullRequest.Decide(state, command);
+        var result = PullRequestCommandProcessor.Process(state, command);
 
         if (!result.TryGetEvents(out var events, out var error))
         {

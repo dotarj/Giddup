@@ -15,10 +15,10 @@ public partial class PullRequestTests
         _ = BranchName.TryCreate("refs/heads/bar", out var targetBranch, out _);
         _ = Title.TryCreate("baz", out var title, out _);
         var @event = new CreatedEvent(Guid.NewGuid(), sourceBranch!, targetBranch!, title!);
-        var state = PullRequest.InitialState;
+        var state = IPullRequestState.InitialState;
 
         // Act
-        var result = PullRequest.Evolve(state, @event);
+        var result = IPullRequestState.ProcessEvent(state, @event);
 
         // Assert
         var createdState = Assert.IsType<PullRequestCreatedState>(result);
@@ -37,7 +37,7 @@ public partial class PullRequestTests
         var state = GetPullRequestState();
 
         // Act
-        var result = PullRequest.Evolve(state, @event);
+        var result = IPullRequestState.ProcessEvent(state, @event);
 
         // Assert
         var createdState = Assert.IsType<PullRequestCreatedState>(result);
@@ -52,7 +52,7 @@ public partial class PullRequestTests
         var state = GetPullRequestState();
 
         // Act
-        var result = PullRequest.Evolve(state, @event);
+        var result = IPullRequestState.ProcessEvent(state, @event);
 
         // Assert
         var createdState = Assert.IsType<PullRequestCreatedState>(result);
@@ -67,7 +67,7 @@ public partial class PullRequestTests
         var state = GetPullRequestState();
 
         // Act
-        var result = PullRequest.Evolve(state, @event);
+        var result = IPullRequestState.ProcessEvent(state, @event);
 
         // Assert
         var createdState = Assert.IsType<PullRequestCreatedState>(result);
@@ -85,7 +85,7 @@ public partial class PullRequestTests
         var state = GetPullRequestState();
 
         // Act
-        var result = PullRequest.Evolve(state, @event);
+        var result = IPullRequestState.ProcessEvent(state, @event);
 
         // Assert
         var createdState = Assert.IsType<PullRequestCreatedState>(result);
@@ -103,7 +103,7 @@ public partial class PullRequestTests
         var state = GetPullRequestState(reviewers: GetReviewers((@event.UserId, ReviewerType.Optional, ReviewerFeedback.None)));
 
         // Act
-        var result = PullRequest.Evolve(state, @event);
+        var result = IPullRequestState.ProcessEvent(state, @event);
 
         // Assert
         var createdState = Assert.IsType<PullRequestCreatedState>(result);
@@ -118,7 +118,7 @@ public partial class PullRequestTests
         var state = GetPullRequestState(reviewers: GetReviewers((@event.UserId, ReviewerType.Required, ReviewerFeedback.None)));
 
         // Act
-        var result = PullRequest.Evolve(state, @event);
+        var result = IPullRequestState.ProcessEvent(state, @event);
 
         // Assert
         var createdState = Assert.IsType<PullRequestCreatedState>(result);
@@ -133,7 +133,7 @@ public partial class PullRequestTests
         var state = GetPullRequestState(reviewers: GetReviewers((@event.UserId, ReviewerType.Required, ReviewerFeedback.None)));
 
         // Act
-        var result = PullRequest.Evolve(state, @event);
+        var result = IPullRequestState.ProcessEvent(state, @event);
 
         // Assert
         var createdState = Assert.IsType<PullRequestCreatedState>(result);
@@ -148,7 +148,7 @@ public partial class PullRequestTests
         var state = GetPullRequestState(reviewers: GetReviewers((@event.UserId, ReviewerType.Required, ReviewerFeedback.None)));
 
         // Act
-        var result = PullRequest.Evolve(state, @event);
+        var result = IPullRequestState.ProcessEvent(state, @event);
 
         // Assert
         var createdState = Assert.IsType<PullRequestCreatedState>(result);
@@ -163,7 +163,7 @@ public partial class PullRequestTests
         var state = GetPullRequestState(reviewers: GetReviewers((@event.UserId, ReviewerType.Required, ReviewerFeedback.None)));
 
         // Act
-        var result = PullRequest.Evolve(state, @event);
+        var result = IPullRequestState.ProcessEvent(state, @event);
 
         // Assert
         var createdState = Assert.IsType<PullRequestCreatedState>(result);
@@ -178,7 +178,7 @@ public partial class PullRequestTests
         var state = GetPullRequestState(reviewers: GetReviewers((@event.UserId, ReviewerType.Required, ReviewerFeedback.None)));
 
         // Act
-        var result = PullRequest.Evolve(state, @event);
+        var result = IPullRequestState.ProcessEvent(state, @event);
 
         // Assert
         var createdState = Assert.IsType<PullRequestCreatedState>(result);
@@ -193,7 +193,7 @@ public partial class PullRequestTests
         var state = GetPullRequestState(reviewers: GetReviewers((@event.UserId, ReviewerType.Required, ReviewerFeedback.None)));
 
         // Act
-        var result = PullRequest.Evolve(state, @event);
+        var result = IPullRequestState.ProcessEvent(state, @event);
 
         // Assert
         var createdState = Assert.IsType<PullRequestCreatedState>(result);
@@ -208,7 +208,7 @@ public partial class PullRequestTests
         var state = GetPullRequestState(reviewers: GetReviewers((@event.UserId, ReviewerType.Required, ReviewerFeedback.Approved)));
 
         // Act
-        var result = PullRequest.Evolve(state, @event);
+        var result = IPullRequestState.ProcessEvent(state, @event);
 
         // Assert
         var createdState = Assert.IsType<PullRequestCreatedState>(result);
@@ -223,7 +223,7 @@ public partial class PullRequestTests
         var state = GetPullRequestState();
 
         // Act
-        var result = PullRequest.Evolve(state, @event);
+        var result = IPullRequestState.ProcessEvent(state, @event);
 
         // Assert
         var createdState = Assert.IsType<PullRequestCreatedState>(result);
@@ -239,7 +239,7 @@ public partial class PullRequestTests
         var state = GetPullRequestState(workItems: GetWorkItems(@event.WorkItemId));
 
         // Act
-        var result = PullRequest.Evolve(state, @event);
+        var result = IPullRequestState.ProcessEvent(state, @event);
 
         // Assert
         var createdState = Assert.IsType<PullRequestCreatedState>(result);
@@ -254,7 +254,7 @@ public partial class PullRequestTests
         var state = GetPullRequestState();
 
         // Act
-        var result = PullRequest.Evolve(state, @event);
+        var result = IPullRequestState.ProcessEvent(state, @event);
 
         // Assert
         var createdState = Assert.IsType<PullRequestCreatedState>(result);
@@ -269,7 +269,7 @@ public partial class PullRequestTests
         var state = GetPullRequestState();
 
         // Act
-        var result = PullRequest.Evolve(state, @event);
+        var result = IPullRequestState.ProcessEvent(state, @event);
 
         // Assert
         var createdState = Assert.IsType<PullRequestCreatedState>(result);
@@ -284,7 +284,7 @@ public partial class PullRequestTests
         var state = GetPullRequestState(autoCompleteMode: AutoCompleteMode.Enabled);
 
         // Act
-        var result = PullRequest.Evolve(state, @event);
+        var result = IPullRequestState.ProcessEvent(state, @event);
 
         // Assert
         var createdState = Assert.IsType<PullRequestCreatedState>(result);
@@ -299,7 +299,7 @@ public partial class PullRequestTests
         var state = GetPullRequestState();
 
         // Act
-        var result = PullRequest.Evolve(state, @event);
+        var result = IPullRequestState.ProcessEvent(state, @event);
 
         // Assert
         var createdState = Assert.IsType<PullRequestCreatedState>(result);
@@ -314,7 +314,7 @@ public partial class PullRequestTests
         var state = GetPullRequestState(status: PullRequestStatus.Abandoned);
 
         // Act
-        var result = PullRequest.Evolve(state, @event);
+        var result = IPullRequestState.ProcessEvent(state, @event);
 
         // Assert
         var createdState = Assert.IsType<PullRequestCreatedState>(result);

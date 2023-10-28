@@ -2,11 +2,9 @@
 
 namespace Giddup.Domain.PullRequests;
 
-public static class PullRequest
+public static class PullRequestCommandProcessor
 {
-    public static IPullRequestState InitialState => new PullRequestInitialState();
-
-    public static DeciderResult<IPullRequestEvent, IPullRequestError> Decide(IPullRequestState state, IPullRequestCommand command)
+    public static DeciderResult<IPullRequestEvent, IPullRequestError> Process(IPullRequestState state, IPullRequestCommand command)
     {
         if (state is PullRequestCreatedState createdState)
         {
@@ -48,48 +46,6 @@ public static class PullRequest
         }
 
         return new CreatedEvent(createCommand.Owner, createCommand.SourceBranch, createCommand.TargetBranch, createCommand.Title);
-    }
-
-    public static IPullRequestState Evolve(IPullRequestState state, IPullRequestEvent @event)
-    {
-        if (state is PullRequestCreatedState createdState)
-        {
-            return @event switch
-            {
-                TitleChangedEvent(var title) => createdState with { Title = title },
-                DescriptionChangedEvent(var description) => createdState with { Description = description },
-
-                RequiredReviewerAddedEvent(var userId) => createdState with { Reviewers = createdState.Reviewers.WithReviewerAdded(userId, ReviewerType.Required) },
-                OptionalReviewerAddedEvent(var userId) => createdState with { Reviewers = createdState.Reviewers.WithReviewerAdded(userId, ReviewerType.Optional) },
-                ReviewerMadeRequiredEvent(var userId) => createdState with { Reviewers = createdState.Reviewers.WithReviewerTypeChanged(userId, ReviewerType.Required) },
-                ReviewerMadeOptionalEvent(var userId) => createdState with { Reviewers = createdState.Reviewers.WithReviewerTypeChanged(userId, ReviewerType.Optional) },
-                ReviewerRemovedEvent(var userId) => createdState with { Reviewers = createdState.Reviewers.WithReviewerRemoved(userId) },
-
-                ApprovedEvent(var userId) => createdState with { Reviewers = createdState.Reviewers.WithReviewerFeedbackChanged(userId, ReviewerFeedback.Approved) },
-                ApprovedWithSuggestionsEvent(var userId) => createdState with { Reviewers = createdState.Reviewers.WithReviewerFeedbackChanged(userId, ReviewerFeedback.ApprovedWithSuggestions) },
-                WaitingForAuthorEvent(var userId) => createdState with { Reviewers = createdState.Reviewers.WithReviewerFeedbackChanged(userId, ReviewerFeedback.WaitingForAuthor) },
-                RejectedEvent(var userId) => createdState with { Reviewers = createdState.Reviewers.WithReviewerFeedbackChanged(userId, ReviewerFeedback.Rejected) },
-                FeedbackResetEvent(var userId) => createdState with { Reviewers = createdState.Reviewers.WithReviewerFeedbackChanged(userId, ReviewerFeedback.None) },
-
-                WorkItemLinkedEvent(var workItemId) => createdState with { WorkItems = createdState.WorkItems.WithWorkItemLinked(workItemId) },
-                WorkItemRemovedEvent(var workItemId) => createdState with { WorkItems = createdState.WorkItems.WithWorkItemRemoved(workItemId) },
-
-                CompletedEvent => createdState with { Status = PullRequestStatus.Completed },
-                AutoCompleteSetEvent => createdState with { AutoCompleteMode = AutoCompleteMode.Enabled },
-                AutoCompleteCancelledEvent => createdState with { AutoCompleteMode = AutoCompleteMode.Disabled },
-                AbandonedEvent => createdState with { Status = PullRequestStatus.Abandoned },
-                ReactivatedEvent => createdState with { Status = PullRequestStatus.Active },
-
-                _ => throw new InvalidOperationException($"State '{state.GetType().FullName}' and event '{@event.GetType().FullName}' not supported.")
-            };
-        }
-
-        if (@event is not CreatedEvent createdEvent)
-        {
-            throw new InvalidOperationException($"State '{state.GetType().FullName}' and event '{@event.GetType().FullName}' not supported.");
-        }
-
-        return new PullRequestCreatedState(createdEvent.Owner, createdEvent.SourceBranch, createdEvent.TargetBranch, createdEvent.Title, string.Empty, CheckForLinkedWorkItemsMode.Disabled, AutoCompleteMode.Disabled, PullRequestStatus.Active, new List<(Guid UserId, ReviewerType Type, ReviewerFeedback Feedback)>().AsReadOnly(), new List<Guid>().AsReadOnly());
     }
 
     private static DeciderResult<IPullRequestEvent, IPullRequestError> ChangeTitle(Title title, PullRequestCreatedState state)
@@ -504,40 +460,4 @@ public static class PullRequest
 
         return true;
     }
-
-    private static IReadOnlyCollection<(Guid UserId, ReviewerType Type, ReviewerFeedback Feedback)> WithReviewerAdded(this IReadOnlyCollection<(Guid UserId, ReviewerType Type, ReviewerFeedback Feedback)> reviewers, Guid userId, ReviewerType type)
-        => reviewers
-            .Append((userId, type, ReviewerFeedback.None))
-            .ToList()
-            .AsReadOnly();
-
-    private static IReadOnlyCollection<(Guid UserId, ReviewerType Type, ReviewerFeedback Feedback)> WithReviewerFeedbackChanged(this IReadOnlyCollection<(Guid UserId, ReviewerType Type, ReviewerFeedback Feedback)> reviewers, Guid userId, ReviewerFeedback feedback)
-        => reviewers
-            .Select(reviewer => reviewer.UserId == userId ? new(reviewer.UserId, reviewer.Type, feedback) : reviewer)
-            .ToList()
-            .AsReadOnly();
-
-    private static IReadOnlyCollection<(Guid UserId, ReviewerType Type, ReviewerFeedback Feedback)> WithReviewerRemoved(this IReadOnlyCollection<(Guid UserId, ReviewerType Type, ReviewerFeedback Feedback)> reviewers, Guid userId)
-        => reviewers
-            .Where(reviewer => reviewer.UserId != userId)
-            .ToList()
-            .AsReadOnly();
-
-    private static IReadOnlyCollection<(Guid UserId, ReviewerType Type, ReviewerFeedback Feedback)> WithReviewerTypeChanged(this IReadOnlyCollection<(Guid UserId, ReviewerType Type, ReviewerFeedback Feedback)> reviewers, Guid userId, ReviewerType type)
-        => reviewers
-            .Select(reviewer => reviewer.UserId.Equals(userId) ? new(reviewer.UserId, type, reviewer.Feedback) : reviewer)
-            .ToList()
-            .AsReadOnly();
-
-    private static IReadOnlyCollection<Guid> WithWorkItemLinked(this IReadOnlyCollection<Guid> workItems, Guid workItemId)
-        => workItems
-            .Append(workItemId)
-            .ToList()
-            .AsReadOnly();
-
-    private static IReadOnlyCollection<Guid> WithWorkItemRemoved(this IReadOnlyCollection<Guid> workItems, Guid workItemId)
-        => workItems
-            .Where(existingWorkItemId => existingWorkItemId != workItemId)
-            .ToList()
-            .AsReadOnly();
 }

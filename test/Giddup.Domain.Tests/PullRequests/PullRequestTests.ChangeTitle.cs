@@ -13,10 +13,10 @@ public partial class PullRequestTests
         // Arrange
         _ = Title.TryCreate("baz", out var title, out _);
         var command = new ChangeTitleCommand(title!);
-        var state = PullRequest.InitialState;
+        var state = IPullRequestState.InitialState;
 
         // Act
-        var result = PullRequest.Decide(state, command);
+        var result = PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.False(result.TryGetEvents(out _, out var error));
@@ -34,7 +34,7 @@ public partial class PullRequestTests
         var state = GetPullRequestState(status: status);
 
         // Act
-        var result = PullRequest.Decide(state, command);
+        var result = PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.False(result.TryGetEvents(out _, out var error));
@@ -50,7 +50,7 @@ public partial class PullRequestTests
         var state = GetPullRequestState(title: command.Title);
 
         // Act
-        var result = PullRequest.Decide(state, command);
+        var result = PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.True(result.TryGetEvents(out var events, out _));
@@ -66,7 +66,7 @@ public partial class PullRequestTests
         var state = GetPullRequestState();
 
         // Act
-        var result = PullRequest.Decide(state, command);
+        var result = PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.True(result.TryGetEvents(out var events, out _));

@@ -4,6 +4,49 @@ namespace Giddup.Domain.PullRequests;
 
 public interface IPullRequestState
 {
+    public static IPullRequestState InitialState => new PullRequestInitialState();
+
+    public static IPullRequestState ProcessEvent(IPullRequestState state, IPullRequestEvent @event)
+    {
+        if (state is PullRequestCreatedState createdState)
+        {
+            return @event switch
+            {
+                TitleChangedEvent(var title) => createdState with { Title = title },
+                DescriptionChangedEvent(var description) => createdState with { Description = description },
+
+                RequiredReviewerAddedEvent(var userId) => createdState with { Reviewers = createdState.Reviewers.WithReviewerAdded(userId, ReviewerType.Required) },
+                OptionalReviewerAddedEvent(var userId) => createdState with { Reviewers = createdState.Reviewers.WithReviewerAdded(userId, ReviewerType.Optional) },
+                ReviewerMadeRequiredEvent(var userId) => createdState with { Reviewers = createdState.Reviewers.WithReviewerTypeChanged(userId, ReviewerType.Required) },
+                ReviewerMadeOptionalEvent(var userId) => createdState with { Reviewers = createdState.Reviewers.WithReviewerTypeChanged(userId, ReviewerType.Optional) },
+                ReviewerRemovedEvent(var userId) => createdState with { Reviewers = createdState.Reviewers.WithReviewerRemoved(userId) },
+
+                ApprovedEvent(var userId) => createdState with { Reviewers = createdState.Reviewers.WithReviewerFeedbackChanged(userId, ReviewerFeedback.Approved) },
+                ApprovedWithSuggestionsEvent(var userId) => createdState with { Reviewers = createdState.Reviewers.WithReviewerFeedbackChanged(userId, ReviewerFeedback.ApprovedWithSuggestions) },
+                WaitingForAuthorEvent(var userId) => createdState with { Reviewers = createdState.Reviewers.WithReviewerFeedbackChanged(userId, ReviewerFeedback.WaitingForAuthor) },
+                RejectedEvent(var userId) => createdState with { Reviewers = createdState.Reviewers.WithReviewerFeedbackChanged(userId, ReviewerFeedback.Rejected) },
+                FeedbackResetEvent(var userId) => createdState with { Reviewers = createdState.Reviewers.WithReviewerFeedbackChanged(userId, ReviewerFeedback.None) },
+
+                WorkItemLinkedEvent(var workItemId) => createdState with { WorkItems = createdState.WorkItems.WithWorkItemLinked(workItemId) },
+                WorkItemRemovedEvent(var workItemId) => createdState with { WorkItems = createdState.WorkItems.WithWorkItemRemoved(workItemId) },
+
+                CompletedEvent => createdState with { Status = PullRequestStatus.Completed },
+                AutoCompleteSetEvent => createdState with { AutoCompleteMode = AutoCompleteMode.Enabled },
+                AutoCompleteCancelledEvent => createdState with { AutoCompleteMode = AutoCompleteMode.Disabled },
+                AbandonedEvent => createdState with { Status = PullRequestStatus.Abandoned },
+                ReactivatedEvent => createdState with { Status = PullRequestStatus.Active },
+
+                _ => throw new InvalidOperationException($"State '{state.GetType().FullName}' and event '{@event.GetType().FullName}' not supported.")
+            };
+        }
+
+        if (@event is not CreatedEvent createdEvent)
+        {
+            throw new InvalidOperationException($"State '{state.GetType().FullName}' and event '{@event.GetType().FullName}' not supported.");
+        }
+
+        return new PullRequestCreatedState(createdEvent.Owner, createdEvent.SourceBranch, createdEvent.TargetBranch, createdEvent.Title, string.Empty, CheckForLinkedWorkItemsMode.Disabled, AutoCompleteMode.Disabled, PullRequestStatus.Active, new List<(Guid UserId, ReviewerType Type, ReviewerFeedback Feedback)>().AsReadOnly(), new List<Guid>().AsReadOnly());
+    }
 }
 
 public record PullRequestInitialState : IPullRequestState;

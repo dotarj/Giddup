@@ -18,7 +18,7 @@ public partial class PullRequestTests
         var state = GetPullRequestState();
 
         // Act
-        var result = PullRequest.Decide(state, command);
+        var result = PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.False(result.TryGetEvents(out _, out var error));
@@ -33,10 +33,10 @@ public partial class PullRequestTests
         _ = BranchName.TryCreate("refs/heads/bar", out var targetBranch, out _);
         _ = Title.TryCreate("baz", out var title, out _);
         var command = new CreateCommand(Guid.NewGuid(), sourceBranch!, targetBranch!, title!);
-        var state = PullRequest.InitialState;
+        var state = IPullRequestState.InitialState;
 
         // Act
-        var result = PullRequest.Decide(state, command);
+        var result = PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.True(result.TryGetEvents(out var events, out _));

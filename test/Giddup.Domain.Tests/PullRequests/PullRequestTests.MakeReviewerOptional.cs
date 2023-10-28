@@ -12,10 +12,10 @@ public partial class PullRequestTests
     {
         // Arrange
         var command = new MakeReviewerOptionalCommand(Guid.NewGuid());
-        var state = PullRequest.InitialState;
+        var state = IPullRequestState.InitialState;
 
         // Act
-        var result = PullRequest.Decide(state, command);
+        var result = PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.False(result.TryGetEvents(out _, out var error));
@@ -32,7 +32,7 @@ public partial class PullRequestTests
         var state = GetPullRequestState(status: status);
 
         // Act
-        var result = PullRequest.Decide(state, command);
+        var result = PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.False(result.TryGetEvents(out _, out var error));
@@ -47,7 +47,7 @@ public partial class PullRequestTests
         var state = GetPullRequestState(reviewers: GetReviewers((Guid.NewGuid(), ReviewerType.Required, ReviewerFeedback.None)));
 
         // Act
-        var result = PullRequest.Decide(state, command);
+        var result = PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.False(result.TryGetEvents(out _, out var error));
@@ -62,7 +62,7 @@ public partial class PullRequestTests
         var state = GetPullRequestState(reviewers: GetReviewers((command.UserId, ReviewerType.Optional, ReviewerFeedback.None)));
 
         // Act
-        var result = PullRequest.Decide(state, command);
+        var result = PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.True(result.TryGetEvents(out var events, out _));
@@ -84,7 +84,7 @@ public partial class PullRequestTests
         var state = GetPullRequestState(checkForLinkedWorkItemsMode: checkForLinkedWorkItemsMode, autoCompleteMode: AutoCompleteMode.Enabled, reviewers: reviewers, workItems: workItems);
 
         // Act
-        var result = PullRequest.Decide(state, command);
+        var result = PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.True(result.TryGetEvents(out var events, out _));
@@ -109,7 +109,7 @@ public partial class PullRequestTests
         var state = GetPullRequestState(checkForLinkedWorkItemsMode: checkForLinkedWorkItemsMode, autoCompleteMode: autoCompleteMode, reviewers: reviewers);
 
         // Act
-        var result = PullRequest.Decide(state, command);
+        var result = PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.True(result.TryGetEvents(out var events, out _));
