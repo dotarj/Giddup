@@ -48,6 +48,25 @@ public partial class PullRequestCommandProcessorTests
     }
 
     [Fact]
+    public async Task Create_SameSourceAndTargetBranch_ReturnsTargetBranchEqualsSourceBranchError()
+    {
+        // Arrange
+        _ = BranchName.TryCreate("refs/heads/foo", out var sourceBranch, out _);
+        _ = BranchName.TryCreate("refs/heads/foo", out var targetBranch, out _);
+        _ = Title.TryCreate("baz", out var title, out _);
+        Task<bool> IsExistingBranch(BranchName branch) => Task.FromResult(true);
+        var command = new CreateCommand(Guid.NewGuid(), sourceBranch!, targetBranch!, title!, IsExistingBranch);
+        var state = IPullRequestState.InitialState;
+
+        // Act
+        var result = await PullRequestCommandProcessor.Process(state, command);
+
+        // Assert
+        Assert.False(result.TryGetEvents(out _, out var error));
+        _ = Assert.IsType<TargetBranchEqualsSourceBranchError>(error);
+    }
+
+    [Fact]
     public async Task Create_ReturnsCreatedEvent()
     {
         // Arrange

@@ -64,6 +64,11 @@ public static class PullRequestCommandProcessor
             return new InvalidTargetBranchError();
         }
 
+        if (command.TargetBranch == command.SourceBranch)
+        {
+            return new TargetBranchEqualsSourceBranchError();
+        }
+
         return new CreatedEvent(command.Owner, command.SourceBranch, command.TargetBranch, command.Title);
     }
 
@@ -77,6 +82,11 @@ public static class PullRequestCommandProcessor
         if (command.TargetBranch == state.TargetBranch)
         {
             return Array.Empty<IPullRequestEvent>();
+        }
+
+        if (command.TargetBranch == state.SourceBranch)
+        {
+            return new TargetBranchEqualsSourceBranchError();
         }
 
         if (!await command.IsExistingBranch(command.TargetBranch))

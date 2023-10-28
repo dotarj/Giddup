@@ -14,6 +14,7 @@ public interface IPullRequestState
         {
             return @event switch
             {
+                TargetBranchChangedEvent(var targetBranch) => createdState with { TargetBranch = targetBranch },
                 TitleChangedEvent(var title) => createdState with { Title = title },
                 DescriptionChangedEvent(var description) => createdState with { Description = description },
 

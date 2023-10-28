@@ -25,3 +25,5 @@ public record NotFoundError : IPullRequestError;
 public record NoWorkItemLinkedError : IPullRequestError;
 
 public record ReviewerNotFoundError(Guid UserId) : IPullRequestError;
+
+public record TargetBranchEqualsSourceBranchError : IPullRequestError;

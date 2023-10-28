@@ -5,11 +5,10 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["src/Giddup.Application/Giddup.Application.csproj", "src/Giddup.Application/"]
-COPY ["src/Giddup.Domain/Giddup.Domain.csproj", "src/Giddup.Domain/"]
+COPY ["src/Giddup.ApplicationCore/Giddup.ApplicationCore.csproj", "src/Giddup.ApplicationCore/"]
 COPY ["src/Giddup.Infrastructure/Giddup.Infrastructure.csproj", "src/Giddup.Infrastructure/"]
 COPY ["src/Giddup.Presentation.Api/Giddup.Presentation.Api.csproj", "src/Giddup.Presentation.Api/"]
-COPY ["src/SharedAssemblyInfo.targets", "SharedAssemblyInfo.targets"]
+COPY ["src/SharedAssemblyInfo.targets", "src/"]
 RUN dotnet restore "src/Giddup.Presentation.Api/Giddup.Presentation.Api.csproj"
 COPY . .
 WORKDIR "/src/src/Giddup.Presentation.Api"

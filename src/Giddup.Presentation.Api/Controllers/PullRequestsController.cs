@@ -157,6 +157,7 @@ public class PullRequestsController : ControllerBase
                 NotFoundError => new NotFoundResult(),
                 NoWorkItemLinkedError => ProblemDetailsResult("At least one work item should be linked.", "no-work-item-linked"),
                 ReviewerNotFoundError => ProblemDetailsResult("The given reviewer was not found.", "reviewer-not-found"),
+                TargetBranchEqualsSourceBranchError => ProblemDetailsResult("The given target branch is equal to the source branch.", "target-branch-equals-source-branch"),
 
                 _ => throw new InvalidOperationException($"Error '{error.GetType().FullName}' not supported.")
             };

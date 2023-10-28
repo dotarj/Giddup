@@ -15,7 +15,7 @@ This repository contains a reference architecture using ports and adapters, doma
 Once you have cloned or downloaded the project you can run (and debug) the application using the provided Docker Compose file. The Docker Compose file can be started from Rider or Visual Studio, or you can use the Docker Compose CLI:
 
 ```Shell
-docker-compose up
+docker-compose up --build
 ```
 
  By running the Docker Compose file, an EventStore instance is started and the solution is build and started. When the services have started, you can make requests to localhost:5000.
@@ -40,16 +40,16 @@ TODO: expand on tasks with screenshots
 
 The structure of the solution conforms to the ports and adapters architecture (hexagonal architecture) introduced by Alistair Cockburn [[2]](https://alistair.cockburn.us/hexagonal-architecture/ "Hexagonal architecture"). In this architecture three main components are identified, each with their respective responsibility:
 
-* Domain  
+* Domain
 Domain is what the application is all about, the crown jewels. It solely consists of business logic encapsulated in aggregates, value objects and domain services. Domain is the inner layer of the application core, has no references to other projects in the solution and references to third party libraries should be avoided as much as possible.
 
-* Application  
+* Application
 Application is the outer layer of the application core and acts as a wrapper around the domain layer, providing ports (interfaces) which describe how the application core must be used, or how the application core uses external systems. Application references domain, has no references to other projects in the solution and references to third party libraries should be avoided as much as possible.
 
-* Presentation  
+* Presentation
 Presentation translates what comes from the delivery mechanism to the application core. The delivery mechanism can be an HTTP request, a console window, a CRON job, a service bus consumer and so on. These delivery mechanisms are called primary adapters (or driving adapters) which use the ports defined in the application core to tell the application core what to do.
 
-* Infrastructure  
+* Infrastructure
 Infrastructure enables the application core to interact with external systems. The external system can be a data store, a service bus, an API, an SMTP server and so on. These implementations are called secondary adapters (or driven adapters) which implement ports defined in the application core.
 
 #### Compared to three-tier architecture

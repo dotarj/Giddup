@@ -13,26 +13,27 @@ public class EventMapping : IEnumerable
 
     public static EventMapping Value { get; } = new()
     {
-        { "created", typeof(CreatedEvent) },
-        { "title-changed", typeof(TitleChangedEvent) },
-        { "description-changed", typeof(DescriptionChangedEvent) },
-        { "required-reviewer-added", typeof(RequiredReviewerAddedEvent) },
-        { "optional-reviewer-added", typeof(OptionalReviewerAddedEvent) },
-        { "reviewer-made-required", typeof(ReviewerMadeRequiredEvent) },
-        { "reviewer-made-optional", typeof(ReviewerMadeOptionalEvent) },
-        { "reviewer-removed", typeof(ReviewerRemovedEvent) },
+        { "abandoned", typeof(AbandonedEvent) },
         { "approved", typeof(ApprovedEvent) },
         { "approved-with-suggestions", typeof(ApprovedWithSuggestionsEvent) },
-        { "waiting-for-author", typeof(WaitingForAuthorEvent) },
-        { "rejected", typeof(RejectedEvent) },
-        { "feedback-reset", typeof(FeedbackResetEvent) },
-        { "work-item-linked", typeof(WorkItemLinkedEvent) },
-        { "work-item-removed", typeof(WorkItemRemovedEvent) },
-        { "completed", typeof(CompletedEvent) },
-        { "auto-complete-set", typeof(AutoCompleteSetEvent) },
         { "auto-complete-cancelled", typeof(AutoCompleteCancelledEvent) },
-        { "abandoned", typeof(AbandonedEvent) },
+        { "auto-complete-set", typeof(AutoCompleteSetEvent) },
+        { "completed", typeof(CompletedEvent) },
+        { "created", typeof(CreatedEvent) },
+        { "description-changed", typeof(DescriptionChangedEvent) },
+        { "feedback-reset", typeof(FeedbackResetEvent) },
+        { "optional-reviewer-added", typeof(OptionalReviewerAddedEvent) },
         { "reactivated", typeof(ReactivatedEvent) },
+        { "rejected", typeof(RejectedEvent) },
+        { "required-reviewer-added", typeof(RequiredReviewerAddedEvent) },
+        { "reviewer-made-optional", typeof(ReviewerMadeOptionalEvent) },
+        { "reviewer-made-required", typeof(ReviewerMadeRequiredEvent) },
+        { "reviewer-removed", typeof(ReviewerRemovedEvent) },
+        { "target-branch-changed", typeof(TargetBranchChangedEvent) },
+        { "title-changed", typeof(TitleChangedEvent) },
+        { "waiting-for-author", typeof(WaitingForAuthorEvent) },
+        { "work-item-linked", typeof(WorkItemLinkedEvent) },
+        { "work-item-removed", typeof(WorkItemRemovedEvent) }
     };
 
     public void Add(string type, Type @event)
