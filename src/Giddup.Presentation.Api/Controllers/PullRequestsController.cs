@@ -7,7 +7,7 @@ using Giddup.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Giddup.Presentation.Api.Endpoints.PullRequests;
+namespace Giddup.Presentation.Api.Controllers;
 
 [Authorize]
 [ApiController]
