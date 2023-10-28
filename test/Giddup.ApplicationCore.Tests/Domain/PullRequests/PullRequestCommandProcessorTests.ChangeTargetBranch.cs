@@ -9,7 +9,7 @@ namespace Giddup.ApplicationCore.Tests.Domain.PullRequests;
 public partial class PullRequestCommandProcessorTests
 {
     [Fact]
-    public async Task ChangeTargetBranch_NotCreated_ReturnsNotCreatedError()
+    public async Task ChangeTargetBranch_NotFound_ReturnsNotFoundError()
     {
         // Arrange
         _ = BranchName.TryCreate("refs/heads/bar", out var targetBranch, out _);
@@ -22,7 +22,7 @@ public partial class PullRequestCommandProcessorTests
 
         // Assert
         Assert.False(result.TryGetEvents(out _, out var error));
-        _ = Assert.IsType<NotCreatedError>(error);
+        _ = Assert.IsType<NotFoundError>(error);
     }
 
     [Theory]

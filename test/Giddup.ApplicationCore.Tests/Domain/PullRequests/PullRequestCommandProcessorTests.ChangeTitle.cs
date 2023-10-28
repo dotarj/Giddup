@@ -8,7 +8,7 @@ namespace Giddup.ApplicationCore.Tests.Domain.PullRequests;
 public partial class PullRequestCommandProcessorTests
 {
     [Fact]
-    public async Task ChangeTitle_NotCreated_ReturnsNotCreatedError()
+    public async Task ChangeTitle_NotFound_ReturnsNotFoundError()
     {
         // Arrange
         _ = Title.TryCreate("baz", out var title, out _);
@@ -20,7 +20,7 @@ public partial class PullRequestCommandProcessorTests
 
         // Assert
         Assert.False(result.TryGetEvents(out _, out var error));
-        _ = Assert.IsType<NotCreatedError>(error);
+        _ = Assert.IsType<NotFoundError>(error);
     }
 
     [Theory]

@@ -6,9 +6,7 @@ public interface IPullRequestError
 {
 }
 
-public record NotCreatedError : IPullRequestError;
-
-public record AlreadyCreatedError : IPullRequestError;
+public record NotFoundError : IPullRequestError;
 
 public record InvalidReviewerError : IPullRequestError;
 

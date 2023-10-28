@@ -9,25 +9,6 @@ namespace Giddup.ApplicationCore.Tests.Domain.PullRequests;
 public partial class PullRequestCommandProcessorTests
 {
     [Fact]
-    public async Task Create_AlreadyCreated_ReturnsAlreadyCreatedError()
-    {
-        // Arrange
-        _ = BranchName.TryCreate("refs/heads/foo", out var sourceBranch, out _);
-        _ = BranchName.TryCreate("refs/heads/bar", out var targetBranch, out _);
-        _ = Title.TryCreate("baz", out var title, out _);
-        Task<bool> IsExistingBranch(BranchName branch) => Task.FromResult(true);
-        var command = new CreateCommand(Guid.NewGuid(), sourceBranch!, targetBranch!, title!, IsExistingBranch);
-        var state = GetPullRequestState();
-
-        // Act
-        var result = await PullRequestCommandProcessor.Process(state, command);
-
-        // Assert
-        Assert.False(result.TryGetEvents(out _, out var error));
-        _ = Assert.IsType<AlreadyCreatedError>(error);
-    }
-
-    [Fact]
     public async Task Create_InvalidSourceBranch_ReturnsInvalidSourceBranchError()
     {
         // Arrange

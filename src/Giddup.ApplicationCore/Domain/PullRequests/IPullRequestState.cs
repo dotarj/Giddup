@@ -10,7 +10,7 @@ public interface IPullRequestState
 
     public static IPullRequestState ProcessEvent(IPullRequestState state, IPullRequestEvent @event)
     {
-        if (state is PullRequestCreatedState createdState)
+        if (state is PullRequestState createdState)
         {
             return @event switch
             {
@@ -47,13 +47,13 @@ public interface IPullRequestState
             throw new InvalidOperationException($"State '{state.GetType().FullName}' and event '{@event.GetType().FullName}' not supported.");
         }
 
-        return new PullRequestCreatedState(createdEvent.Owner, createdEvent.SourceBranch, createdEvent.TargetBranch, createdEvent.Title, string.Empty, CheckForLinkedWorkItemsMode.Disabled, AutoCompleteMode.Disabled, PullRequestStatus.Active, ImmutableList<(Guid UserId, ReviewerType Type, ReviewerFeedback Feedback)>.Empty, ImmutableList<Guid>.Empty);
+        return new PullRequestState(createdEvent.Owner, createdEvent.SourceBranch, createdEvent.TargetBranch, createdEvent.Title, string.Empty, CheckForLinkedWorkItemsMode.Disabled, AutoCompleteMode.Disabled, PullRequestStatus.Active, ImmutableList<(Guid UserId, ReviewerType Type, ReviewerFeedback Feedback)>.Empty, ImmutableList<Guid>.Empty);
     }
 }
 
 public record PullRequestInitialState : IPullRequestState;
 
-public record PullRequestCreatedState(Guid Owner, BranchName SourceBranch, BranchName TargetBranch, Title Title, string Description, CheckForLinkedWorkItemsMode CheckForLinkedWorkItemsMode, AutoCompleteMode AutoCompleteMode, PullRequestStatus Status, ImmutableList<(Guid UserId, ReviewerType Type, ReviewerFeedback Feedback)> Reviewers, ImmutableList<Guid> WorkItems) : IPullRequestState;
+public record PullRequestState(Guid Owner, BranchName SourceBranch, BranchName TargetBranch, Title Title, string Description, CheckForLinkedWorkItemsMode CheckForLinkedWorkItemsMode, AutoCompleteMode AutoCompleteMode, PullRequestStatus Status, ImmutableList<(Guid UserId, ReviewerType Type, ReviewerFeedback Feedback)> Reviewers, ImmutableList<Guid> WorkItems) : IPullRequestState;
 
 public enum CheckForLinkedWorkItemsMode
 {

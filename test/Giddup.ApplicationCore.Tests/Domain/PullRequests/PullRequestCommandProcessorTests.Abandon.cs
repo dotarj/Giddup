@@ -8,7 +8,7 @@ namespace Giddup.ApplicationCore.Tests.Domain.PullRequests;
 public partial class PullRequestCommandProcessorTests
 {
     [Fact]
-    public async Task Abandon_NotCreated_ReturnsNotCreatedError()
+    public async Task Abandon_NotFound_ReturnsNotFoundError()
     {
         // Arrange
         var command = new AbandonCommand();
@@ -19,7 +19,7 @@ public partial class PullRequestCommandProcessorTests
 
         // Assert
         Assert.False(result.TryGetEvents(out _, out var error));
-        _ = Assert.IsType<NotCreatedError>(error);
+        _ = Assert.IsType<NotFoundError>(error);
     }
 
     [Fact]

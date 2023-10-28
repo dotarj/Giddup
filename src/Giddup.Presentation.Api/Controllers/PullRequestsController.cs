@@ -147,7 +147,7 @@ public class PullRequestsController : ControllerBase
         {
             return error switch
             {
-                NotCreatedError => new NotFoundResult(),
+                NotFoundError => new NotFoundResult(),
                 ReviewerNotFoundError => ProblemDetailsResult("The given reviewer was not found.", "reviewer-not-found"),
                 NotAllRequiredReviewersApprovedError => ProblemDetailsResult("Not all required reviewers approved the pull request.", "not-all-required-reviewers-approved"),
                 FeedbackContainsWaitForAuthorOrRejectError => ProblemDetailsResult("Pull request blocked by one or more reviewers.", "feedback-contains-wait-for-author-or-reject"),

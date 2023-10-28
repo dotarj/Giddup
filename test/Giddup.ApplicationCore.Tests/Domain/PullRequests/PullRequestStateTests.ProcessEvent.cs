@@ -23,7 +23,7 @@ public class PullRequestStateTests
         var result = IPullRequestState.ProcessEvent(state, @event);
 
         // Assert
-        var createdState = Assert.IsType<PullRequestCreatedState>(result);
+        var createdState = Assert.IsType<PullRequestState>(result);
         Assert.Equal(@event.Owner, createdState.Owner);
         Assert.Equal(@event.SourceBranch, createdState.SourceBranch);
         Assert.Equal(@event.TargetBranch, createdState.TargetBranch);
@@ -42,7 +42,7 @@ public class PullRequestStateTests
         var result = IPullRequestState.ProcessEvent(state, @event);
 
         // Assert
-        var createdState = Assert.IsType<PullRequestCreatedState>(result);
+        var createdState = Assert.IsType<PullRequestState>(result);
         Assert.Equal(@event.Title, createdState.Title);
     }
 
@@ -57,7 +57,7 @@ public class PullRequestStateTests
         var result = IPullRequestState.ProcessEvent(state, @event);
 
         // Assert
-        var createdState = Assert.IsType<PullRequestCreatedState>(result);
+        var createdState = Assert.IsType<PullRequestState>(result);
         Assert.Equal(@event.Description, createdState.Description);
     }
 
@@ -72,7 +72,7 @@ public class PullRequestStateTests
         var result = IPullRequestState.ProcessEvent(state, @event);
 
         // Assert
-        var createdState = Assert.IsType<PullRequestCreatedState>(result);
+        var createdState = Assert.IsType<PullRequestState>(result);
         var reviewer = Assert.Single(createdState.Reviewers);
         Assert.Equal(@event.UserId, reviewer.UserId);
         Assert.Equal(ReviewerType.Required, reviewer.Type);
@@ -90,7 +90,7 @@ public class PullRequestStateTests
         var result = IPullRequestState.ProcessEvent(state, @event);
 
         // Assert
-        var createdState = Assert.IsType<PullRequestCreatedState>(result);
+        var createdState = Assert.IsType<PullRequestState>(result);
         var reviewer = Assert.Single(createdState.Reviewers);
         Assert.Equal(@event.UserId, reviewer.UserId);
         Assert.Equal(ReviewerType.Optional, reviewer.Type);
@@ -108,7 +108,7 @@ public class PullRequestStateTests
         var result = IPullRequestState.ProcessEvent(state, @event);
 
         // Assert
-        var createdState = Assert.IsType<PullRequestCreatedState>(result);
+        var createdState = Assert.IsType<PullRequestState>(result);
         Assert.Equal(ReviewerType.Required, createdState.Reviewers.First().Type);
     }
 
@@ -123,7 +123,7 @@ public class PullRequestStateTests
         var result = IPullRequestState.ProcessEvent(state, @event);
 
         // Assert
-        var createdState = Assert.IsType<PullRequestCreatedState>(result);
+        var createdState = Assert.IsType<PullRequestState>(result);
         Assert.Equal(ReviewerType.Optional, createdState.Reviewers.First().Type);
     }
 
@@ -138,7 +138,7 @@ public class PullRequestStateTests
         var result = IPullRequestState.ProcessEvent(state, @event);
 
         // Assert
-        var createdState = Assert.IsType<PullRequestCreatedState>(result);
+        var createdState = Assert.IsType<PullRequestState>(result);
         Assert.Empty(createdState.Reviewers);
     }
 
@@ -153,7 +153,7 @@ public class PullRequestStateTests
         var result = IPullRequestState.ProcessEvent(state, @event);
 
         // Assert
-        var createdState = Assert.IsType<PullRequestCreatedState>(result);
+        var createdState = Assert.IsType<PullRequestState>(result);
         Assert.Equal(ReviewerFeedback.Approved, createdState.Reviewers.First().Feedback);
     }
 
@@ -168,7 +168,7 @@ public class PullRequestStateTests
         var result = IPullRequestState.ProcessEvent(state, @event);
 
         // Assert
-        var createdState = Assert.IsType<PullRequestCreatedState>(result);
+        var createdState = Assert.IsType<PullRequestState>(result);
         Assert.Equal(ReviewerFeedback.ApprovedWithSuggestions, createdState.Reviewers.First().Feedback);
     }
 
@@ -183,7 +183,7 @@ public class PullRequestStateTests
         var result = IPullRequestState.ProcessEvent(state, @event);
 
         // Assert
-        var createdState = Assert.IsType<PullRequestCreatedState>(result);
+        var createdState = Assert.IsType<PullRequestState>(result);
         Assert.Equal(ReviewerFeedback.WaitingForAuthor, createdState.Reviewers.First().Feedback);
     }
 
@@ -198,7 +198,7 @@ public class PullRequestStateTests
         var result = IPullRequestState.ProcessEvent(state, @event);
 
         // Assert
-        var createdState = Assert.IsType<PullRequestCreatedState>(result);
+        var createdState = Assert.IsType<PullRequestState>(result);
         Assert.Equal(ReviewerFeedback.Rejected, createdState.Reviewers.First().Feedback);
     }
 
@@ -213,7 +213,7 @@ public class PullRequestStateTests
         var result = IPullRequestState.ProcessEvent(state, @event);
 
         // Assert
-        var createdState = Assert.IsType<PullRequestCreatedState>(result);
+        var createdState = Assert.IsType<PullRequestState>(result);
         Assert.Equal(ReviewerFeedback.None, createdState.Reviewers.First().Feedback);
     }
 
@@ -228,7 +228,7 @@ public class PullRequestStateTests
         var result = IPullRequestState.ProcessEvent(state, @event);
 
         // Assert
-        var createdState = Assert.IsType<PullRequestCreatedState>(result);
+        var createdState = Assert.IsType<PullRequestState>(result);
         var workItemId = Assert.Single(createdState.WorkItems);
         Assert.Equal(@event.WorkItemId, workItemId);
     }
@@ -244,7 +244,7 @@ public class PullRequestStateTests
         var result = IPullRequestState.ProcessEvent(state, @event);
 
         // Assert
-        var createdState = Assert.IsType<PullRequestCreatedState>(result);
+        var createdState = Assert.IsType<PullRequestState>(result);
         Assert.Empty(createdState.WorkItems);
     }
 
@@ -259,7 +259,7 @@ public class PullRequestStateTests
         var result = IPullRequestState.ProcessEvent(state, @event);
 
         // Assert
-        var createdState = Assert.IsType<PullRequestCreatedState>(result);
+        var createdState = Assert.IsType<PullRequestState>(result);
         Assert.Equal(PullRequestStatus.Completed, createdState.Status);
     }
 
@@ -274,7 +274,7 @@ public class PullRequestStateTests
         var result = IPullRequestState.ProcessEvent(state, @event);
 
         // Assert
-        var createdState = Assert.IsType<PullRequestCreatedState>(result);
+        var createdState = Assert.IsType<PullRequestState>(result);
         Assert.Equal(AutoCompleteMode.Enabled, createdState.AutoCompleteMode);
     }
 
@@ -289,7 +289,7 @@ public class PullRequestStateTests
         var result = IPullRequestState.ProcessEvent(state, @event);
 
         // Assert
-        var createdState = Assert.IsType<PullRequestCreatedState>(result);
+        var createdState = Assert.IsType<PullRequestState>(result);
         Assert.Equal(AutoCompleteMode.Disabled, createdState.AutoCompleteMode);
     }
 
@@ -304,7 +304,7 @@ public class PullRequestStateTests
         var result = IPullRequestState.ProcessEvent(state, @event);
 
         // Assert
-        var createdState = Assert.IsType<PullRequestCreatedState>(result);
+        var createdState = Assert.IsType<PullRequestState>(result);
         Assert.Equal(PullRequestStatus.Abandoned, createdState.Status);
     }
 
@@ -319,7 +319,7 @@ public class PullRequestStateTests
         var result = IPullRequestState.ProcessEvent(state, @event);
 
         // Assert
-        var createdState = Assert.IsType<PullRequestCreatedState>(result);
+        var createdState = Assert.IsType<PullRequestState>(result);
         Assert.Equal(PullRequestStatus.Active, createdState.Status);
     }
 
@@ -340,7 +340,7 @@ public class PullRequestStateTests
             _ = BranchName.TryCreate("refs/heads/target", out targetBranch!, out _);
         }
 
-        return new PullRequestCreatedState(owner ?? Guid.NewGuid(), sourceBranch, targetBranch, title, description ?? "description", checkForLinkedWorkItemsMode, autoCompleteMode, status, reviewers ?? GetReviewers(), workItems ?? GetWorkItems());
+        return new PullRequestState(owner ?? Guid.NewGuid(), sourceBranch, targetBranch, title, description ?? "description", checkForLinkedWorkItemsMode, autoCompleteMode, status, reviewers ?? GetReviewers(), workItems ?? GetWorkItems());
     }
 
     private static ImmutableList<(Guid UserId, ReviewerType Type, ReviewerFeedback Feedback)> GetReviewers(params (Guid UserId, ReviewerType Type, ReviewerFeedback Feedback)[] reviewers)
