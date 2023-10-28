@@ -8,14 +8,14 @@ namespace Giddup.ApplicationCore.Tests.Domain.PullRequests;
 public partial class PullRequestTests
 {
     [Fact]
-    public void LinkWorkItem_NotCreated_ReturnsNotCreatedError()
+    public async Task LinkWorkItem_NotCreated_ReturnsNotCreatedError()
     {
         // Arrange
         var command = new LinkWorkItemCommand(Guid.NewGuid());
         var state = IPullRequestState.InitialState;
 
         // Act
-        var result = PullRequestCommandProcessor.Process(state, command);
+        var result = await PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.False(result.TryGetEvents(out _, out var error));
@@ -25,14 +25,14 @@ public partial class PullRequestTests
     [Theory]
     [InlineData(PullRequestStatus.Abandoned)]
     [InlineData(PullRequestStatus.Completed)]
-    public void LinkWorkItem_InvalidStatus_ReturnsNotActiveError(PullRequestStatus status)
+    public async Task LinkWorkItem_InvalidStatus_ReturnsNotActiveError(PullRequestStatus status)
     {
         // Arrange
         var command = new LinkWorkItemCommand(Guid.NewGuid());
         var state = GetPullRequestState(status: status);
 
         // Act
-        var result = PullRequestCommandProcessor.Process(state, command);
+        var result = await PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.False(result.TryGetEvents(out _, out var error));
@@ -40,14 +40,14 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public void LinkWorkItem_ExistingWorkItem_ReturnsNoEvents()
+    public async Task LinkWorkItem_ExistingWorkItem_ReturnsNoEvents()
     {
         // Arrange
         var command = new LinkWorkItemCommand(Guid.NewGuid());
         var state = GetPullRequestState(workItems: GetWorkItems(command.WorkItemId));
 
         // Act
-        var result = PullRequestCommandProcessor.Process(state, command);
+        var result = await PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.True(result.TryGetEvents(out var events, out _));
@@ -60,7 +60,7 @@ public partial class PullRequestTests
     [InlineData("073cb612-720e-4813-adfc-ffe021d3db08", ReviewerType.Optional, ReviewerFeedback.None, CheckForLinkedWorkItemsMode.Disabled)]
     [InlineData(null, ReviewerType.Required, ReviewerFeedback.Approved, CheckForLinkedWorkItemsMode.Enabled)]
     [InlineData(null, ReviewerType.Required, ReviewerFeedback.Approved, CheckForLinkedWorkItemsMode.Disabled)]
-    public void LinkWorkItem_ReturnsWorkItemLinkedEventAndCompletedEvent(string? reviewerUserId, ReviewerType reviewerType, ReviewerFeedback reviewerFeedback, CheckForLinkedWorkItemsMode checkForLinkedWorkItemsMode)
+    public async Task LinkWorkItem_ReturnsWorkItemLinkedEventAndCompletedEvent(string? reviewerUserId, ReviewerType reviewerType, ReviewerFeedback reviewerFeedback, CheckForLinkedWorkItemsMode checkForLinkedWorkItemsMode)
     {
         // Arrange
         var command = new LinkWorkItemCommand(Guid.NewGuid());
@@ -68,7 +68,7 @@ public partial class PullRequestTests
         var state = GetPullRequestState(checkForLinkedWorkItemsMode: checkForLinkedWorkItemsMode, autoCompleteMode: AutoCompleteMode.Enabled, reviewers: reviewers);
 
         // Act
-        var result = PullRequestCommandProcessor.Process(state, command);
+        var result = await PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.True(result.TryGetEvents(out var events, out _));
@@ -84,7 +84,7 @@ public partial class PullRequestTests
     [InlineData(AutoCompleteMode.Enabled, "073cb612-720e-4813-adfc-ffe021d3db08", ReviewerType.Required, ReviewerFeedback.None)]
     [InlineData(AutoCompleteMode.Enabled, "073cb612-720e-4813-adfc-ffe021d3db08", ReviewerType.Required, ReviewerFeedback.WaitingForAuthor)]
     [InlineData(AutoCompleteMode.Enabled, "073cb612-720e-4813-adfc-ffe021d3db08", ReviewerType.Required, ReviewerFeedback.Rejected)]
-    public void LinkWorkItem_ReturnsWorkItemLinkedEvent(AutoCompleteMode autoCompleteMode, string? reviewerUserId, ReviewerType reviewerType, ReviewerFeedback reviewerFeedback)
+    public async Task LinkWorkItem_ReturnsWorkItemLinkedEvent(AutoCompleteMode autoCompleteMode, string? reviewerUserId, ReviewerType reviewerType, ReviewerFeedback reviewerFeedback)
     {
         // Arrange
         var command = new LinkWorkItemCommand(Guid.NewGuid());
@@ -92,7 +92,7 @@ public partial class PullRequestTests
         var state = GetPullRequestState(autoCompleteMode: autoCompleteMode, reviewers: reviewers);
 
         // Act
-        var result = PullRequestCommandProcessor.Process(state, command);
+        var result = await PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.True(result.TryGetEvents(out var events, out _));

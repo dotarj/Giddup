@@ -8,14 +8,14 @@ namespace Giddup.ApplicationCore.Tests.Domain.PullRequests;
 public partial class PullRequestTests
 {
     [Fact]
-    public void Reactivate_NotCreated_ReturnsNotCreatedError()
+    public async Task Reactivate_NotCreated_ReturnsNotCreatedError()
     {
         // Arrange
         var command = new ReactivateCommand();
         var state = IPullRequestState.InitialState;
 
         // Act
-        var result = PullRequestCommandProcessor.Process(state, command);
+        var result = await PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.False(result.TryGetEvents(out _, out var error));
@@ -23,14 +23,14 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public void Reactivate_AlreadyActive_ReturnsNoEvents()
+    public async Task Reactivate_AlreadyActive_ReturnsNoEvents()
     {
         // Arrange
         var command = new ReactivateCommand();
         var state = GetPullRequestState();
 
         // Act
-        var result = PullRequestCommandProcessor.Process(state, command);
+        var result = await PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.True(result.TryGetEvents(out var events, out _));
@@ -38,14 +38,14 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public void Reactivate_Completed_ReturnsNotAbandonedError()
+    public async Task Reactivate_Completed_ReturnsNotAbandonedError()
     {
         // Arrange
         var command = new ReactivateCommand();
         var state = GetPullRequestState(status: PullRequestStatus.Completed);
 
         // Act
-        var result = PullRequestCommandProcessor.Process(state, command);
+        var result = await PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.False(result.TryGetEvents(out _, out var error));
@@ -53,14 +53,14 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public void Reactivate_ReturnsReactivatedEvent()
+    public async Task Reactivate_ReturnsReactivatedEvent()
     {
         // Arrange
         var command = new ReactivateCommand();
         var state = GetPullRequestState(status: PullRequestStatus.Abandoned);
 
         // Act
-        var result = PullRequestCommandProcessor.Process(state, command);
+        var result = await PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.True(result.TryGetEvents(out var events, out _));

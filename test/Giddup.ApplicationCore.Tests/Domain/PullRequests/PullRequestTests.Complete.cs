@@ -8,14 +8,14 @@ namespace Giddup.ApplicationCore.Tests.Domain.PullRequests;
 public partial class PullRequestTests
 {
     [Fact]
-    public void Complete_NotCreated_ReturnsNotCreatedError()
+    public async Task Complete_NotCreated_ReturnsNotCreatedError()
     {
         // Arrange
         var command = new CompleteCommand();
         var state = IPullRequestState.InitialState;
 
         // Act
-        var result = PullRequestCommandProcessor.Process(state, command);
+        var result = await PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.False(result.TryGetEvents(out _, out var error));
@@ -25,14 +25,14 @@ public partial class PullRequestTests
     [Theory]
     [InlineData(PullRequestStatus.Abandoned)]
     [InlineData(PullRequestStatus.Completed)]
-    public void Complete_InvalidStatus_ReturnsNotActiveError(PullRequestStatus status)
+    public async Task Complete_InvalidStatus_ReturnsNotActiveError(PullRequestStatus status)
     {
         // Arrange
         var command = new CompleteCommand();
         var state = GetPullRequestState(status: status);
 
         // Act
-        var result = PullRequestCommandProcessor.Process(state, command);
+        var result = await PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.False(result.TryGetEvents(out _, out var error));
@@ -42,14 +42,14 @@ public partial class PullRequestTests
     [Theory]
     [InlineData(ReviewerFeedback.WaitingForAuthor)]
     [InlineData(ReviewerFeedback.Rejected)]
-    public void Complete_ReviewerFeedbackWaitForAuthorOrReject_ReturnsFeedbackContainsWaitForAuthorOrRejectError(ReviewerFeedback feedback)
+    public async Task Complete_ReviewerFeedbackWaitForAuthorOrReject_ReturnsFeedbackContainsWaitForAuthorOrRejectError(ReviewerFeedback feedback)
     {
         // Arrange
         var command = new CompleteCommand();
         var state = GetPullRequestState(reviewers: GetReviewers((Guid.NewGuid(), ReviewerType.Optional, feedback)));
 
         // Act
-        var result = PullRequestCommandProcessor.Process(state, command);
+        var result = await PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.False(result.TryGetEvents(out _, out var error));
@@ -57,14 +57,14 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public void Complete_RequiredReviewerFeedbackNotApproveOrApproveWithSuggestions_ReturnsNotAllRequiredReviewersApprovedError()
+    public async Task Complete_RequiredReviewerFeedbackNotApproveOrApproveWithSuggestions_ReturnsNotAllRequiredReviewersApprovedError()
     {
         // Arrange
         var command = new CompleteCommand();
         var state = GetPullRequestState(reviewers: GetReviewers((Guid.NewGuid(), ReviewerType.Required, ReviewerFeedback.None)));
 
         // Act
-        var result = PullRequestCommandProcessor.Process(state, command);
+        var result = await PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.False(result.TryGetEvents(out _, out var error));
@@ -72,14 +72,14 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public void Complete_NoWorkItemLinked_ReturnsNoWorkItemLinkedError()
+    public async Task Complete_NoWorkItemLinked_ReturnsNoWorkItemLinkedError()
     {
         // Arrange
         var command = new CompleteCommand();
         var state = GetPullRequestState(checkForLinkedWorkItemsMode: CheckForLinkedWorkItemsMode.Enabled);
 
         // Act
-        var result = PullRequestCommandProcessor.Process(state, command);
+        var result = await PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.False(result.TryGetEvents(out _, out var error));
@@ -87,14 +87,14 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public void Complete_NoWorkItemLinked_ReturnsCompletedEvent()
+    public async Task Complete_NoWorkItemLinked_ReturnsCompletedEvent()
     {
         // Arrange
         var command = new CompleteCommand();
         var state = GetPullRequestState();
 
         // Act
-        var result = PullRequestCommandProcessor.Process(state, command);
+        var result = await PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.True(result.TryGetEvents(out var events, out _));
@@ -103,14 +103,14 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public void Complete_WorkItemLinked_ReturnsCompletedEvent()
+    public async Task Complete_WorkItemLinked_ReturnsCompletedEvent()
     {
         // Arrange
         var command = new CompleteCommand();
         var state = GetPullRequestState(checkForLinkedWorkItemsMode: CheckForLinkedWorkItemsMode.Enabled, workItems: GetWorkItems(Guid.NewGuid()));
 
         // Act
-        var result = PullRequestCommandProcessor.Process(state, command);
+        var result = await PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.True(result.TryGetEvents(out var events, out _));

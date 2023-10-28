@@ -10,6 +10,10 @@ public record NotCreatedError : IPullRequestError;
 
 public record AlreadyCreatedError : IPullRequestError;
 
+public record InvalidSourceBranchError : IPullRequestError;
+
+public record InvalidTargetBranchError : IPullRequestError;
+
 public record NotActiveError : IPullRequestError;
 
 public record ReviewerNotFoundError(Guid UserId) : IPullRequestError;

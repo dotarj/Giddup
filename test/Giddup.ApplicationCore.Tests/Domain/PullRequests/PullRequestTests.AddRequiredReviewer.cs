@@ -8,14 +8,14 @@ namespace Giddup.ApplicationCore.Tests.Domain.PullRequests;
 public partial class PullRequestTests
 {
     [Fact]
-    public void AddRequiredReviewer_NotCreated_ReturnsNotCreatedError()
+    public async Task AddRequiredReviewer_NotCreated_ReturnsNotCreatedError()
     {
         // Arrange
         var command = new AddRequiredReviewerCommand(Guid.NewGuid());
         var state = IPullRequestState.InitialState;
 
         // Act
-        var result = PullRequestCommandProcessor.Process(state, command);
+        var result = await PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.False(result.TryGetEvents(out _, out var error));
@@ -25,14 +25,14 @@ public partial class PullRequestTests
     [Theory]
     [InlineData(PullRequestStatus.Abandoned)]
     [InlineData(PullRequestStatus.Completed)]
-    public void AddRequiredReviewer_InvalidStatus_ReturnsNotActiveError(PullRequestStatus status)
+    public async Task AddRequiredReviewer_InvalidStatus_ReturnsNotActiveError(PullRequestStatus status)
     {
         // Arrange
         var command = new AddRequiredReviewerCommand(Guid.NewGuid());
         var state = GetPullRequestState(status: status);
 
         // Act
-        var result = PullRequestCommandProcessor.Process(state, command);
+        var result = await PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.False(result.TryGetEvents(out _, out var error));
@@ -40,14 +40,14 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public void AddRequiredReviewer_ExistingReviewer_ReturnsNoEvents()
+    public async Task AddRequiredReviewer_ExistingReviewer_ReturnsNoEvents()
     {
         // Arrange
         var command = new AddRequiredReviewerCommand(Guid.NewGuid());
         var state = GetPullRequestState(reviewers: GetReviewers((command.UserId, ReviewerType.Optional, ReviewerFeedback.None)));
 
         // Act
-        var result = PullRequestCommandProcessor.Process(state, command);
+        var result = await PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.True(result.TryGetEvents(out var events, out _));
@@ -55,14 +55,14 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public void AddRequiredReviewer_ReturnsRequiredReviewerAddedEvent()
+    public async Task AddRequiredReviewer_ReturnsRequiredReviewerAddedEvent()
     {
         // Arrange
         var command = new AddRequiredReviewerCommand(Guid.NewGuid());
         var state = GetPullRequestState();
 
         // Act
-        var result = PullRequestCommandProcessor.Process(state, command);
+        var result = await PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.True(result.TryGetEvents(out var events, out _));

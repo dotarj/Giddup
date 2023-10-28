@@ -19,7 +19,7 @@ public class PullRequestService : IPullRequestService
     {
         var (state, revision) = await _stateProvider.Provide(pullRequestId);
 
-        var result = PullRequestCommandProcessor.Process(state, command);
+        var result = await PullRequestCommandProcessor.Process(state, command);
 
         if (!result.TryGetEvents(out var events, out var error))
         {

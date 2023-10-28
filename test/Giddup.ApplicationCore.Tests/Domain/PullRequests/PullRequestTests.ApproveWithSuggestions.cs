@@ -8,14 +8,14 @@ namespace Giddup.ApplicationCore.Tests.Domain.PullRequests;
 public partial class PullRequestTests
 {
     [Fact]
-    public void ApproveWithSuggestions_NotCreated_ReturnsNotCreatedError()
+    public async Task ApproveWithSuggestions_NotCreated_ReturnsNotCreatedError()
     {
         // Arrange
         var command = new ApproveWithSuggestionsCommand(Guid.NewGuid());
         var state = IPullRequestState.InitialState;
 
         // Act
-        var result = PullRequestCommandProcessor.Process(state, command);
+        var result = await PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.False(result.TryGetEvents(out _, out var error));
@@ -25,14 +25,14 @@ public partial class PullRequestTests
     [Theory]
     [InlineData(PullRequestStatus.Abandoned)]
     [InlineData(PullRequestStatus.Completed)]
-    public void ApproveWithSuggestions_InvalidStatus_ReturnsNotActiveError(PullRequestStatus status)
+    public async Task ApproveWithSuggestions_InvalidStatus_ReturnsNotActiveError(PullRequestStatus status)
     {
         // Arrange
         var command = new ApproveWithSuggestionsCommand(Guid.NewGuid());
         var state = GetPullRequestState(status: status);
 
         // Act
-        var result = PullRequestCommandProcessor.Process(state, command);
+        var result = await PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.False(result.TryGetEvents(out _, out var error));
@@ -40,14 +40,14 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public void ApproveWithSuggestions_NotExistingReviewer_ReturnsOptionalReviewerAddedEventAndApprovedEvent()
+    public async Task ApproveWithSuggestions_NotExistingReviewer_ReturnsOptionalReviewerAddedEventAndApprovedEvent()
     {
         // Arrange
         var command = new ApproveWithSuggestionsCommand(Guid.NewGuid());
         var state = GetPullRequestState();
 
         // Act
-        var result = PullRequestCommandProcessor.Process(state, command);
+        var result = await PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.True(result.TryGetEvents(out var events, out _));
@@ -62,7 +62,7 @@ public partial class PullRequestTests
     [InlineData("073cb612-720e-4813-adfc-ffe021d3db08", ReviewerType.Optional, ReviewerFeedback.None, CheckForLinkedWorkItemsMode.Disabled, null)]
     [InlineData(null, ReviewerType.Required, ReviewerFeedback.Approved, CheckForLinkedWorkItemsMode.Enabled, "528705cb-0a97-4564-b2bb-f89f514b54e6")]
     [InlineData(null, ReviewerType.Required, ReviewerFeedback.Approved, CheckForLinkedWorkItemsMode.Disabled, null)]
-    public void ApproveWithSuggestions_ReturnsApprovedWithSuggestionsEventAndCompletedEvent(string? reviewerUserId, ReviewerType reviewerType, ReviewerFeedback reviewerFeedback, CheckForLinkedWorkItemsMode checkForLinkedWorkItemsMode, string? workItemId)
+    public async Task ApproveWithSuggestions_ReturnsApprovedWithSuggestionsEventAndCompletedEvent(string? reviewerUserId, ReviewerType reviewerType, ReviewerFeedback reviewerFeedback, CheckForLinkedWorkItemsMode checkForLinkedWorkItemsMode, string? workItemId)
     {
         // Arrange
         var command = new ApproveWithSuggestionsCommand(Guid.NewGuid());
@@ -71,7 +71,7 @@ public partial class PullRequestTests
         var state = GetPullRequestState(checkForLinkedWorkItemsMode: checkForLinkedWorkItemsMode, autoCompleteMode: AutoCompleteMode.Enabled, reviewers: reviewers, workItems: workItems);
 
         // Act
-        var result = PullRequestCommandProcessor.Process(state, command);
+        var result = await PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.True(result.TryGetEvents(out var events, out _));
@@ -88,7 +88,7 @@ public partial class PullRequestTests
     [InlineData(AutoCompleteMode.Enabled, "073cb612-720e-4813-adfc-ffe021d3db08", ReviewerType.Required, ReviewerFeedback.WaitingForAuthor, CheckForLinkedWorkItemsMode.Disabled)]
     [InlineData(AutoCompleteMode.Enabled, "073cb612-720e-4813-adfc-ffe021d3db08", ReviewerType.Required, ReviewerFeedback.Rejected, CheckForLinkedWorkItemsMode.Disabled)]
     [InlineData(AutoCompleteMode.Enabled, null, ReviewerType.Required, ReviewerFeedback.Approved, CheckForLinkedWorkItemsMode.Enabled)]
-    public void ApproveWithSuggestions_ReturnsApprovedWithSuggestionsEvent(AutoCompleteMode autoCompleteMode, string? reviewerUserId, ReviewerType reviewerType, ReviewerFeedback reviewerFeedback, CheckForLinkedWorkItemsMode checkForLinkedWorkItemsMode)
+    public async Task ApproveWithSuggestions_ReturnsApprovedWithSuggestionsEvent(AutoCompleteMode autoCompleteMode, string? reviewerUserId, ReviewerType reviewerType, ReviewerFeedback reviewerFeedback, CheckForLinkedWorkItemsMode checkForLinkedWorkItemsMode)
     {
         // Arrange
         var command = new ApproveWithSuggestionsCommand(Guid.NewGuid());
@@ -96,7 +96,7 @@ public partial class PullRequestTests
         var state = GetPullRequestState(checkForLinkedWorkItemsMode: checkForLinkedWorkItemsMode, autoCompleteMode: autoCompleteMode, reviewers: reviewers);
 
         // Act
-        var result = PullRequestCommandProcessor.Process(state, command);
+        var result = await PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.True(result.TryGetEvents(out var events, out _));

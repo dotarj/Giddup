@@ -8,14 +8,14 @@ namespace Giddup.ApplicationCore.Tests.Domain.PullRequests;
 public partial class PullRequestTests
 {
     [Fact]
-    public void CancelAutoComplete_NotCreated_ReturnsNotCreatedError()
+    public async Task CancelAutoComplete_NotCreated_ReturnsNotCreatedError()
     {
         // Arrange
         var command = new CancelAutoCompleteCommand();
         var state = IPullRequestState.InitialState;
 
         // Act
-        var result = PullRequestCommandProcessor.Process(state, command);
+        var result = await PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.False(result.TryGetEvents(out _, out var error));
@@ -25,14 +25,14 @@ public partial class PullRequestTests
     [Theory]
     [InlineData(PullRequestStatus.Abandoned)]
     [InlineData(PullRequestStatus.Completed)]
-    public void CancelAutoComplete_InvalidStatus_ReturnsNotActiveError(PullRequestStatus status)
+    public async Task CancelAutoComplete_InvalidStatus_ReturnsNotActiveError(PullRequestStatus status)
     {
         // Arrange
         var command = new CancelAutoCompleteCommand();
         var state = GetPullRequestState(status: status);
 
         // Act
-        var result = PullRequestCommandProcessor.Process(state, command);
+        var result = await PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.False(result.TryGetEvents(out _, out var error));
@@ -40,14 +40,14 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public void CancelAutoComplete_AlreadyDisabled_ReturnsNoEvents()
+    public async Task CancelAutoComplete_AlreadyDisabled_ReturnsNoEvents()
     {
         // Arrange
         var command = new CancelAutoCompleteCommand();
         var state = GetPullRequestState();
 
         // Act
-        var result = PullRequestCommandProcessor.Process(state, command);
+        var result = await PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.True(result.TryGetEvents(out var events, out _));
@@ -55,14 +55,14 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public void CancelAutoComplete_ReturnsAutoCompleteCancelledEvent()
+    public async Task CancelAutoComplete_ReturnsAutoCompleteCancelledEvent()
     {
         // Arrange
         var command = new CancelAutoCompleteCommand();
         var state = GetPullRequestState(autoCompleteMode: AutoCompleteMode.Enabled);
 
         // Act
-        var result = PullRequestCommandProcessor.Process(state, command);
+        var result = await PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.True(result.TryGetEvents(out var events, out _));

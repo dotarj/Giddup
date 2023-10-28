@@ -8,14 +8,14 @@ namespace Giddup.ApplicationCore.Tests.Domain.PullRequests;
 public partial class PullRequestTests
 {
     [Fact]
-    public void ChangeDescription_NotCreated_ReturnsNotCreatedError()
+    public async Task ChangeDescription_NotCreated_ReturnsNotCreatedError()
     {
         // Arrange
         var command = new ChangeDescriptionCommand("baz");
         var state = IPullRequestState.InitialState;
 
         // Act
-        var result = PullRequestCommandProcessor.Process(state, command);
+        var result = await PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.False(result.TryGetEvents(out _, out var error));
@@ -25,14 +25,14 @@ public partial class PullRequestTests
     [Theory]
     [InlineData(PullRequestStatus.Abandoned)]
     [InlineData(PullRequestStatus.Completed)]
-    public void ChangeDescription_InvalidStatus_ReturnsNotActiveError(PullRequestStatus status)
+    public async Task ChangeDescription_InvalidStatus_ReturnsNotActiveError(PullRequestStatus status)
     {
         // Arrange
         var command = new ChangeDescriptionCommand("baz");
         var state = GetPullRequestState(status: status);
 
         // Act
-        var result = PullRequestCommandProcessor.Process(state, command);
+        var result = await PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.False(result.TryGetEvents(out _, out var error));
@@ -40,14 +40,14 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public void ChangeDescription_SameDescription_ReturnsNoEvents()
+    public async Task ChangeDescription_SameDescription_ReturnsNoEvents()
     {
         // Arrange
         var command = new ChangeDescriptionCommand("bar");
         var state = GetPullRequestState(description: command.Description);
 
         // Act
-        var result = PullRequestCommandProcessor.Process(state, command);
+        var result = await PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.True(result.TryGetEvents(out var events, out _));
@@ -55,14 +55,14 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public void ChangeDescription_ReturnsRequiredReviewerAddedEvent()
+    public async Task ChangeDescription_ReturnsDescriptionChangedEvent()
     {
         // Arrange
         var command = new ChangeDescriptionCommand("baz");
         var state = GetPullRequestState();
 
         // Act
-        var result = PullRequestCommandProcessor.Process(state, command);
+        var result = await PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.True(result.TryGetEvents(out var events, out _));

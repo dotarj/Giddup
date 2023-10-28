@@ -8,14 +8,14 @@ namespace Giddup.ApplicationCore.Tests.Domain.PullRequests;
 public partial class PullRequestTests
 {
     [Fact]
-    public void Abandon_NotCreated_ReturnsNotCreatedError()
+    public async Task Abandon_NotCreated_ReturnsNotCreatedError()
     {
         // Arrange
         var command = new AbandonCommand();
         var state = IPullRequestState.InitialState;
 
         // Act
-        var result = PullRequestCommandProcessor.Process(state, command);
+        var result = await PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.False(result.TryGetEvents(out _, out var error));
@@ -23,14 +23,14 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public void Abandon_AlreadyAbandoned_ReturnsNoEvents()
+    public async Task Abandon_AlreadyAbandoned_ReturnsNoEvents()
     {
         // Arrange
         var command = new AbandonCommand();
         var state = GetPullRequestState(status: PullRequestStatus.Abandoned);
 
         // Act
-        var result = PullRequestCommandProcessor.Process(state, command);
+        var result = await PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.True(result.TryGetEvents(out var events, out _));
@@ -38,14 +38,14 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public void Abandon_Completed_ReturnsNotActiveError()
+    public async Task Abandon_Completed_ReturnsNotActiveError()
     {
         // Arrange
         var command = new AbandonCommand();
         var state = GetPullRequestState(status: PullRequestStatus.Completed);
 
         // Act
-        var result = PullRequestCommandProcessor.Process(state, command);
+        var result = await PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.False(result.TryGetEvents(out _, out var error));
@@ -53,14 +53,14 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public void Abandon_ReturnsAbandonedEvent()
+    public async Task Abandon_ReturnsAbandonedEvent()
     {
         // Arrange
         var command = new AbandonCommand();
         var state = GetPullRequestState();
 
         // Act
-        var result = PullRequestCommandProcessor.Process(state, command);
+        var result = await PullRequestCommandProcessor.Process(state, command);
 
         // Assert
         Assert.True(result.TryGetEvents(out var events, out _));

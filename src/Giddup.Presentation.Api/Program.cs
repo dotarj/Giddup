@@ -9,6 +9,7 @@ using Giddup.Presentation.Api.AppStartup;
 var builder = WebApplication.CreateBuilder(args);
 
 _ = builder.Services
+    .AddSingleton<IBranchService, BranchService>()
     .AddSingleton<IEventStream, EventStream>()
     .AddSingleton<IPullRequestEventProcessor, PullRequestEventProcessor>()
     .AddSingleton<IPullRequestService, PullRequestService>()

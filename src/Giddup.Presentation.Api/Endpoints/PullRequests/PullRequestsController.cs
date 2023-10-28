@@ -3,6 +3,7 @@
 using Giddup.ApplicationCore.Application.PullRequests;
 using Giddup.ApplicationCore.Domain;
 using Giddup.ApplicationCore.Domain.PullRequests;
+using Giddup.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,19 +20,19 @@ public class PullRequestsController : ControllerBase
 
     [HttpPost]
     [Route("/pull-requests/create")]
-    public async Task<IActionResult> Create(CreateInput input)
+    public async Task<IActionResult> Create([FromServices] IBranchService branchService, CreateInput input)
     {
         var pullRequestId = Guid.NewGuid();
 
-        var error = await _pullRequestService.ProcessCommand(pullRequestId, new CreateCommand(User.GetUserId(), input.SourceBranch, input.TargetBranch, input.Title));
+        var error = await _pullRequestService.ProcessCommand(pullRequestId, new CreateCommand(User.GetUserId(), input.SourceBranch, input.TargetBranch, input.Title, branchService.IsExistingBranch));
 
         return CreateResult(error, Request.Path, () => Created($"/pull-requests/{pullRequestId}", null));
     }
 
     [HttpPost]
     [Route("/pull-requests/{pullRequestId:guid}/change-target-branch")]
-    public Task<IActionResult> ChangeTargetBranch(Guid pullRequestId, ChangeTargetBranchInput input)
-        => ProcessCommand(pullRequestId, new ChangeTargetBranchCommand(input.TargetBranch));
+    public Task<IActionResult> ChangeTargetBranch(Guid pullRequestId, [FromServices] IBranchService branchService, ChangeTargetBranchInput input)
+        => ProcessCommand(pullRequestId, new ChangeTargetBranchCommand(input.TargetBranch, branchService.IsExistingBranch));
 
     [HttpPost]
     [Route("/pull-requests/{pullRequestId:guid}/change-title")]
