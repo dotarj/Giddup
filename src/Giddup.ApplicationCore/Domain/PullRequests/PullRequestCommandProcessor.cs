@@ -4,7 +4,7 @@ namespace Giddup.ApplicationCore.Domain.PullRequests;
 
 public static class PullRequestCommandProcessor
 {
-    public static DeciderResult<IPullRequestEvent, IPullRequestError> Process(IPullRequestState state, IPullRequestCommand command)
+    public static CommandProcessorResult<IPullRequestEvent, IPullRequestError> Process(IPullRequestState state, IPullRequestCommand command)
     {
         if (state is PullRequestCreatedState createdState)
         {
@@ -48,7 +48,7 @@ public static class PullRequestCommandProcessor
         return new CreatedEvent(createCommand.Owner, createCommand.SourceBranch, createCommand.TargetBranch, createCommand.Title);
     }
 
-    private static DeciderResult<IPullRequestEvent, IPullRequestError> ChangeTitle(Title title, PullRequestCreatedState state)
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> ChangeTitle(Title title, PullRequestCreatedState state)
     {
         if (state.Status != PullRequestStatus.Active)
         {
@@ -63,7 +63,7 @@ public static class PullRequestCommandProcessor
         return new TitleChangedEvent(title);
     }
 
-    private static DeciderResult<IPullRequestEvent, IPullRequestError> ChangeDescription(string description, PullRequestCreatedState state)
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> ChangeDescription(string description, PullRequestCreatedState state)
     {
         if (state.Status != PullRequestStatus.Active)
         {
@@ -78,7 +78,7 @@ public static class PullRequestCommandProcessor
         return new DescriptionChangedEvent(description);
     }
 
-    private static DeciderResult<IPullRequestEvent, IPullRequestError> AddRequiredReviewer(Guid userId, PullRequestCreatedState state)
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> AddRequiredReviewer(Guid userId, PullRequestCreatedState state)
     {
         if (state.Status != PullRequestStatus.Active)
         {
@@ -93,7 +93,7 @@ public static class PullRequestCommandProcessor
         return new RequiredReviewerAddedEvent(userId);
     }
 
-    private static DeciderResult<IPullRequestEvent, IPullRequestError> AddOptionalReviewer(Guid userId, PullRequestCreatedState state)
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> AddOptionalReviewer(Guid userId, PullRequestCreatedState state)
     {
         if (state.Status != PullRequestStatus.Active)
         {
@@ -108,7 +108,7 @@ public static class PullRequestCommandProcessor
         return new OptionalReviewerAddedEvent(userId);
     }
 
-    private static DeciderResult<IPullRequestEvent, IPullRequestError> MakeReviewerRequired(Guid userId, PullRequestCreatedState state)
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> MakeReviewerRequired(Guid userId, PullRequestCreatedState state)
     {
         if (state.Status != PullRequestStatus.Active)
         {
@@ -130,7 +130,7 @@ public static class PullRequestCommandProcessor
         return new ReviewerMadeRequiredEvent(userId);
     }
 
-    private static DeciderResult<IPullRequestEvent, IPullRequestError> MakeReviewerOptional(Guid userId, PullRequestCreatedState state)
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> MakeReviewerOptional(Guid userId, PullRequestCreatedState state)
     {
         if (state.Status != PullRequestStatus.Active)
         {
@@ -159,7 +159,7 @@ public static class PullRequestCommandProcessor
         return events.ToArray();
     }
 
-    private static DeciderResult<IPullRequestEvent, IPullRequestError> RemoveReviewer(Guid userId, PullRequestCreatedState state)
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> RemoveReviewer(Guid userId, PullRequestCreatedState state)
     {
         if (state.Status != PullRequestStatus.Active)
         {
@@ -181,7 +181,7 @@ public static class PullRequestCommandProcessor
         return events.ToArray();
     }
 
-    private static DeciderResult<IPullRequestEvent, IPullRequestError> Approve(Guid userId, PullRequestCreatedState state)
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> Approve(Guid userId, PullRequestCreatedState state)
     {
         if (state.Status != PullRequestStatus.Active)
         {
@@ -212,7 +212,7 @@ public static class PullRequestCommandProcessor
         return events.ToArray();
     }
 
-    private static DeciderResult<IPullRequestEvent, IPullRequestError> ApproveWithSuggestions(Guid userId, PullRequestCreatedState state)
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> ApproveWithSuggestions(Guid userId, PullRequestCreatedState state)
     {
         if (state.Status != PullRequestStatus.Active)
         {
@@ -243,7 +243,7 @@ public static class PullRequestCommandProcessor
         return events.ToArray();
     }
 
-    private static DeciderResult<IPullRequestEvent, IPullRequestError> WaitForAuthor(Guid userId, PullRequestCreatedState state)
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> WaitForAuthor(Guid userId, PullRequestCreatedState state)
     {
         if (state.Status != PullRequestStatus.Active)
         {
@@ -262,7 +262,7 @@ public static class PullRequestCommandProcessor
         return events.ToArray();
     }
 
-    private static DeciderResult<IPullRequestEvent, IPullRequestError> Reject(Guid userId, PullRequestCreatedState state)
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> Reject(Guid userId, PullRequestCreatedState state)
     {
         if (state.Status != PullRequestStatus.Active)
         {
@@ -281,7 +281,7 @@ public static class PullRequestCommandProcessor
         return events.ToArray();
     }
 
-    private static DeciderResult<IPullRequestEvent, IPullRequestError> ResetFeedback(Guid userId, PullRequestCreatedState state)
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> ResetFeedback(Guid userId, PullRequestCreatedState state)
     {
         if (state.Status != PullRequestStatus.Active)
         {
@@ -303,7 +303,7 @@ public static class PullRequestCommandProcessor
         return events.ToArray();
     }
 
-    private static DeciderResult<IPullRequestEvent, IPullRequestError> LinkWorkItem(Guid workItemId, PullRequestCreatedState state)
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> LinkWorkItem(Guid workItemId, PullRequestCreatedState state)
     {
         if (state.Status != PullRequestStatus.Active)
         {
@@ -325,7 +325,7 @@ public static class PullRequestCommandProcessor
         return events.ToArray();
     }
 
-    private static DeciderResult<IPullRequestEvent, IPullRequestError> RemoveWorkItem(Guid workItemId, PullRequestCreatedState state)
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> RemoveWorkItem(Guid workItemId, PullRequestCreatedState state)
     {
         if (state.Status != PullRequestStatus.Active)
         {
@@ -340,7 +340,7 @@ public static class PullRequestCommandProcessor
         return new WorkItemRemovedEvent(workItemId);
     }
 
-    private static DeciderResult<IPullRequestEvent, IPullRequestError> Complete(PullRequestCreatedState state)
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> Complete(PullRequestCreatedState state)
     {
         if (state.Status != PullRequestStatus.Active)
         {
@@ -367,7 +367,7 @@ public static class PullRequestCommandProcessor
         return new CompletedEvent();
     }
 
-    private static DeciderResult<IPullRequestEvent, IPullRequestError> SetAutoComplete(PullRequestCreatedState state)
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> SetAutoComplete(PullRequestCreatedState state)
     {
         if (state.Status != PullRequestStatus.Active)
         {
@@ -389,7 +389,7 @@ public static class PullRequestCommandProcessor
         return events.ToArray();
     }
 
-    private static DeciderResult<IPullRequestEvent, IPullRequestError> CancelAutoComplete(PullRequestCreatedState state)
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> CancelAutoComplete(PullRequestCreatedState state)
     {
         if (state.Status != PullRequestStatus.Active)
         {
@@ -404,7 +404,7 @@ public static class PullRequestCommandProcessor
         return new AutoCompleteCancelledEvent();
     }
 
-    private static DeciderResult<IPullRequestEvent, IPullRequestError> Abandon(PullRequestCreatedState state)
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> Abandon(PullRequestCreatedState state)
     {
         if (state.Status == PullRequestStatus.Abandoned)
         {
@@ -419,7 +419,7 @@ public static class PullRequestCommandProcessor
         return new AbandonedEvent();
     }
 
-    private static DeciderResult<IPullRequestEvent, IPullRequestError> Reactivate(PullRequestCreatedState state)
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> Reactivate(PullRequestCreatedState state)
     {
         if (state.Status == PullRequestStatus.Active)
         {

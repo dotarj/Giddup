@@ -13,7 +13,8 @@ public class PullRequestsController : ControllerBase
 {
     private readonly IPullRequestService _pullRequestService;
 
-    public PullRequestsController(IPullRequestService pullRequestService) => _pullRequestService = pullRequestService;
+    public PullRequestsController(IPullRequestService pullRequestService)
+        => _pullRequestService = pullRequestService;
 
     [HttpPost]
     [Route("/pull-requests/create")]
