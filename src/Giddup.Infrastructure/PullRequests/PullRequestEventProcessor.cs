@@ -1,5 +1,6 @@
 // Copyright (c) Arjen Post. See LICENSE in the project root for license information.
 
+using System.Collections.Immutable;
 using Giddup.ApplicationCore.Domain.PullRequests;
 using Giddup.ApplicationCore.PullRequests;
 
@@ -12,7 +13,7 @@ public class PullRequestEventProcessor : IPullRequestEventProcessor
     public PullRequestEventProcessor(IEventStream eventStream)
         => _eventStream = eventStream;
 
-    public Task Process(Guid pullRequestId, ulong? revision, IReadOnlyCollection<IPullRequestEvent> events)
+    public Task Process(Guid pullRequestId, ulong? revision, ImmutableList<IPullRequestEvent> events)
     {
         var streamName = $"pull-request-{pullRequestId}";
 

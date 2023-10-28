@@ -1,5 +1,6 @@
 // Copyright (c) Arjen Post. See LICENSE in the project root for license information.
 
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Giddup.ApplicationCore.Domain;
@@ -7,13 +8,13 @@ namespace Giddup.ApplicationCore.Domain;
 public readonly struct CommandProcessorResult<TEvent, TError>
 {
     private readonly bool _isError;
-    private readonly IReadOnlyCollection<TEvent>? _events;
+    private readonly ImmutableList<TEvent>? _events;
     private readonly TError? _error;
 
     private CommandProcessorResult(IEnumerable<TEvent> events)
     {
         _isError = false;
-        _events = events.ToList().AsReadOnly();
+        _events = events.ToImmutableList();
         _error = default;
     }
 
@@ -30,7 +31,7 @@ public readonly struct CommandProcessorResult<TEvent, TError>
 
     public static implicit operator CommandProcessorResult<TEvent, TError>(TError error) => new(error);
 
-    public bool TryGetEvents([NotNullWhen(true)]out IReadOnlyCollection<TEvent>? events, [NotNullWhen(false)]out TError? error)
+    public bool TryGetEvents([NotNullWhen(true)]out ImmutableList<TEvent>? events, [NotNullWhen(false)]out TError? error)
     {
         events = !_isError ? _events : null;
         error = _isError ? _error : default;
