@@ -3,7 +3,7 @@
 using Giddup.ApplicationCore.Domain;
 using Xunit;
 
-namespace Giddup.ApplicationCore.Tests.Domain.PullRequests;
+namespace Giddup.ApplicationCore.Tests.Domain;
 
 public class BranchNameTests
 {

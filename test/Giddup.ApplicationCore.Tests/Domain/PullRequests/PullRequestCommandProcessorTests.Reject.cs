@@ -5,13 +5,13 @@ using Xunit;
 
 namespace Giddup.ApplicationCore.Tests.Domain.PullRequests;
 
-public partial class PullRequestTests
+public partial class PullRequestCommandProcessorTests
 {
     [Fact]
-    public async Task RemoveWorkItem_NotCreated_ReturnsNotCreatedError()
+    public async Task Reject_NotCreated_ReturnsNotCreatedError()
     {
         // Arrange
-        var command = new RemoveWorkItemCommand(Guid.NewGuid());
+        var command = new RejectCommand(Guid.NewGuid());
         var state = IPullRequestState.InitialState;
 
         // Act
@@ -25,10 +25,10 @@ public partial class PullRequestTests
     [Theory]
     [InlineData(PullRequestStatus.Abandoned)]
     [InlineData(PullRequestStatus.Completed)]
-    public async Task RemoveWorkItem_InvalidStatus_ReturnsNotActiveError(PullRequestStatus status)
+    public async Task Reject_InvalidStatus_ReturnsNotActiveError(PullRequestStatus status)
     {
         // Arrange
-        var command = new RemoveWorkItemCommand(Guid.NewGuid());
+        var command = new RejectCommand(Guid.NewGuid());
         var state = GetPullRequestState(status: status);
 
         // Act
@@ -40,10 +40,10 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public async Task RemoveWorkItem_ExistingWorkItem_ReturnsNoEvents()
+    public async Task Reject_NotExistingReviewer_ReturnsOptionalReviewerAddedEventAndRejectedEvent()
     {
         // Arrange
-        var command = new RemoveWorkItemCommand(Guid.NewGuid());
+        var command = new RejectCommand(Guid.NewGuid());
         var state = GetPullRequestState();
 
         // Act
@@ -51,15 +51,17 @@ public partial class PullRequestTests
 
         // Assert
         Assert.True(result.TryGetEvents(out var events, out _));
-        Assert.Empty(events);
+        Assert.Equal(2, events!.Count);
+        _ = Assert.IsType<OptionalReviewerAddedEvent>(events.First());
+        _ = Assert.IsType<RejectedEvent>(events.Last());
     }
 
     [Fact]
-    public async Task RemoveWorkItem_ReturnsWorkItemRemovedEvent()
+    public async Task Reject_ReturnsRejectedEvent()
     {
         // Arrange
-        var command = new RemoveWorkItemCommand(Guid.NewGuid());
-        var state = GetPullRequestState(workItems: GetWorkItems(command.WorkItemId));
+        var command = new RejectCommand(Guid.NewGuid());
+        var state = GetPullRequestState(reviewers: GetReviewers((command.UserId, ReviewerType.Optional, ReviewerFeedback.None)));
 
         // Act
         var result = await PullRequestCommandProcessor.Process(state, command);
@@ -67,6 +69,6 @@ public partial class PullRequestTests
         // Assert
         Assert.True(result.TryGetEvents(out var events, out _));
         var @event = Assert.Single(events);
-        _ = Assert.IsType<WorkItemRemovedEvent>(@event);
+        _ = Assert.IsType<RejectedEvent>(@event);
     }
 }

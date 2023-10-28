@@ -5,13 +5,13 @@ using Xunit;
 
 namespace Giddup.ApplicationCore.Tests.Domain.PullRequests;
 
-public partial class PullRequestTests
+public partial class PullRequestCommandProcessorTests
 {
     [Fact]
-    public async Task Reject_NotCreated_ReturnsNotCreatedError()
+    public async Task CancelAutoComplete_NotCreated_ReturnsNotCreatedError()
     {
         // Arrange
-        var command = new RejectCommand(Guid.NewGuid());
+        var command = new CancelAutoCompleteCommand();
         var state = IPullRequestState.InitialState;
 
         // Act
@@ -25,10 +25,10 @@ public partial class PullRequestTests
     [Theory]
     [InlineData(PullRequestStatus.Abandoned)]
     [InlineData(PullRequestStatus.Completed)]
-    public async Task Reject_InvalidStatus_ReturnsNotActiveError(PullRequestStatus status)
+    public async Task CancelAutoComplete_InvalidStatus_ReturnsNotActiveError(PullRequestStatus status)
     {
         // Arrange
-        var command = new RejectCommand(Guid.NewGuid());
+        var command = new CancelAutoCompleteCommand();
         var state = GetPullRequestState(status: status);
 
         // Act
@@ -40,10 +40,10 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public async Task Reject_NotExistingReviewer_ReturnsOptionalReviewerAddedEventAndRejectedEvent()
+    public async Task CancelAutoComplete_AlreadyDisabled_ReturnsNoEvents()
     {
         // Arrange
-        var command = new RejectCommand(Guid.NewGuid());
+        var command = new CancelAutoCompleteCommand();
         var state = GetPullRequestState();
 
         // Act
@@ -51,17 +51,15 @@ public partial class PullRequestTests
 
         // Assert
         Assert.True(result.TryGetEvents(out var events, out _));
-        Assert.Equal(2, events!.Count);
-        _ = Assert.IsType<OptionalReviewerAddedEvent>(events.First());
-        _ = Assert.IsType<RejectedEvent>(events.Last());
+        Assert.Empty(events);
     }
 
     [Fact]
-    public async Task Reject_ReturnsRejectedEvent()
+    public async Task CancelAutoComplete_ReturnsAutoCompleteCancelledEvent()
     {
         // Arrange
-        var command = new RejectCommand(Guid.NewGuid());
-        var state = GetPullRequestState(reviewers: GetReviewers((command.UserId, ReviewerType.Optional, ReviewerFeedback.None)));
+        var command = new CancelAutoCompleteCommand();
+        var state = GetPullRequestState(autoCompleteMode: AutoCompleteMode.Enabled);
 
         // Act
         var result = await PullRequestCommandProcessor.Process(state, command);
@@ -69,6 +67,6 @@ public partial class PullRequestTests
         // Assert
         Assert.True(result.TryGetEvents(out var events, out _));
         var @event = Assert.Single(events);
-        _ = Assert.IsType<RejectedEvent>(@event);
+        _ = Assert.IsType<AutoCompleteCancelledEvent>(@event);
     }
 }

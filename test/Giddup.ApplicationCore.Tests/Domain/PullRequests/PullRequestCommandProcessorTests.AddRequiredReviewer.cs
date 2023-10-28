@@ -5,13 +5,13 @@ using Xunit;
 
 namespace Giddup.ApplicationCore.Tests.Domain.PullRequests;
 
-public partial class PullRequestTests
+public partial class PullRequestCommandProcessorTests
 {
     [Fact]
-    public async Task WaitForAuthor_NotCreated_ReturnsNotCreatedError()
+    public async Task AddRequiredReviewer_NotCreated_ReturnsNotCreatedError()
     {
         // Arrange
-        var command = new WaitForAuthorCommand(Guid.NewGuid());
+        var command = new AddRequiredReviewerCommand(Guid.NewGuid());
         var state = IPullRequestState.InitialState;
 
         // Act
@@ -25,10 +25,10 @@ public partial class PullRequestTests
     [Theory]
     [InlineData(PullRequestStatus.Abandoned)]
     [InlineData(PullRequestStatus.Completed)]
-    public async Task WaitForAuthor_InvalidStatus_ReturnsNotActiveError(PullRequestStatus status)
+    public async Task AddRequiredReviewer_InvalidStatus_ReturnsNotActiveError(PullRequestStatus status)
     {
         // Arrange
-        var command = new WaitForAuthorCommand(Guid.NewGuid());
+        var command = new AddRequiredReviewerCommand(Guid.NewGuid());
         var state = GetPullRequestState(status: status);
 
         // Act
@@ -40,27 +40,10 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public async Task WaitForAuthor_NotExistingReviewer_ReturnsOptionalReviewerAddedEventAndRejectedEvent()
+    public async Task AddRequiredReviewer_ExistingReviewer_ReturnsNoEvents()
     {
         // Arrange
-        var command = new WaitForAuthorCommand(Guid.NewGuid());
-        var state = GetPullRequestState();
-
-        // Act
-        var result = await PullRequestCommandProcessor.Process(state, command);
-
-        // Assert
-        Assert.True(result.TryGetEvents(out var events, out _));
-        Assert.Equal(2, events!.Count);
-        _ = Assert.IsType<OptionalReviewerAddedEvent>(events.First());
-        _ = Assert.IsType<WaitingForAuthorEvent>(events.Last());
-    }
-
-    [Fact]
-    public async Task WaitForAuthor_ReturnsWaitingForAuthorEvent()
-    {
-        // Arrange
-        var command = new WaitForAuthorCommand(Guid.NewGuid());
+        var command = new AddRequiredReviewerCommand(Guid.NewGuid());
         var state = GetPullRequestState(reviewers: GetReviewers((command.UserId, ReviewerType.Optional, ReviewerFeedback.None)));
 
         // Act
@@ -68,7 +51,22 @@ public partial class PullRequestTests
 
         // Assert
         Assert.True(result.TryGetEvents(out var events, out _));
+        Assert.Empty(events);
+    }
+
+    [Fact]
+    public async Task AddRequiredReviewer_ReturnsRequiredReviewerAddedEvent()
+    {
+        // Arrange
+        var command = new AddRequiredReviewerCommand(Guid.NewGuid());
+        var state = GetPullRequestState();
+
+        // Act
+        var result = await PullRequestCommandProcessor.Process(state, command);
+
+        // Assert
+        Assert.True(result.TryGetEvents(out var events, out _));
         var @event = Assert.Single(events);
-        _ = Assert.IsType<WaitingForAuthorEvent>(@event);
+        _ = Assert.IsType<RequiredReviewerAddedEvent>(@event);
     }
 }

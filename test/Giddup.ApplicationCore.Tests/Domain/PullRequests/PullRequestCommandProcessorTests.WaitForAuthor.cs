@@ -5,13 +5,13 @@ using Xunit;
 
 namespace Giddup.ApplicationCore.Tests.Domain.PullRequests;
 
-public partial class PullRequestTests
+public partial class PullRequestCommandProcessorTests
 {
     [Fact]
-    public async Task CancelAutoComplete_NotCreated_ReturnsNotCreatedError()
+    public async Task WaitForAuthor_NotCreated_ReturnsNotCreatedError()
     {
         // Arrange
-        var command = new CancelAutoCompleteCommand();
+        var command = new WaitForAuthorCommand(Guid.NewGuid());
         var state = IPullRequestState.InitialState;
 
         // Act
@@ -25,10 +25,10 @@ public partial class PullRequestTests
     [Theory]
     [InlineData(PullRequestStatus.Abandoned)]
     [InlineData(PullRequestStatus.Completed)]
-    public async Task CancelAutoComplete_InvalidStatus_ReturnsNotActiveError(PullRequestStatus status)
+    public async Task WaitForAuthor_InvalidStatus_ReturnsNotActiveError(PullRequestStatus status)
     {
         // Arrange
-        var command = new CancelAutoCompleteCommand();
+        var command = new WaitForAuthorCommand(Guid.NewGuid());
         var state = GetPullRequestState(status: status);
 
         // Act
@@ -40,10 +40,10 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public async Task CancelAutoComplete_AlreadyDisabled_ReturnsNoEvents()
+    public async Task WaitForAuthor_NotExistingReviewer_ReturnsOptionalReviewerAddedEventAndRejectedEvent()
     {
         // Arrange
-        var command = new CancelAutoCompleteCommand();
+        var command = new WaitForAuthorCommand(Guid.NewGuid());
         var state = GetPullRequestState();
 
         // Act
@@ -51,15 +51,17 @@ public partial class PullRequestTests
 
         // Assert
         Assert.True(result.TryGetEvents(out var events, out _));
-        Assert.Empty(events);
+        Assert.Equal(2, events!.Count);
+        _ = Assert.IsType<OptionalReviewerAddedEvent>(events.First());
+        _ = Assert.IsType<WaitingForAuthorEvent>(events.Last());
     }
 
     [Fact]
-    public async Task CancelAutoComplete_ReturnsAutoCompleteCancelledEvent()
+    public async Task WaitForAuthor_ReturnsWaitingForAuthorEvent()
     {
         // Arrange
-        var command = new CancelAutoCompleteCommand();
-        var state = GetPullRequestState(autoCompleteMode: AutoCompleteMode.Enabled);
+        var command = new WaitForAuthorCommand(Guid.NewGuid());
+        var state = GetPullRequestState(reviewers: GetReviewers((command.UserId, ReviewerType.Optional, ReviewerFeedback.None)));
 
         // Act
         var result = await PullRequestCommandProcessor.Process(state, command);
@@ -67,6 +69,6 @@ public partial class PullRequestTests
         // Assert
         Assert.True(result.TryGetEvents(out var events, out _));
         var @event = Assert.Single(events);
-        _ = Assert.IsType<AutoCompleteCancelledEvent>(@event);
+        _ = Assert.IsType<WaitingForAuthorEvent>(@event);
     }
 }

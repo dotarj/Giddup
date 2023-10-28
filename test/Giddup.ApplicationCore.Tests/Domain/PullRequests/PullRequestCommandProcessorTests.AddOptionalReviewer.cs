@@ -5,14 +5,13 @@ using Xunit;
 
 namespace Giddup.ApplicationCore.Tests.Domain.PullRequests;
 
-public partial class PullRequestTests
+public partial class PullRequestCommandProcessorTests
 {
     [Fact]
-    public async Task ChangeTitle_NotCreated_ReturnsNotCreatedError()
+    public async Task AddOptionalReviewer_NotCreated_ReturnsNotCreatedError()
     {
         // Arrange
-        _ = Title.TryCreate("baz", out var title, out _);
-        var command = new ChangeTitleCommand(title!);
+        var command = new AddOptionalReviewerCommand(Guid.NewGuid());
         var state = IPullRequestState.InitialState;
 
         // Act
@@ -26,11 +25,10 @@ public partial class PullRequestTests
     [Theory]
     [InlineData(PullRequestStatus.Abandoned)]
     [InlineData(PullRequestStatus.Completed)]
-    public async Task ChangeTitle_InvalidStatus_ReturnsNotActiveError(PullRequestStatus status)
+    public async Task AddOptionalReviewer_InvalidStatus_ReturnsNotActiveError(PullRequestStatus status)
     {
         // Arrange
-        _ = Title.TryCreate("baz", out var title, out _);
-        var command = new ChangeTitleCommand(title!);
+        var command = new AddOptionalReviewerCommand(Guid.NewGuid());
         var state = GetPullRequestState(status: status);
 
         // Act
@@ -42,12 +40,11 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public async Task ChangeTitle_SameTitle_ReturnsNoEvents()
+    public async Task AddOptionalReviewer_ExistingReviewer_ReturnsNoEvents()
     {
         // Arrange
-        _ = Title.TryCreate("baz", out var title, out _);
-        var command = new ChangeTitleCommand(title!);
-        var state = GetPullRequestState(title: command.Title);
+        var command = new AddOptionalReviewerCommand(Guid.NewGuid());
+        var state = GetPullRequestState(reviewers: GetReviewers((command.UserId, ReviewerType.Optional, ReviewerFeedback.None)));
 
         // Act
         var result = await PullRequestCommandProcessor.Process(state, command);
@@ -58,11 +55,10 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public async Task ChangeTitle_ReturnsTitleChangedEvent()
+    public async Task AddOptionalReviewer_ReturnsOptionalReviewerAddedEvent()
     {
         // Arrange
-        _ = Title.TryCreate("baz", out var title, out _);
-        var command = new ChangeTitleCommand(title!);
+        var command = new AddOptionalReviewerCommand(Guid.NewGuid());
         var state = GetPullRequestState();
 
         // Act
@@ -71,6 +67,6 @@ public partial class PullRequestTests
         // Assert
         Assert.True(result.TryGetEvents(out var events, out _));
         var @event = Assert.Single(events);
-        _ = Assert.IsType<TitleChangedEvent>(@event);
+        _ = Assert.IsType<OptionalReviewerAddedEvent>(@event);
     }
 }

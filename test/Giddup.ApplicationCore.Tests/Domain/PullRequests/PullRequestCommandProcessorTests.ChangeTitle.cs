@@ -5,13 +5,14 @@ using Xunit;
 
 namespace Giddup.ApplicationCore.Tests.Domain.PullRequests;
 
-public partial class PullRequestTests
+public partial class PullRequestCommandProcessorTests
 {
     [Fact]
-    public async Task ChangeDescription_NotCreated_ReturnsNotCreatedError()
+    public async Task ChangeTitle_NotCreated_ReturnsNotCreatedError()
     {
         // Arrange
-        var command = new ChangeDescriptionCommand("baz");
+        _ = Title.TryCreate("baz", out var title, out _);
+        var command = new ChangeTitleCommand(title!);
         var state = IPullRequestState.InitialState;
 
         // Act
@@ -25,10 +26,11 @@ public partial class PullRequestTests
     [Theory]
     [InlineData(PullRequestStatus.Abandoned)]
     [InlineData(PullRequestStatus.Completed)]
-    public async Task ChangeDescription_InvalidStatus_ReturnsNotActiveError(PullRequestStatus status)
+    public async Task ChangeTitle_InvalidStatus_ReturnsNotActiveError(PullRequestStatus status)
     {
         // Arrange
-        var command = new ChangeDescriptionCommand("baz");
+        _ = Title.TryCreate("baz", out var title, out _);
+        var command = new ChangeTitleCommand(title!);
         var state = GetPullRequestState(status: status);
 
         // Act
@@ -40,11 +42,12 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public async Task ChangeDescription_SameDescription_ReturnsNoEvents()
+    public async Task ChangeTitle_SameTitle_ReturnsNoEvents()
     {
         // Arrange
-        var command = new ChangeDescriptionCommand("bar");
-        var state = GetPullRequestState(description: command.Description);
+        _ = Title.TryCreate("baz", out var title, out _);
+        var command = new ChangeTitleCommand(title!);
+        var state = GetPullRequestState(title: command.Title);
 
         // Act
         var result = await PullRequestCommandProcessor.Process(state, command);
@@ -55,10 +58,11 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public async Task ChangeDescription_ReturnsDescriptionChangedEvent()
+    public async Task ChangeTitle_ReturnsTitleChangedEvent()
     {
         // Arrange
-        var command = new ChangeDescriptionCommand("baz");
+        _ = Title.TryCreate("baz", out var title, out _);
+        var command = new ChangeTitleCommand(title!);
         var state = GetPullRequestState();
 
         // Act
@@ -67,6 +71,6 @@ public partial class PullRequestTests
         // Assert
         Assert.True(result.TryGetEvents(out var events, out _));
         var @event = Assert.Single(events);
-        _ = Assert.IsType<DescriptionChangedEvent>(@event);
+        _ = Assert.IsType<TitleChangedEvent>(@event);
     }
 }

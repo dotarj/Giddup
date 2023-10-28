@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Giddup.ApplicationCore.Tests.Domain.PullRequests;
 
-public partial class PullRequestTests
+public partial class PullRequestCommandProcessorTests
 {
     [Fact]
     public async Task Complete_NotCreated_ReturnsNotCreatedError()

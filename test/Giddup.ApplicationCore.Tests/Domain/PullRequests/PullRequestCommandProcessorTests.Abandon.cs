@@ -5,13 +5,13 @@ using Xunit;
 
 namespace Giddup.ApplicationCore.Tests.Domain.PullRequests;
 
-public partial class PullRequestTests
+public partial class PullRequestCommandProcessorTests
 {
     [Fact]
-    public async Task Reactivate_NotCreated_ReturnsNotCreatedError()
+    public async Task Abandon_NotCreated_ReturnsNotCreatedError()
     {
         // Arrange
-        var command = new ReactivateCommand();
+        var command = new AbandonCommand();
         var state = IPullRequestState.InitialState;
 
         // Act
@@ -23,11 +23,11 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public async Task Reactivate_AlreadyActive_ReturnsNoEvents()
+    public async Task Abandon_AlreadyAbandoned_ReturnsNoEvents()
     {
         // Arrange
-        var command = new ReactivateCommand();
-        var state = GetPullRequestState();
+        var command = new AbandonCommand();
+        var state = GetPullRequestState(status: PullRequestStatus.Abandoned);
 
         // Act
         var result = await PullRequestCommandProcessor.Process(state, command);
@@ -38,10 +38,10 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public async Task Reactivate_Completed_ReturnsNotAbandonedError()
+    public async Task Abandon_Completed_ReturnsNotActiveError()
     {
         // Arrange
-        var command = new ReactivateCommand();
+        var command = new AbandonCommand();
         var state = GetPullRequestState(status: PullRequestStatus.Completed);
 
         // Act
@@ -49,15 +49,15 @@ public partial class PullRequestTests
 
         // Assert
         Assert.False(result.TryGetEvents(out _, out var error));
-        _ = Assert.IsType<NotAbandonedError>(error);
+        _ = Assert.IsType<NotActiveError>(error);
     }
 
     [Fact]
-    public async Task Reactivate_ReturnsReactivatedEvent()
+    public async Task Abandon_ReturnsAbandonedEvent()
     {
         // Arrange
-        var command = new ReactivateCommand();
-        var state = GetPullRequestState(status: PullRequestStatus.Abandoned);
+        var command = new AbandonCommand();
+        var state = GetPullRequestState();
 
         // Act
         var result = await PullRequestCommandProcessor.Process(state, command);
@@ -65,6 +65,6 @@ public partial class PullRequestTests
         // Assert
         Assert.True(result.TryGetEvents(out var events, out _));
         var @event = Assert.Single(events);
-        _ = Assert.IsType<ReactivatedEvent>(@event);
+        _ = Assert.IsType<AbandonedEvent>(@event);
     }
 }

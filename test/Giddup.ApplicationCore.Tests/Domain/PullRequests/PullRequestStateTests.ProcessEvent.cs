@@ -1,15 +1,16 @@
 // Copyright (c) Arjen Post. See LICENSE in the project root for license information.
 
+using System.Collections.Immutable;
 using Giddup.ApplicationCore.Domain;
 using Giddup.ApplicationCore.Domain.PullRequests;
 using Xunit;
 
 namespace Giddup.ApplicationCore.Tests.Domain.PullRequests;
 
-public partial class PullRequestTests
+public class PullRequestStateTests
 {
     [Fact]
-    public void Evolve_Created_ReturnsPullRequestCreatedState()
+    public void ProcessEvent_Created_ReturnsPullRequestCreatedState()
     {
         // Arrange
         _ = BranchName.TryCreate("refs/heads/foo", out var sourceBranch, out _);
@@ -30,7 +31,7 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public void Evolve_TitleChanged_AddsRequiredReviewer()
+    public void ProcessEvent_TitleChanged_AddsRequiredReviewer()
     {
         // Arrange
         _ = Title.TryCreate("baz", out var title, out _);
@@ -46,7 +47,7 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public void Evolve_DescriptionChanged_AddsRequiredReviewer()
+    public void ProcessEvent_DescriptionChanged_AddsRequiredReviewer()
     {
         // Arrange
         var @event = new DescriptionChangedEvent("baz");
@@ -61,7 +62,7 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public void Evolve_RequiredReviewerAdded_AddsRequiredReviewer()
+    public void ProcessEvent_RequiredReviewerAdded_AddsRequiredReviewer()
     {
         // Arrange
         var @event = new RequiredReviewerAddedEvent(Guid.NewGuid());
@@ -79,7 +80,7 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public void Evolve_OptionalReviewerAdded_AddsOptionalReviewer()
+    public void ProcessEvent_OptionalReviewerAdded_AddsOptionalReviewer()
     {
         // Arrange
         var @event = new OptionalReviewerAddedEvent(Guid.NewGuid());
@@ -97,7 +98,7 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public void Evolve_ReviewerMadeRequired_MakesReviewerRequired()
+    public void ProcessEvent_ReviewerMadeRequired_MakesReviewerRequired()
     {
         // Arrange
         var @event = new ReviewerMadeRequiredEvent(Guid.NewGuid());
@@ -112,7 +113,7 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public void Evolve_ReviewerMadeOptional_MakesReviewerOptional()
+    public void ProcessEvent_ReviewerMadeOptional_MakesReviewerOptional()
     {
         // Arrange
         var @event = new ReviewerMadeOptionalEvent(Guid.NewGuid());
@@ -127,7 +128,7 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public void Evolve_ReviewerRemoved_RemovesReviewer()
+    public void ProcessEvent_ReviewerRemoved_RemovesReviewer()
     {
         // Arrange
         var @event = new ReviewerRemovedEvent(Guid.NewGuid());
@@ -142,7 +143,7 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public void Evolve_Approved_ChangesFeedbackToApproved()
+    public void ProcessEvent_Approved_ChangesFeedbackToApproved()
     {
         // Arrange
         var @event = new ApprovedEvent(Guid.NewGuid());
@@ -157,7 +158,7 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public void Evolve_ApprovedWithSuggestions_ChangesFeedbackToApprovedWithSuggestions()
+    public void ProcessEvent_ApprovedWithSuggestions_ChangesFeedbackToApprovedWithSuggestions()
     {
         // Arrange
         var @event = new ApprovedWithSuggestionsEvent(Guid.NewGuid());
@@ -172,7 +173,7 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public void Evolve_WaitingForAuthor_ChangesFeedbackToWaitingForAuthor()
+    public void ProcessEvent_WaitingForAuthor_ChangesFeedbackToWaitingForAuthor()
     {
         // Arrange
         var @event = new WaitingForAuthorEvent(Guid.NewGuid());
@@ -187,7 +188,7 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public void Evolve_Rejected_ChangesFeedbackToRejected()
+    public void ProcessEvent_Rejected_ChangesFeedbackToRejected()
     {
         // Arrange
         var @event = new RejectedEvent(Guid.NewGuid());
@@ -202,7 +203,7 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public void Evolve_FeedbackReset_ResetsFeedbackToNone()
+    public void ProcessEvent_FeedbackReset_ResetsFeedbackToNone()
     {
         // Arrange
         var @event = new FeedbackResetEvent(Guid.NewGuid());
@@ -217,7 +218,7 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public void Evolve_WorkItemLinked_AddsWorkItem()
+    public void ProcessEvent_WorkItemLinked_AddsWorkItem()
     {
         // Arrange
         var @event = new WorkItemLinkedEvent(Guid.NewGuid());
@@ -233,7 +234,7 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public void Evolve_WorkItemRemoved_AddsWorkItem()
+    public void ProcessEvent_WorkItemRemoved_AddsWorkItem()
     {
         // Arrange
         var @event = new WorkItemRemovedEvent(Guid.NewGuid());
@@ -248,7 +249,7 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public void Evolve_Completed_ChangesStatusToCompleted()
+    public void ProcessEvent_Completed_ChangesStatusToCompleted()
     {
         // Arrange
         var @event = new CompletedEvent();
@@ -263,7 +264,7 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public void Evolve_AutoCompleteSet_SetsAutoCompleteModeToEnabled()
+    public void ProcessEvent_AutoCompleteSet_SetsAutoCompleteModeToEnabled()
     {
         // Arrange
         var @event = new AutoCompleteSetEvent();
@@ -278,7 +279,7 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public void Evolve_AutoCompleteSet_SetsAutoCompleteModeToDisabled()
+    public void ProcessEvent_AutoCompleteSet_SetsAutoCompleteModeToDisabled()
     {
         // Arrange
         var @event = new AutoCompleteCancelledEvent();
@@ -293,7 +294,7 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public void Evolve_Abandon_ChangesStatusToAbandoned()
+    public void ProcessEvent_Abandon_ChangesStatusToAbandoned()
     {
         // Arrange
         var @event = new AbandonedEvent();
@@ -308,7 +309,7 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public void Evolve_Reactivate_ChangesStatusToActive()
+    public void ProcessEvent_Reactivate_ChangesStatusToActive()
     {
         // Arrange
         var @event = new ReactivatedEvent();
@@ -321,4 +322,32 @@ public partial class PullRequestTests
         var createdState = Assert.IsType<PullRequestCreatedState>(result);
         Assert.Equal(PullRequestStatus.Active, createdState.Status);
     }
+
+    private static IPullRequestState GetPullRequestState(Guid? owner = null, BranchName? sourceBranch = null, BranchName? targetBranch = null, Title? title = null, string? description = null, CheckForLinkedWorkItemsMode checkForLinkedWorkItemsMode = CheckForLinkedWorkItemsMode.Disabled, AutoCompleteMode autoCompleteMode = AutoCompleteMode.Disabled, PullRequestStatus status = PullRequestStatus.Active, ImmutableList<(Guid UserId, ReviewerType Type, ReviewerFeedback Feedback)>? reviewers = null, ImmutableList<Guid>? workItems = null)
+    {
+        if (title is null)
+        {
+            _ = Title.TryCreate("title", out title!, out _);
+        }
+
+        if (sourceBranch is null)
+        {
+            _ = BranchName.TryCreate("refs/heads/source", out sourceBranch!, out _);
+        }
+
+        if (targetBranch is null)
+        {
+            _ = BranchName.TryCreate("refs/heads/target", out targetBranch!, out _);
+        }
+
+        return new PullRequestCreatedState(owner ?? Guid.NewGuid(), sourceBranch, targetBranch, title, description ?? "description", checkForLinkedWorkItemsMode, autoCompleteMode, status, reviewers ?? GetReviewers(), workItems ?? GetWorkItems());
+    }
+
+    private static ImmutableList<(Guid UserId, ReviewerType Type, ReviewerFeedback Feedback)> GetReviewers(params (Guid UserId, ReviewerType Type, ReviewerFeedback Feedback)[] reviewers)
+        => reviewers
+            .ToImmutableList();
+
+    private static ImmutableList<Guid> GetWorkItems(params Guid[] workItems)
+        => workItems
+            .ToImmutableList();
 }

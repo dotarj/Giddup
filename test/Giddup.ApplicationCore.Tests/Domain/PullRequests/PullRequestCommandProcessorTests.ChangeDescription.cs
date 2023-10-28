@@ -5,13 +5,13 @@ using Xunit;
 
 namespace Giddup.ApplicationCore.Tests.Domain.PullRequests;
 
-public partial class PullRequestTests
+public partial class PullRequestCommandProcessorTests
 {
     [Fact]
-    public async Task AddOptionalReviewer_NotCreated_ReturnsNotCreatedError()
+    public async Task ChangeDescription_NotCreated_ReturnsNotCreatedError()
     {
         // Arrange
-        var command = new AddOptionalReviewerCommand(Guid.NewGuid());
+        var command = new ChangeDescriptionCommand("baz");
         var state = IPullRequestState.InitialState;
 
         // Act
@@ -25,10 +25,10 @@ public partial class PullRequestTests
     [Theory]
     [InlineData(PullRequestStatus.Abandoned)]
     [InlineData(PullRequestStatus.Completed)]
-    public async Task AddOptionalReviewer_InvalidStatus_ReturnsNotActiveError(PullRequestStatus status)
+    public async Task ChangeDescription_InvalidStatus_ReturnsNotActiveError(PullRequestStatus status)
     {
         // Arrange
-        var command = new AddOptionalReviewerCommand(Guid.NewGuid());
+        var command = new ChangeDescriptionCommand("baz");
         var state = GetPullRequestState(status: status);
 
         // Act
@@ -40,11 +40,11 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public async Task AddOptionalReviewer_ExistingReviewer_ReturnsNoEvents()
+    public async Task ChangeDescription_SameDescription_ReturnsNoEvents()
     {
         // Arrange
-        var command = new AddOptionalReviewerCommand(Guid.NewGuid());
-        var state = GetPullRequestState(reviewers: GetReviewers((command.UserId, ReviewerType.Optional, ReviewerFeedback.None)));
+        var command = new ChangeDescriptionCommand("bar");
+        var state = GetPullRequestState(description: command.Description);
 
         // Act
         var result = await PullRequestCommandProcessor.Process(state, command);
@@ -55,10 +55,10 @@ public partial class PullRequestTests
     }
 
     [Fact]
-    public async Task AddOptionalReviewer_ReturnsOptionalReviewerAddedEvent()
+    public async Task ChangeDescription_ReturnsDescriptionChangedEvent()
     {
         // Arrange
-        var command = new AddOptionalReviewerCommand(Guid.NewGuid());
+        var command = new ChangeDescriptionCommand("baz");
         var state = GetPullRequestState();
 
         // Act
@@ -67,6 +67,6 @@ public partial class PullRequestTests
         // Assert
         Assert.True(result.TryGetEvents(out var events, out _));
         var @event = Assert.Single(events);
-        _ = Assert.IsType<OptionalReviewerAddedEvent>(@event);
+        _ = Assert.IsType<DescriptionChangedEvent>(@event);
     }
 }
