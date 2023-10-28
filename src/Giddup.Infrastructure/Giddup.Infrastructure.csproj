@@ -1,7 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="EventStore.Client.Grpc.Streams" Version="21.2.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.376">
@@ -9,8 +6,10 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="../Giddup.ApplicationCore/Giddup.ApplicationCore.csproj" />
   </ItemGroup>
+
   <Import Project="../SharedAssemblyInfo.targets" />
 </Project>
