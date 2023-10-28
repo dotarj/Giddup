@@ -147,13 +147,16 @@ public class PullRequestsController : ControllerBase
         {
             return error switch
             {
-                NotFoundError => new NotFoundResult(),
-                ReviewerNotFoundError => ProblemDetailsResult("The given reviewer was not found.", "reviewer-not-found"),
-                NotAllRequiredReviewersApprovedError => ProblemDetailsResult("Not all required reviewers approved the pull request.", "not-all-required-reviewers-approved"),
                 FeedbackContainsWaitForAuthorOrRejectError => ProblemDetailsResult("Pull request blocked by one or more reviewers.", "feedback-contains-wait-for-author-or-reject"),
-                NoWorkItemLinkedError => ProblemDetailsResult("At least one work item should be linked.", "no-work-item-linked"),
-                NotActiveError => ProblemDetailsResult("Only active pull requests can be modified.", "not-active"),
+                InvalidReviewerError => ProblemDetailsResult("The given reviewer is invalid.", "invalid-reviewer"),
+                InvalidSourceBranchError => ProblemDetailsResult("The given source branch is invalid.", "invalid-source-branch"),
+                InvalidTargetBranchError => ProblemDetailsResult("The given target branch is invalid.", "invalid-target-branch"),
                 NotAbandonedError => ProblemDetailsResult("Only abandoned pull requests can be reactivated.", "not-abandoned"),
+                NotActiveError => ProblemDetailsResult("Only active pull requests can be modified.", "not-active"),
+                NotAllRequiredReviewersApprovedError => ProblemDetailsResult("Not all required reviewers approved the pull request.", "not-all-required-reviewers-approved"),
+                NotFoundError => new NotFoundResult(),
+                NoWorkItemLinkedError => ProblemDetailsResult("At least one work item should be linked.", "no-work-item-linked"),
+                ReviewerNotFoundError => ProblemDetailsResult("The given reviewer was not found.", "reviewer-not-found"),
 
                 _ => throw new InvalidOperationException($"Error '{error.GetType().FullName}' not supported.")
             };

@@ -6,7 +6,7 @@ public interface IPullRequestError
 {
 }
 
-public record NotFoundError : IPullRequestError;
+public record FeedbackContainsWaitForAuthorOrRejectError : IPullRequestError;
 
 public record InvalidReviewerError : IPullRequestError;
 
@@ -14,14 +14,14 @@ public record InvalidSourceBranchError : IPullRequestError;
 
 public record InvalidTargetBranchError : IPullRequestError;
 
-public record NotActiveError : IPullRequestError;
+public record NotAbandonedError : IPullRequestError;
 
-public record ReviewerNotFoundError(Guid UserId) : IPullRequestError;
+public record NotActiveError : IPullRequestError;
 
 public record NotAllRequiredReviewersApprovedError : IPullRequestError;
 
-public record FeedbackContainsWaitForAuthorOrRejectError : IPullRequestError;
+public record NotFoundError : IPullRequestError;
 
 public record NoWorkItemLinkedError : IPullRequestError;
 
-public record NotAbandonedError : IPullRequestError;
+public record ReviewerNotFoundError(Guid UserId) : IPullRequestError;
