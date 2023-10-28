@@ -46,13 +46,13 @@ public class PullRequestsController : ControllerBase
 
     [HttpPost]
     [Route("/pull-requests/{pullRequestId:guid}/add-required-reviewer")]
-    public Task<IActionResult> AddRequiredReviewer(Guid pullRequestId, AddRequiredReviewerInput input)
-        => ProcessCommand(pullRequestId, new AddRequiredReviewerCommand(input.UserId));
+    public Task<IActionResult> AddRequiredReviewer(Guid pullRequestId, [FromServices] IReviewerService reviewerService, AddRequiredReviewerInput input)
+        => ProcessCommand(pullRequestId, new AddRequiredReviewerCommand(input.UserId, reviewerService.IsValidReviewer));
 
     [HttpPost]
     [Route("/pull-requests/{pullRequestId:guid}/add-optional-reviewer")]
-    public Task<IActionResult> AddOptionalReviewer(Guid pullRequestId, AddOptionalReviewerInput input)
-        => ProcessCommand(pullRequestId, new AddOptionalReviewerCommand(input.UserId));
+    public Task<IActionResult> AddOptionalReviewer(Guid pullRequestId, [FromServices] IReviewerService reviewerService, AddOptionalReviewerInput input)
+        => ProcessCommand(pullRequestId, new AddOptionalReviewerCommand(input.UserId, reviewerService.IsValidReviewer));
 
     [HttpPost]
     [Route("/pull-requests/{pullRequestId:guid}/make-reviewer-required")]

@@ -16,8 +16,8 @@ public static class PullRequestCommandProcessor
                 ChangeTitleCommand changeTitleCommand => ChangeTitle(changeTitleCommand, createdState),
                 ChangeDescriptionCommand changeDescriptionCommand => ChangeDescription(changeDescriptionCommand, createdState),
 
-                AddRequiredReviewerCommand addRequiredReviewerCommand => AddRequiredReviewer(addRequiredReviewerCommand, createdState),
-                AddOptionalReviewerCommand addOptionalReviewerCommand => AddOptionalReviewer(addOptionalReviewerCommand, createdState),
+                AddRequiredReviewerCommand addRequiredReviewerCommand => await AddRequiredReviewer(addRequiredReviewerCommand, createdState),
+                AddOptionalReviewerCommand addOptionalReviewerCommand => await AddOptionalReviewer(addOptionalReviewerCommand, createdState),
                 MakeReviewerRequiredCommand makeReviewerRequiredCommand => MakeReviewerRequired(makeReviewerRequiredCommand, createdState),
                 MakeReviewerOptionalCommand makeReviewerOptionalCommand => MakeReviewerOptional(makeReviewerOptionalCommand, createdState),
                 RemoveReviewerCommand removeReviewerCommand => RemoveReviewer(removeReviewerCommand, createdState),
@@ -114,7 +114,7 @@ public static class PullRequestCommandProcessor
         return new DescriptionChangedEvent(command.Description);
     }
 
-    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> AddRequiredReviewer(AddRequiredReviewerCommand command, PullRequestCreatedState state)
+    private static async Task<CommandProcessorResult<IPullRequestEvent, IPullRequestError>> AddRequiredReviewer(AddRequiredReviewerCommand command, PullRequestCreatedState state)
     {
         if (state.Status != PullRequestStatus.Active)
         {
@@ -124,12 +124,17 @@ public static class PullRequestCommandProcessor
         if (state.Reviewers.Any(reviewer => reviewer.UserId == command.UserId))
         {
             return Array.Empty<IPullRequestEvent>();
+        }
+
+        if (!await command.IsValidReviewer(command.UserId))
+        {
+            return new InvalidReviewerError();
         }
 
         return new RequiredReviewerAddedEvent(command.UserId);
     }
 
-    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> AddOptionalReviewer(AddOptionalReviewerCommand command, PullRequestCreatedState state)
+    private static async Task<CommandProcessorResult<IPullRequestEvent, IPullRequestError>> AddOptionalReviewer(AddOptionalReviewerCommand command, PullRequestCreatedState state)
     {
         if (state.Status != PullRequestStatus.Active)
         {
@@ -139,6 +144,11 @@ public static class PullRequestCommandProcessor
         if (state.Reviewers.Any(reviewer => reviewer.UserId == command.UserId))
         {
             return Array.Empty<IPullRequestEvent>();
+        }
+
+        if (!await command.IsValidReviewer(command.UserId))
+        {
+            return new InvalidReviewerError();
         }
 
         return new OptionalReviewerAddedEvent(command.UserId);

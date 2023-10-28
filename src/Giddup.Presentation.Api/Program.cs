@@ -13,7 +13,8 @@ _ = builder.Services
     .AddSingleton<IEventStream, EventStream>()
     .AddSingleton<IPullRequestEventProcessor, PullRequestEventProcessor>()
     .AddSingleton<IPullRequestService, PullRequestService>()
-    .AddSingleton<IPullRequestStateProvider, PullRequestStateProvider>();
+    .AddSingleton<IPullRequestStateProvider, PullRequestStateProvider>()
+    .AddSingleton<IReviewerService, ReviewerService>();
 
 _ = builder.Services
     .AddAppStartupAuthentication()

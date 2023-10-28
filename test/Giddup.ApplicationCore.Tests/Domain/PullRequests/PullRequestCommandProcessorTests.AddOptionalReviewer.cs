@@ -11,7 +11,8 @@ public partial class PullRequestCommandProcessorTests
     public async Task AddOptionalReviewer_NotCreated_ReturnsNotCreatedError()
     {
         // Arrange
-        var command = new AddOptionalReviewerCommand(Guid.NewGuid());
+        Task<bool> IsValidReviewer(Guid userId) => Task.FromResult(true);
+        var command = new AddOptionalReviewerCommand(Guid.NewGuid(), IsValidReviewer);
         var state = IPullRequestState.InitialState;
 
         // Act
@@ -28,7 +29,8 @@ public partial class PullRequestCommandProcessorTests
     public async Task AddOptionalReviewer_InvalidStatus_ReturnsNotActiveError(PullRequestStatus status)
     {
         // Arrange
-        var command = new AddOptionalReviewerCommand(Guid.NewGuid());
+        Task<bool> IsValidReviewer(Guid userId) => Task.FromResult(true);
+        var command = new AddOptionalReviewerCommand(Guid.NewGuid(), IsValidReviewer);
         var state = GetPullRequestState(status: status);
 
         // Act
@@ -43,7 +45,8 @@ public partial class PullRequestCommandProcessorTests
     public async Task AddOptionalReviewer_ExistingReviewer_ReturnsNoEvents()
     {
         // Arrange
-        var command = new AddOptionalReviewerCommand(Guid.NewGuid());
+        Task<bool> IsValidReviewer(Guid userId) => Task.FromResult(true);
+        var command = new AddOptionalReviewerCommand(Guid.NewGuid(), IsValidReviewer);
         var state = GetPullRequestState(reviewers: GetReviewers((command.UserId, ReviewerType.Optional, ReviewerFeedback.None)));
 
         // Act
@@ -55,10 +58,27 @@ public partial class PullRequestCommandProcessorTests
     }
 
     [Fact]
+    public async Task AddOptionalReviewer_InvalidReviewer_ReturnsInvalidReviewerError()
+    {
+        // Arrange
+        Task<bool> IsValidReviewer(Guid userId) => Task.FromResult(false);
+        var command = new AddOptionalReviewerCommand(Guid.NewGuid(), IsValidReviewer);
+        var state = GetPullRequestState();
+
+        // Act
+        var result = await PullRequestCommandProcessor.Process(state, command);
+
+        // Assert
+        Assert.False(result.TryGetEvents(out _, out var error));
+        _ = Assert.IsType<InvalidReviewerError>(error);
+    }
+
+    [Fact]
     public async Task AddOptionalReviewer_ReturnsOptionalReviewerAddedEvent()
     {
         // Arrange
-        var command = new AddOptionalReviewerCommand(Guid.NewGuid());
+        Task<bool> IsValidReviewer(Guid userId) => Task.FromResult(true);
+        var command = new AddOptionalReviewerCommand(Guid.NewGuid(), IsValidReviewer);
         var state = GetPullRequestState();
 
         // Act

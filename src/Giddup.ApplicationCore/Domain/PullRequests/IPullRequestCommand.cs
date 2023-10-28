@@ -14,9 +14,9 @@ public record ChangeTitleCommand(Title Title) : IPullRequestCommand;
 
 public record ChangeDescriptionCommand(string Description) : IPullRequestCommand;
 
-public record AddRequiredReviewerCommand(Guid UserId) : IPullRequestCommand;
+public record AddRequiredReviewerCommand(Guid UserId, Func<Guid, Task<bool>> IsValidReviewer) : IPullRequestCommand;
 
-public record AddOptionalReviewerCommand(Guid UserId) : IPullRequestCommand;
+public record AddOptionalReviewerCommand(Guid UserId, Func<Guid, Task<bool>> IsValidReviewer) : IPullRequestCommand;
 
 public record MakeReviewerRequiredCommand(Guid UserId) : IPullRequestCommand;
 

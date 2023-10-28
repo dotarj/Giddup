@@ -10,6 +10,8 @@ public record NotCreatedError : IPullRequestError;
 
 public record AlreadyCreatedError : IPullRequestError;
 
+public record InvalidReviewerError : IPullRequestError;
+
 public record InvalidSourceBranchError : IPullRequestError;
 
 public record InvalidTargetBranchError : IPullRequestError;
