@@ -4,13 +4,16 @@ using Giddup.Application;
 using Giddup.Application.PullRequests;
 using Giddup.Infrastructure;
 using Giddup.Infrastructure.JsonConverters;
+using Giddup.Infrastructure.PullRequests;
 using Giddup.Presentation.Api.AppStartup;
 
 var builder = WebApplication.CreateBuilder(args);
 
 _ = builder.Services
+    .AddSingleton<IEventStream, EventStream>()
+    .AddSingleton<IPullRequestEventProcessor, PullRequestEventProcessor>()
     .AddSingleton<IPullRequestService, PullRequestService>()
-    .AddSingleton<IEventStream, EventStream>();
+    .AddSingleton<IPullRequestStateProvider, PullRequestStateProvider>();
 
 _ = builder.Services
     .AddAppStartupAuthentication()

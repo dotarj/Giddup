@@ -6,16 +6,18 @@ namespace Giddup.Application.PullRequests;
 
 public class PullRequestService : IPullRequestService
 {
-    private readonly IEventStream _eventStream;
+    private readonly IPullRequestStateProvider _stateProvider;
+    private readonly IPullRequestEventProcessor _eventProcessor;
 
-    public PullRequestService(IEventStream eventStream) => _eventStream = eventStream;
+    public PullRequestService(IPullRequestStateProvider stateProvider, IPullRequestEventProcessor eventProcessor)
+    {
+        _stateProvider = stateProvider;
+        _eventProcessor = eventProcessor;
+    }
 
     public async Task<IPullRequestError?> Execute(Guid pullRequestId, IPullRequestCommand command)
     {
-        var streamName = $"pull-request-{pullRequestId}";
-        var (streamRevision, streamEvents) = await _eventStream.ReadStream<IPullRequestEvent>(streamName);
-
-        var state = streamEvents.Aggregate(IPullRequestState.InitialState, IPullRequestState.ProcessEvent);
+        var (state, revision) = await _stateProvider.Provide(pullRequestId);
 
         var result = PullRequestCommandProcessor.Process(state, command);
 
@@ -24,7 +26,7 @@ public class PullRequestService : IPullRequestService
             return error;
         }
 
-        await _eventStream.AppendToStream(streamName, streamRevision, events);
+        await _eventProcessor.Process(pullRequestId, revision, events);
 
         return null;
     }
