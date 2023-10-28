@@ -2,7 +2,7 @@
 
 using Giddup.ApplicationCore.Domain;
 
-namespace Giddup.Infrastructure;
+namespace Giddup.Infrastructure.Services;
 
 public interface IBranchService
 {

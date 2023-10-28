@@ -3,7 +3,7 @@
 using Giddup.ApplicationCore.Application.PullRequests;
 using Giddup.ApplicationCore.Domain;
 using Giddup.ApplicationCore.Domain.PullRequests;
-using Giddup.Infrastructure;
+using Giddup.Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

@@ -4,6 +4,7 @@ using Giddup.ApplicationCore.Application.PullRequests;
 using Giddup.Infrastructure;
 using Giddup.Infrastructure.JsonConverters;
 using Giddup.Infrastructure.PullRequests;
+using Giddup.Infrastructure.Services;
 using Giddup.Presentation.Api.AppStartup;
 
 var builder = WebApplication.CreateBuilder(args);
