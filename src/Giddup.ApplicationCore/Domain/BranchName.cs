@@ -2,13 +2,14 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace Giddup.ApplicationCore.Domain.PullRequests;
+namespace Giddup.ApplicationCore.Domain;
 
 public class BranchName : ValueObject
 {
     private readonly string _value;
 
-    private BranchName(string value) => _value = value;
+    private BranchName(string value)
+        => _value = value;
 
     public static bool TryCreate(string value, [NotNullWhen(true)]out BranchName? branchName, [NotNullWhen(false)]out IBranchNameError? error)
     {

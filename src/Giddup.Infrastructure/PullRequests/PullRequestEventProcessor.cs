@@ -1,8 +1,8 @@
 // Copyright (c) Arjen Post. See LICENSE in the project root for license information.
 
 using System.Collections.Immutable;
+using Giddup.ApplicationCore.Application.PullRequests;
 using Giddup.ApplicationCore.Domain.PullRequests;
-using Giddup.ApplicationCore.PullRequests;
 
 namespace Giddup.Infrastructure.PullRequests;
 

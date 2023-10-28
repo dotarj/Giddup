@@ -1,7 +1,7 @@
 // Copyright (c) Arjen Post. See LICENSE in the project root for license information.
 
 using System.Collections.Immutable;
-using System.Collections.ObjectModel;
+using Giddup.ApplicationCore.Domain;
 using Giddup.ApplicationCore.Domain.PullRequests;
 
 namespace Giddup.ApplicationCore.Tests.Domain.PullRequests;

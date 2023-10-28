@@ -3,7 +3,7 @@
 using System.Collections.Immutable;
 using Giddup.ApplicationCore.Domain.PullRequests;
 
-namespace Giddup.ApplicationCore.PullRequests;
+namespace Giddup.ApplicationCore.Application.PullRequests;
 
 public interface IPullRequestEventProcessor
 {

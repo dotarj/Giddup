@@ -1,6 +1,6 @@
 // Copyright (c) Arjen Post. See LICENSE in the project root for license information.
 
-using Giddup.ApplicationCore.Domain.PullRequests;
+using Giddup.ApplicationCore.Domain;
 using Xunit;
 
 namespace Giddup.ApplicationCore.Tests.Domain.PullRequests;
