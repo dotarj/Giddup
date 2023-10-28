@@ -19,54 +19,54 @@ public class PullRequestsController : ControllerBase
 
     [HttpPost]
     [Route("/pull-requests/create")]
-    public async Task<IActionResult> Create(CreateCommand command)
+    public async Task<IActionResult> Create(CreateInput input)
     {
         var pullRequestId = Guid.NewGuid();
 
-        var error = await _pullRequestService.ProcessCommand(pullRequestId, new ApplicationCore.Domain.PullRequests.CreateCommand(User.GetUserId(), command.SourceBranch, command.TargetBranch, command.Title));
+        var error = await _pullRequestService.ProcessCommand(pullRequestId, new CreateCommand(User.GetUserId(), input.SourceBranch, input.TargetBranch, input.Title));
 
         return CreateResult(error, Request.Path, () => Created($"/pull-requests/{pullRequestId}", null));
     }
 
     [HttpPost]
     [Route("/pull-requests/{pullRequestId:guid}/change-target-branch")]
-    public Task<IActionResult> ChangeTargetBranch(Guid pullRequestId, ChangeTargetBranchCommand command)
-        => ProcessCommand(pullRequestId, command);
+    public Task<IActionResult> ChangeTargetBranch(Guid pullRequestId, ChangeTargetBranchInput input)
+        => ProcessCommand(pullRequestId, new ChangeTargetBranchCommand(input.TargetBranch));
 
     [HttpPost]
     [Route("/pull-requests/{pullRequestId:guid}/change-title")]
-    public Task<IActionResult> ChangeTitle(Guid pullRequestId, ChangeTitleCommand command)
-        => ProcessCommand(pullRequestId, command);
+    public Task<IActionResult> ChangeTitle(Guid pullRequestId, ChangeTitleInput input)
+        => ProcessCommand(pullRequestId, new ChangeTitleCommand(input.Title));
 
     [HttpPost]
     [Route("/pull-requests/{pullRequestId:guid}/change-description")]
-    public Task<IActionResult> ChangeDescription(Guid pullRequestId, ChangeDescriptionCommand command)
-        => ProcessCommand(pullRequestId, command);
+    public Task<IActionResult> ChangeDescription(Guid pullRequestId, ChangeDescriptionInput input)
+        => ProcessCommand(pullRequestId, new ChangeDescriptionCommand(input.Description));
 
     [HttpPost]
     [Route("/pull-requests/{pullRequestId:guid}/add-required-reviewer")]
-    public Task<IActionResult> AddRequiredReviewer(Guid pullRequestId, AddRequiredReviewerCommand command)
-        => ProcessCommand(pullRequestId, command);
+    public Task<IActionResult> AddRequiredReviewer(Guid pullRequestId, AddRequiredReviewerInput input)
+        => ProcessCommand(pullRequestId, new AddRequiredReviewerCommand(input.UserId));
 
     [HttpPost]
     [Route("/pull-requests/{pullRequestId:guid}/add-optional-reviewer")]
-    public Task<IActionResult> AddOptionalReviewer(Guid pullRequestId, AddOptionalReviewerCommand command)
-        => ProcessCommand(pullRequestId, command);
+    public Task<IActionResult> AddOptionalReviewer(Guid pullRequestId, AddOptionalReviewerInput input)
+        => ProcessCommand(pullRequestId, new AddOptionalReviewerCommand(input.UserId));
 
     [HttpPost]
     [Route("/pull-requests/{pullRequestId:guid}/make-reviewer-required")]
-    public Task<IActionResult> MakeReviewerRequired(Guid pullRequestId, MakeReviewerRequiredCommand command)
-        => ProcessCommand(pullRequestId, command);
+    public Task<IActionResult> MakeReviewerRequired(Guid pullRequestId, MakeReviewerRequiredInput input)
+        => ProcessCommand(pullRequestId, new MakeReviewerRequiredCommand(input.UserId));
 
     [HttpPost]
     [Route("/pull-requests/{pullRequestId:guid}/make-reviewer-optional")]
-    public Task<IActionResult> MakeReviewerOptional(Guid pullRequestId, MakeReviewerOptionalCommand command)
-        => ProcessCommand(pullRequestId, command);
+    public Task<IActionResult> MakeReviewerOptional(Guid pullRequestId, MakeReviewerOptionalInput input)
+        => ProcessCommand(pullRequestId, new MakeReviewerOptionalCommand(input.UserId));
 
     [HttpPost]
     [Route("/pull-requests/{pullRequestId:guid}/remove-reviewer")]
-    public Task<IActionResult> Remove(Guid pullRequestId, RemoveReviewerCommand command)
-        => ProcessCommand(pullRequestId, command);
+    public Task<IActionResult> Remove(Guid pullRequestId, RemoveReviewerInput input)
+        => ProcessCommand(pullRequestId, new RemoveReviewerCommand(input.UserId));
 
     [HttpPost]
     [Route("/pull-requests/{pullRequestId:guid}/approve")]
@@ -95,13 +95,13 @@ public class PullRequestsController : ControllerBase
 
     [HttpPost]
     [Route("/pull-requests/{pullRequestId:guid}/link-work-item")]
-    public Task<IActionResult> LinkWorkItem(Guid pullRequestId, LinkWorkItemCommand command)
-        => ProcessCommand(pullRequestId, command);
+    public Task<IActionResult> LinkWorkItem(Guid pullRequestId, LinkWorkItemInput input)
+        => ProcessCommand(pullRequestId, new LinkWorkItemCommand(input.WorkItemId));
 
     [HttpPost]
     [Route("/pull-requests/{pullRequestId:guid}/remove-work-item")]
-    public Task<IActionResult> RemoveWorkItem(Guid pullRequestId, RemoveWorkItemCommand command)
-        => ProcessCommand(pullRequestId, command);
+    public Task<IActionResult> RemoveWorkItem(Guid pullRequestId, RemoveWorkItemInput input)
+        => ProcessCommand(pullRequestId, new RemoveWorkItemCommand(input.WorkItemId));
 
     [HttpPost]
     [Route("/pull-requests/{pullRequestId:guid}/complete")]
@@ -168,5 +168,25 @@ public class PullRequestsController : ControllerBase
         return CreateResult(error, Request.Path, () => new OkResult());
     }
 
-    public record CreateCommand(BranchName SourceBranch, BranchName TargetBranch, Title Title);
+    public record CreateInput(BranchName SourceBranch, BranchName TargetBranch, Title Title);
+
+    public record ChangeTargetBranchInput(BranchName TargetBranch);
+
+    public record ChangeTitleInput(Title Title);
+
+    public record ChangeDescriptionInput(string Description);
+
+    public record AddRequiredReviewerInput(Guid UserId);
+
+    public record AddOptionalReviewerInput(Guid UserId);
+
+    public record MakeReviewerRequiredInput(Guid UserId);
+
+    public record MakeReviewerOptionalInput(Guid UserId);
+
+    public record RemoveReviewerInput(Guid UserId);
+
+    public record LinkWorkItemInput(Guid WorkItemId);
+
+    public record RemoveWorkItemInput(Guid WorkItemId);
 }
