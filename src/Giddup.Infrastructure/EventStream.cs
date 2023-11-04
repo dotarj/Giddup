@@ -1,8 +1,8 @@
 // Copyright (c) Arjen Post. See LICENSE in the project root for license information.
 
+using System.Collections.Immutable;
 using System.Text.Json;
 using EventStore.Client;
-using Giddup.Application;
 using Giddup.Infrastructure.JsonConverters;
 using Microsoft.Extensions.Options;
 
@@ -22,7 +22,7 @@ public class EventStream : IEventStream
         _client = new EventStoreClient(EventStoreClientSettings.Create(options.Value.ConnectionString));
     }
 
-    public async Task AppendToStream<TEvent>(string name, ulong? expectedRevision, IReadOnlyCollection<TEvent> events)
+    public async Task AppendToStream<TEvent>(string name, ulong? expectedRevision, ImmutableList<TEvent> events)
         where TEvent : notnull
     {
         var eventData = events.Select(@event => new EventData(Uuid.NewUuid(), EventMapping.Value.GetEventName(@event.GetType()), JsonSerializer.SerializeToUtf8Bytes(@event, @event.GetType(), _jsonSerializerOptions)));
@@ -32,14 +32,14 @@ public class EventStream : IEventStream
             : await _client.AppendToStreamAsync(name, StreamState.NoStream, eventData);
     }
 
-    public async Task<(ulong? Revision, IReadOnlyCollection<TEvent> Events)> ReadStream<TEvent>(string name)
+    public async Task<(ulong? Revision, ImmutableList<TEvent> Events)> ReadStream<TEvent>(string name)
         where TEvent : notnull
     {
         var result = _client.ReadStreamAsync(Direction.Forwards, name, StreamPosition.Start);
 
         if (await result.ReadState == ReadState.StreamNotFound)
         {
-            return (null, new List<TEvent>().AsReadOnly());
+            return (null, ImmutableList<TEvent>.Empty);
         }
 
         var events = await result
@@ -52,6 +52,6 @@ public class EventStream : IEventStream
             })
             .ToListAsync();
 
-        return (events.Last().EventNumber, events.Select(@event => @event.Event).ToList().AsReadOnly());
+        return (events.Last().EventNumber, events.Select(@event => @event.Event).ToImmutableList());
     }
 }

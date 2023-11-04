@@ -3,9 +3,9 @@
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>../..</DockerfileContext>
     <DockerfileTag>giddup/api</DockerfileTag>
-    <TargetFramework>net6.0</TargetFramework>
     <UserSecretsId>58b0c034-7a6e-403e-ace6-12d51c7fb524</UserSecretsId>
   </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.3" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.14.0" />
@@ -15,9 +15,11 @@
     </PackageReference>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
   </ItemGroup>
+
   <ItemGroup>
-    <ProjectReference Include="../Giddup.Application/Giddup.Application.csproj" />
+    <ProjectReference Include="../Giddup.ApplicationCore/Giddup.ApplicationCore.csproj" />
     <ProjectReference Include="../Giddup.Infrastructure/Giddup.Infrastructure.csproj" />
   </ItemGroup>
+
   <Import Project="../SharedAssemblyInfo.targets" />
 </Project>

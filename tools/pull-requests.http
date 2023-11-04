@@ -16,6 +16,16 @@ Content-Type: application/json
 }
 
 ######
+# @name changeTargetBranch
+POST {{host}}{{createPullRequest.response.headers.Location}}/change-target-branch
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "TargetBranch": "refs/heads/baz"
+}
+
+######
 # @name changeTitle
 POST {{host}}{{createPullRequest.response.headers.Location}}/change-title
 Authorization: Bearer {{token}}
