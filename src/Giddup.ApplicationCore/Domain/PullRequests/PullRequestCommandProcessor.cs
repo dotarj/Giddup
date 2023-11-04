@@ -10,7 +10,7 @@ public static class PullRequestCommandProcessor
         {
             if (state is not InitialPullRequestState)
             {
-                throw new InvalidOperationException();
+                return new AlreadyExistsError();
             }
 
             return await Create(createCommand);

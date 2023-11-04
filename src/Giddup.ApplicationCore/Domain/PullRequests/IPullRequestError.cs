@@ -6,6 +6,8 @@ public interface IPullRequestError
 {
 }
 
+public record AlreadyExistsError : IPullRequestError;
+
 public record FeedbackContainsWaitForAuthorOrRejectError : IPullRequestError;
 
 public record InvalidReviewerError : IPullRequestError;
