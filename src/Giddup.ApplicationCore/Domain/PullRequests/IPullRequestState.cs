@@ -17,35 +17,31 @@ public interface IPullRequestState
 
         if (state is not ExistingPullRequestState existingState)
         {
-            throw new InvalidOperationException();
+            throw new InvalidOperationException($"State '{state.GetType().FullName}' and event '{@event.GetType().FullName}' not supported.");
         }
 
         return @event switch
         {
-            TargetBranchChangedEvent(var targetBranch) => existingState with { TargetBranch = targetBranch },
-            TitleChangedEvent(var title) => existingState with { Title = title },
-            DescriptionChangedEvent(var description) => existingState with { Description = description },
-
-            RequiredReviewerAddedEvent(var userId) => existingState with { Reviewers = existingState.Reviewers.WithReviewerAdded(userId, ReviewerType.Required) },
-            OptionalReviewerAddedEvent(var userId) => existingState with { Reviewers = existingState.Reviewers.WithReviewerAdded(userId, ReviewerType.Optional) },
-            ReviewerMadeRequiredEvent(var userId) => existingState with { Reviewers = existingState.Reviewers.WithReviewerTypeChanged(userId, ReviewerType.Required) },
-            ReviewerMadeOptionalEvent(var userId) => existingState with { Reviewers = existingState.Reviewers.WithReviewerTypeChanged(userId, ReviewerType.Optional) },
-            ReviewerRemovedEvent(var userId) => existingState with { Reviewers = existingState.Reviewers.WithReviewerRemoved(userId) },
-
+            AbandonedEvent => existingState with { Status = PullRequestStatus.Abandoned },
             ApprovedEvent(var userId) => existingState with { Reviewers = existingState.Reviewers.WithReviewerFeedbackChanged(userId, ReviewerFeedback.Approved) },
             ApprovedWithSuggestionsEvent(var userId) => existingState with { Reviewers = existingState.Reviewers.WithReviewerFeedbackChanged(userId, ReviewerFeedback.ApprovedWithSuggestions) },
-            WaitingForAuthorEvent(var userId) => existingState with { Reviewers = existingState.Reviewers.WithReviewerFeedbackChanged(userId, ReviewerFeedback.WaitingForAuthor) },
-            RejectedEvent(var userId) => existingState with { Reviewers = existingState.Reviewers.WithReviewerFeedbackChanged(userId, ReviewerFeedback.Rejected) },
+            AutoCompleteCancelledEvent => existingState with { AutoCompleteMode = AutoCompleteMode.Disabled },
+            AutoCompleteSetEvent => existingState with { AutoCompleteMode = AutoCompleteMode.Enabled },
+            CompletedEvent => existingState with { Status = PullRequestStatus.Completed },
+            DescriptionChangedEvent(var description) => existingState with { Description = description },
             FeedbackResetEvent(var userId) => existingState with { Reviewers = existingState.Reviewers.WithReviewerFeedbackChanged(userId, ReviewerFeedback.None) },
-
+            OptionalReviewerAddedEvent(var userId) => existingState with { Reviewers = existingState.Reviewers.WithReviewerAdded(userId, ReviewerType.Optional) },
+            ReactivatedEvent => existingState with { Status = PullRequestStatus.Active },
+            RejectedEvent(var userId) => existingState with { Reviewers = existingState.Reviewers.WithReviewerFeedbackChanged(userId, ReviewerFeedback.Rejected) },
+            RequiredReviewerAddedEvent(var userId) => existingState with { Reviewers = existingState.Reviewers.WithReviewerAdded(userId, ReviewerType.Required) },
+            ReviewerMadeOptionalEvent(var userId) => existingState with { Reviewers = existingState.Reviewers.WithReviewerTypeChanged(userId, ReviewerType.Optional) },
+            ReviewerMadeRequiredEvent(var userId) => existingState with { Reviewers = existingState.Reviewers.WithReviewerTypeChanged(userId, ReviewerType.Required) },
+            ReviewerRemovedEvent(var userId) => existingState with { Reviewers = existingState.Reviewers.WithReviewerRemoved(userId) },
+            TargetBranchChangedEvent(var targetBranch) => existingState with { TargetBranch = targetBranch },
+            TitleChangedEvent(var title) => existingState with { Title = title },
+            WaitingForAuthorEvent(var userId) => existingState with { Reviewers = existingState.Reviewers.WithReviewerFeedbackChanged(userId, ReviewerFeedback.WaitingForAuthor) },
             WorkItemLinkedEvent(var workItemId) => existingState with { WorkItems = existingState.WorkItems.WithWorkItemLinked(workItemId) },
             WorkItemRemovedEvent(var workItemId) => existingState with { WorkItems = existingState.WorkItems.WithWorkItemRemoved(workItemId) },
-
-            CompletedEvent => existingState with { Status = PullRequestStatus.Completed },
-            AutoCompleteSetEvent => existingState with { AutoCompleteMode = AutoCompleteMode.Enabled },
-            AutoCompleteCancelledEvent => existingState with { AutoCompleteMode = AutoCompleteMode.Disabled },
-            AbandonedEvent => existingState with { Status = PullRequestStatus.Abandoned },
-            ReactivatedEvent => existingState with { Status = PullRequestStatus.Active },
 
             _ => throw new InvalidOperationException($"State '{state.GetType().FullName}' and event '{@event.GetType().FullName}' not supported.")
         };
