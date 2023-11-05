@@ -4,28 +4,38 @@ namespace Giddup.ApplicationCore.Domain.PullRequests;
 
 public interface IPullRequestError
 {
+    string Message { get; }
 }
 
-public record AlreadyExistsError : IPullRequestError;
+public abstract record PullRequestError : IPullRequestError
+{
+    public string Message => GetType().Name;
+}
 
-public record FeedbackContainsWaitForAuthorOrRejectError : IPullRequestError;
+public record AlreadyExistsError : PullRequestError;
 
-public record InvalidReviewerError : IPullRequestError;
+public record FeedbackContainsWaitForAuthorOrRejectError : PullRequestError;
 
-public record InvalidSourceBranchError : IPullRequestError;
+public record InvalidBranchNameError : PullRequestError;
 
-public record InvalidTargetBranchError : IPullRequestError;
+public record InvalidReviewerError : PullRequestError;
 
-public record NotAbandonedError : IPullRequestError;
+public record InvalidSourceBranchError : PullRequestError;
 
-public record NotActiveError : IPullRequestError;
+public record InvalidTargetBranchError : PullRequestError;
 
-public record NotAllRequiredReviewersApprovedError : IPullRequestError;
+public record InvalidTitleError : PullRequestError;
 
-public record NotFoundError : IPullRequestError;
+public record NotAbandonedError : PullRequestError;
 
-public record NoWorkItemLinkedError : IPullRequestError;
+public record NotActiveError : PullRequestError;
 
-public record ReviewerNotFoundError(Guid UserId) : IPullRequestError;
+public record NotAllRequiredReviewersApprovedError : PullRequestError;
 
-public record TargetBranchEqualsSourceBranchError : IPullRequestError;
+public record NotFoundError : PullRequestError;
+
+public record NoWorkItemLinkedError : PullRequestError;
+
+public record ReviewerNotFoundError(Guid UserId) : PullRequestError;
+
+public record TargetBranchEqualsSourceBranchError : PullRequestError;

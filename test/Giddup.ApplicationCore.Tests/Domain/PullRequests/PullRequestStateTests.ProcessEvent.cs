@@ -13,9 +13,9 @@ public class PullRequestStateTests
     public void ProcessEvent_Created_ReturnsPullRequestexistingState()
     {
         // Arrange
-        _ = BranchName.TryCreate("refs/heads/foo", out var sourceBranch, out _);
-        _ = BranchName.TryCreate("refs/heads/bar", out var targetBranch, out _);
-        _ = Title.TryCreate("baz", out var title, out _);
+        _ = BranchName.TryCreate("refs/heads/foo", out var sourceBranch);
+        _ = BranchName.TryCreate("refs/heads/bar", out var targetBranch);
+        _ = Title.TryCreate("baz", out var title);
         var @event = new CreatedEvent(Guid.NewGuid(), sourceBranch!, targetBranch!, title!);
         var state = IPullRequestState.InitialState;
 
@@ -34,7 +34,7 @@ public class PullRequestStateTests
     public void ProcessEvent_TitleChanged_AddsRequiredReviewer()
     {
         // Arrange
-        _ = Title.TryCreate("baz", out var title, out _);
+        _ = Title.TryCreate("baz", out var title);
         var @event = new TitleChangedEvent(title!);
         var state = GetPullRequestState();
 
@@ -327,17 +327,17 @@ public class PullRequestStateTests
     {
         if (title is null)
         {
-            _ = Title.TryCreate("title", out title!, out _);
+            _ = Title.TryCreate("title", out title!);
         }
 
         if (sourceBranch is null)
         {
-            _ = BranchName.TryCreate("refs/heads/source", out sourceBranch!, out _);
+            _ = BranchName.TryCreate("refs/heads/source", out sourceBranch!);
         }
 
         if (targetBranch is null)
         {
-            _ = BranchName.TryCreate("refs/heads/target", out targetBranch!, out _);
+            _ = BranchName.TryCreate("refs/heads/target", out targetBranch!);
         }
 
         return new ExistingPullRequestState(owner ?? Guid.NewGuid(), sourceBranch, targetBranch, title, description ?? "description", checkForLinkedWorkItemsMode, autoCompleteMode, status, reviewers ?? GetReviewers(), workItems ?? GetWorkItems());

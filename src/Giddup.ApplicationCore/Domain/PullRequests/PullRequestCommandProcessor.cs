@@ -202,22 +202,27 @@ public static class PullRequestCommandProcessor
             return new NotActiveError();
         }
 
-        if (command.TargetBranch == state.TargetBranch)
+        if (!BranchName.TryCreate(command.TargetBranch, out var targetBranch))
+        {
+            return new InvalidBranchNameError();
+        }
+
+        if (targetBranch == state.TargetBranch)
         {
             return Array.Empty<IPullRequestEvent>();
         }
 
-        if (command.TargetBranch == state.SourceBranch)
+        if (targetBranch == state.SourceBranch)
         {
             return new TargetBranchEqualsSourceBranchError();
         }
 
-        if (!await command.IsExistingBranch(command.TargetBranch))
+        if (!await command.IsExistingBranch(targetBranch))
         {
             return new InvalidTargetBranchError();
         }
 
-        return new TargetBranchChangedEvent(command.TargetBranch);
+        return new TargetBranchChangedEvent(targetBranch);
     }
 
     private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> ChangeTitle(ChangeTitleCommand command, ExistingPullRequestState state)
@@ -227,12 +232,17 @@ public static class PullRequestCommandProcessor
             return new NotActiveError();
         }
 
-        if (command.Title == state.Title)
+        if (!Title.TryCreate(command.Title, out var title))
+        {
+            return new InvalidTitleError();
+        }
+
+        if (title == state.Title)
         {
             return Array.Empty<IPullRequestEvent>();
         }
 
-        return new TitleChangedEvent(command.Title);
+        return new TitleChangedEvent(title);
     }
 
     private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> Complete(ExistingPullRequestState state)
@@ -264,22 +274,37 @@ public static class PullRequestCommandProcessor
 
     private static async Task<CommandProcessorResult<IPullRequestEvent, IPullRequestError>> Create(CreateCommand command)
     {
-        if (!await command.IsExistingBranch(command.SourceBranch))
+        if (!BranchName.TryCreate(command.SourceBranch, out var sourceBranch))
+        {
+            return new InvalidBranchNameError();
+        }
+
+        if (!await command.IsExistingBranch(sourceBranch))
         {
             return new InvalidSourceBranchError();
         }
 
-        if (!await command.IsExistingBranch(command.TargetBranch))
+        if (!BranchName.TryCreate(command.TargetBranch, out var targetBranch))
+        {
+            return new InvalidBranchNameError();
+        }
+
+        if (!await command.IsExistingBranch(targetBranch))
         {
             return new InvalidTargetBranchError();
         }
 
-        if (command.TargetBranch == command.SourceBranch)
+        if (targetBranch == sourceBranch)
         {
             return new TargetBranchEqualsSourceBranchError();
         }
 
-        return new CreatedEvent(command.Owner, command.SourceBranch, command.TargetBranch, command.Title);
+        if (!Title.TryCreate(command.Title, out var title))
+        {
+            return new InvalidTitleError();
+        }
+
+        return new CreatedEvent(command.Owner, sourceBranch, targetBranch, title);
     }
 
     private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> LinkWorkItem(LinkWorkItemCommand command, ExistingPullRequestState state)

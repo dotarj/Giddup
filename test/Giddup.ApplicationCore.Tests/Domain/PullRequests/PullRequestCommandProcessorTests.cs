@@ -12,17 +12,17 @@ public partial class PullRequestCommandProcessorTests
     {
         if (title is null)
         {
-            _ = Title.TryCreate("title", out title!, out _);
+            _ = Title.TryCreate("title", out title!);
         }
 
         if (sourceBranch is null)
         {
-            _ = BranchName.TryCreate("refs/heads/source", out sourceBranch!, out _);
+            _ = BranchName.TryCreate("refs/heads/source", out sourceBranch!);
         }
 
         if (targetBranch is null)
         {
-            _ = BranchName.TryCreate("refs/heads/target", out targetBranch!, out _);
+            _ = BranchName.TryCreate("refs/heads/target", out targetBranch!);
         }
 
         return new ExistingPullRequestState(owner ?? Guid.NewGuid(), sourceBranch, targetBranch, title, description ?? "description", checkForLinkedWorkItemsMode, autoCompleteMode, status, reviewers ?? GetReviewers(), workItems ?? GetWorkItems());

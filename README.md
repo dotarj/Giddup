@@ -18,9 +18,9 @@ Once you have cloned or downloaded the project you can run (and debug) the appli
 docker-compose up --build
 ```
 
- By running the Docker Compose file, an EventStore instance is started and the solution is build and started. When the services have started, you can make requests to localhost:5000.
+By running the Docker Compose file, an EventStore instance is started and the solution is build and started. When the services have started, you can make HTTP requests using http://localhost:5000/swagger/ or GraphQL requests using http://localhost:5000/graphql/ui.
 
- Sample HTTP requests of all available endpoints are provided in tools/pull-requests.http. The HTTP requests in this file can be executed in Visual Studio Code using the REST Client extension by Huachao Mao [[1]](https://marketplace.visualstudio.com/items?itemName=humao.rest-client "REST Client").
+Sample HTTP requests of all available endpoints are provided in the file scripts/pull-requests.http. The HTTP requests in this file can be executed in Visual Studio Code using the REST Client extension by Huachao Mao [[1]](https://marketplace.visualstudio.com/items?itemName=humao.rest-client "REST Client").
 
 ## Functional overview
 

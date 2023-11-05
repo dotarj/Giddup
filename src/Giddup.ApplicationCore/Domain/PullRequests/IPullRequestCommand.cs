@@ -20,13 +20,13 @@ public record CancelAutoCompleteCommand : IPullRequestCommand;
 
 public record ChangeDescriptionCommand(string Description) : IPullRequestCommand;
 
-public record ChangeTargetBranchCommand(BranchName TargetBranch, Func<BranchName, Task<bool>> IsExistingBranch) : IPullRequestCommand;
+public record ChangeTargetBranchCommand(string TargetBranch, Func<BranchName, Task<bool>> IsExistingBranch) : IPullRequestCommand;
 
-public record ChangeTitleCommand(Title Title) : IPullRequestCommand;
+public record ChangeTitleCommand(string Title) : IPullRequestCommand;
 
 public record CompleteCommand : IPullRequestCommand;
 
-public record CreateCommand(Guid Owner, BranchName SourceBranch, BranchName TargetBranch, Title Title, Func<BranchName, Task<bool>> IsExistingBranch) : IPullRequestCommand;
+public record CreateCommand(Guid Owner, string SourceBranch, string TargetBranch, string Title, Func<BranchName, Task<bool>> IsExistingBranch) : IPullRequestCommand;
 
 public record LinkWorkItemCommand(Guid WorkItemId) : IPullRequestCommand;
 

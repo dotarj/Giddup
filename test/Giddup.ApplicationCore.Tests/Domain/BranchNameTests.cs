@@ -30,13 +30,12 @@ public class BranchNameTests
     [InlineData("refs/heads/foo.")]
     [InlineData("refs/heads/foo@{")]
     [InlineData("@")]
-    public void Create_InvalidValue_ReturnsInvalidBranchNameError(string value)
+    public void Create_InvalidValue_ReturnsFalse(string value)
     {
         // Act
-        var result = BranchName.TryCreate(value, out _, out var error);
+        var result = BranchName.TryCreate(value, out _);
 
         // Assert
         Assert.False(result);
-        _ = Assert.IsType<InvalidBranchNameError>(error);
     }
 }

@@ -1,5 +1,6 @@
 // Copyright (c) Arjen Post. See LICENSE in the project root for license information.
 
+using System.Runtime.Serialization.Json;
 using Giddup.ApplicationCore.Domain;
 using Giddup.ApplicationCore.Domain.PullRequests;
 using Xunit;
@@ -12,9 +13,9 @@ public partial class PullRequestCommandProcessorTests
     public async Task ChangeTargetBranch_NotFound_ReturnsNotFoundError()
     {
         // Arrange
-        _ = BranchName.TryCreate("refs/heads/bar", out var targetBranch, out _);
+        _ = BranchName.TryCreate("refs/heads/bar", out var targetBranch);
         Task<bool> IsExistingBranch(BranchName branch) => Task.FromResult(true);
-        var command = new ChangeTargetBranchCommand(targetBranch!, IsExistingBranch);
+        var command = new ChangeTargetBranchCommand(targetBranch!.ToString(), IsExistingBranch);
         var state = IPullRequestState.InitialState;
 
         // Act
@@ -31,9 +32,9 @@ public partial class PullRequestCommandProcessorTests
     public async Task ChangeTargetBranch_InvalidStatus_ReturnsNotActiveError(PullRequestStatus status)
     {
         // Arrange
-        _ = BranchName.TryCreate("refs/heads/bar", out var targetBranch, out _);
+        _ = BranchName.TryCreate("refs/heads/bar", out var targetBranch);
         Task<bool> IsExistingBranch(BranchName branch) => Task.FromResult(true);
-        var command = new ChangeTargetBranchCommand(targetBranch!, IsExistingBranch);
+        var command = new ChangeTargetBranchCommand(targetBranch!.ToString(), IsExistingBranch);
         var state = GetPullRequestState(status: status);
 
         // Act
@@ -48,10 +49,10 @@ public partial class PullRequestCommandProcessorTests
     public async Task ChangeTargetBranch_SameTargetBranch_ReturnsNoEvents()
     {
         // Arrange
-        _ = BranchName.TryCreate("refs/heads/bar", out var targetBranch, out _);
+        _ = BranchName.TryCreate("refs/heads/bar", out var targetBranch);
         Task<bool> IsExistingBranch(BranchName branch) => Task.FromResult(true);
-        var command = new ChangeTargetBranchCommand(targetBranch!, IsExistingBranch);
-        var state = GetPullRequestState(targetBranch: command.TargetBranch);
+        var command = new ChangeTargetBranchCommand(targetBranch!.ToString(), IsExistingBranch);
+        var state = GetPullRequestState(targetBranch: targetBranch);
 
         // Act
         var result = await PullRequestCommandProcessor.Process(state, command);
@@ -65,9 +66,9 @@ public partial class PullRequestCommandProcessorTests
     public async Task ChangeTargetBranch_InvalidTargetBranch_ReturnsInvalidTargetBranchError()
     {
         // Arrange
-        _ = BranchName.TryCreate("refs/heads/bar", out var targetBranch, out _);
+        _ = BranchName.TryCreate("refs/heads/bar", out var targetBranch);
         Task<bool> IsExistingBranch(BranchName branch) => Task.FromResult(false);
-        var command = new ChangeTargetBranchCommand(targetBranch!, IsExistingBranch);
+        var command = new ChangeTargetBranchCommand(targetBranch!.ToString(), IsExistingBranch);
         var state = GetPullRequestState();
 
         // Act
@@ -82,10 +83,10 @@ public partial class PullRequestCommandProcessorTests
     public async Task ChangeTargetBranch_SameSourceAndTargetBranch_ReturnsTargetBranchEqualsSourceBranchError()
     {
         // Arrange
-        _ = BranchName.TryCreate("refs/heads/foo", out var sourceBranch, out _);
-        _ = BranchName.TryCreate("refs/heads/foo", out var targetBranch, out _);
+        _ = BranchName.TryCreate("refs/heads/foo", out var sourceBranch);
+        _ = BranchName.TryCreate("refs/heads/foo", out var targetBranch);
         Task<bool> IsExistingBranch(BranchName branch) => Task.FromResult(true);
-        var command = new ChangeTargetBranchCommand(targetBranch!, IsExistingBranch);
+        var command = new ChangeTargetBranchCommand(targetBranch!.ToString(), IsExistingBranch);
         var state = GetPullRequestState(sourceBranch: sourceBranch);
 
         // Act
@@ -100,9 +101,9 @@ public partial class PullRequestCommandProcessorTests
     public async Task ChangeTargetBranch_ReturnsTargetBranchChangedEvent()
     {
         // Arrange
-        _ = BranchName.TryCreate("refs/heads/bar", out var targetBranch, out _);
+        _ = BranchName.TryCreate("refs/heads/bar", out var targetBranch);
         Task<bool> IsExistingBranch(BranchName branch) => Task.FromResult(true);
-        var command = new ChangeTargetBranchCommand(targetBranch!, IsExistingBranch);
+        var command = new ChangeTargetBranchCommand(targetBranch!.ToString(), IsExistingBranch);
         var state = GetPullRequestState();
 
         // Act

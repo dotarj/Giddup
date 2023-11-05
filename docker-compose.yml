@@ -8,11 +8,12 @@ services:
       EVENTSTORE_INSECURE: 'true'
     image: eventstore/eventstore:21.10.1-buster-slim
     networks:
-      giddup_net:
+      giddup:
         ipv4_address: 172.16.17.3
     ports:
       - '2113:2113'
-  api:
+
+  giddup-api:
     build:
       context: .
       dockerfile: src/Giddup.Presentation.Api/Dockerfile
@@ -23,12 +24,13 @@ services:
       EventStoreClientOptions__ConnectionString: 'esdb+discover://eventstore:2113?tls=false&keepAliveTimeout=10000&keepAliveInterval=10000'
     image: ${DOCKER_REGISTRY-}giddup-api
     networks:
-      giddup_net:
+      giddup:
         ipv4_address: 172.16.17.2
     ports:
       - '5000:80'
+
 networks:
-  giddup_net:
+  giddup:
     driver: bridge
     ipam:
       config:
