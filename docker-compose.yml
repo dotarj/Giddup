@@ -3,34 +3,13 @@ version: '3.8'
 services:
   eventstore:
     environment:
-      EVENTSTORE_EXT_IP: 172.16.17.3
       EVENTSTORE_HTTP_PORT: 2113
       EVENTSTORE_INSECURE: 'true'
     image: eventstore/eventstore:21.10.1-buster-slim
     networks:
-      giddup_net:
-        ipv4_address: 172.16.17.3
+      - giddup
     ports:
       - '2113:2113'
-  api:
-    build:
-      context: .
-      dockerfile: src/Giddup.Presentation.Api/Dockerfile
-    depends_on:
-      - eventstore
-    environment:
-      ASPNETCORE_ENVIRONMENT: 'Development'
-      EventStoreClientOptions__ConnectionString: 'esdb+discover://eventstore:2113?tls=false&keepAliveTimeout=10000&keepAliveInterval=10000'
-    image: ${DOCKER_REGISTRY-}giddup-api
-    networks:
-      giddup_net:
-        ipv4_address: 172.16.17.2
-    ports:
-      - '5000:80'
 networks:
-  giddup_net:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.16.17.0/24
-      driver: default
+  giddup:
+    name: giddup

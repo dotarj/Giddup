@@ -17,7 +17,7 @@ public class BranchNameJsonConverter : JsonConverter<BranchName>
             throw new JsonException("Error occurred");
         }
 
-        if (!BranchName.TryCreate(value, out var branchName, out _))
+        if (!BranchName.TryCreate(value, out var branchName))
         {
             throw new JsonException("Error occurred");
         }

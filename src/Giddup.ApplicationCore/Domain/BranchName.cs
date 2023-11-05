@@ -11,18 +11,16 @@ public class BranchName : ValueObject
     private BranchName(string value)
         => _value = value;
 
-    public static bool TryCreate(string value, [NotNullWhen(true)]out BranchName? branchName, [NotNullWhen(false)]out IBranchNameError? error)
+    public static bool TryCreate(string value, [NotNullWhen(true)]out BranchName? branchName)
     {
         if (!IsValidBranchName(value))
         {
             branchName = null;
-            error = new InvalidBranchNameError();
 
             return false;
         }
 
         branchName = new BranchName(value);
-        error = null;
 
         return true;
     }
@@ -117,9 +115,3 @@ public class BranchName : ValueObject
         return true;
     }
 }
-
-public interface IBranchNameError
-{
-}
-
-public record InvalidBranchNameError : IBranchNameError;

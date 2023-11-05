@@ -1,0 +1,205 @@
+mutation {
+  create(
+    input: {
+      sourceBranch: "refs/heads/foo"
+      targetBranch: "refs/heads/bar"
+      title: "baz"
+    }
+  ) {
+    pullRequestMutationResult {
+      id
+    }
+    errors {
+      __typename
+    }
+  }
+}
+
+mutation {
+  changeTargetBranch(
+    input: {
+      pullRequestId: "6b9f05e3-fd59-4b54-b310-553523270454"
+      targetBranch: "refs/heads/bar"
+    }
+  ) {
+    pullRequestMutationResult {
+      id
+    }
+    errors {
+      __typename
+    }
+  }
+}
+
+mutation {
+  changeTitle(
+    input: {
+      pullRequestId: "6b9f05e3-fd59-4b54-b310-553523270454"
+      title: "qux"
+    }
+  ) {
+    pullRequestMutationResult {
+      id
+    }
+    errors {
+      __typename
+    }
+  }
+}
+
+mutation {
+  changeDescription(
+    input: {
+      pullRequestId: "6b9f05e3-fd59-4b54-b310-553523270454"
+      description: "foo"
+    }
+  ) {
+    pullRequestMutationResult {
+      id
+    }
+    errors {
+      __typename
+    }
+  }
+}
+
+mutation {
+  addRequiredReviewer(
+    input: {
+      pullRequestId: "6b9f05e3-fd59-4b54-b310-553523270454"
+      userId: "769f1cfe-eaab-4a4f-9776-755b89dfb973"
+    }
+  ) {
+    pullRequestMutationResult {
+      id
+    }
+    errors {
+      __typename
+    }
+  }
+}
+
+mutation {
+  addOptionalReviewer(
+    input: {
+      pullRequestId: "6b9f05e3-fd59-4b54-b310-553523270454"
+      userId: "769f1cfe-eaab-4a4f-9776-755b89dfb973"
+    }
+  ) {
+    pullRequestMutationResult {
+      id
+    }
+    errors {
+      __typename
+    }
+  }
+}
+
+mutation {
+  makeReviewerRequired(
+    input: {
+      pullRequestId: "6b9f05e3-fd59-4b54-b310-553523270454"
+      userId: "769f1cfe-eaab-4a4f-9776-755b89dfb973"
+    }
+  ) {
+    pullRequestMutationResult {
+      id
+    }
+    errors {
+      __typename
+    }
+  }
+}
+
+mutation {
+  makeReviewerOptional(
+    input: {
+      pullRequestId: "6b9f05e3-fd59-4b54-b310-553523270454"
+      userId: "769f1cfe-eaab-4a4f-9776-755b89dfb973"
+    }
+  ) {
+    pullRequestMutationResult {
+      id
+    }
+    errors {
+      __typename
+    }
+  }
+}
+
+mutation {
+  removeReviewer(
+    input: {
+      pullRequestId: "6b9f05e3-fd59-4b54-b310-553523270454"
+      userId: "769f1cfe-eaab-4a4f-9776-755b89dfb973"
+    }
+  ) {
+    pullRequestMutationResult {
+      id
+    }
+    errors {
+      __typename
+    }
+  }
+}
+
+mutation {
+  approve(input: { pullRequestId: "6b9f05e3-fd59-4b54-b310-553523270454" }) {
+    pullRequestMutationResult {
+      id
+    }
+    errors {
+      __typename
+    }
+  }
+}
+
+mutation {
+  approveWithSuggestions(
+    input: { pullRequestId: "6b9f05e3-fd59-4b54-b310-553523270454" }
+  ) {
+    pullRequestMutationResult {
+      id
+    }
+    errors {
+      __typename
+    }
+  }
+}
+
+mutation {
+  waitForAuthor(
+    input: { pullRequestId: "6b9f05e3-fd59-4b54-b310-553523270454" }
+  ) {
+    pullRequestMutationResult {
+      id
+    }
+    errors {
+      __typename
+    }
+  }
+}
+
+mutation {
+  reject(input: { pullRequestId: "6b9f05e3-fd59-4b54-b310-553523270454" }) {
+    pullRequestMutationResult {
+      id
+    }
+    errors {
+      __typename
+    }
+  }
+}
+
+mutation {
+  resetFeedback(
+    input: { pullRequestId: "6b9f05e3-fd59-4b54-b310-553523270454" }
+  ) {
+    pullRequestMutationResult {
+      id
+    }
+    errors {
+      __typename
+    }
+  }
+}

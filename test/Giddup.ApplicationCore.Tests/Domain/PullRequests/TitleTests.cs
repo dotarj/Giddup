@@ -10,13 +10,12 @@ public class TitleTests
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
-    public void Create_InvalidValue_ReturnsTitleEmptyOrWhitespaceError(string value)
+    public void Create_InvalidValue_ReturnsFlase(string value)
     {
         // Act
-        var result = Title.TryCreate(value, out _, out var error);
+        var result = Title.TryCreate(value, out _);
 
         // Assert
         Assert.False(result);
-        _ = Assert.IsType<TitleEmptyOrWhitespaceError>(error);
     }
 }

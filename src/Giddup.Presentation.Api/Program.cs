@@ -19,14 +19,10 @@ _ = builder.Services
 
 _ = builder.Services
     .AddAppStartupAuthentication()
+    .AddAppStartupGraphQL()
     .AddAppStartupOptions(builder.Configuration)
     .AddAppStartupSwagger()
-    .AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.Converters.Add(new BranchNameJsonConverter());
-        options.JsonSerializerOptions.Converters.Add(new TitleJsonConverter());
-    });
+    .AddControllers();
 
 var app = builder.Build();
 
@@ -36,5 +32,7 @@ _ = app
     .UseAuthorization();
 
 _ = app.MapControllers();
+
+_ = app.MapAppStartupGraphQL();
 
 app.Run();

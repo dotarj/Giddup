@@ -10,18 +10,16 @@ public class Title : ValueObject
 
     private Title(string value) => _value = value;
 
-    public static bool TryCreate(string value, [NotNullWhen(true)]out Title? title, [NotNullWhen(false)]out ITitleError? error)
+    public static bool TryCreate(string value, [NotNullWhen(true)]out Title? title)
     {
         if (value.All(char.IsWhiteSpace))
         {
             title = null;
-            error = new TitleEmptyOrWhitespaceError();
 
             return false;
         }
 
         title = new Title(value);
-        error = null;
 
         return true;
     }
@@ -33,9 +31,3 @@ public class Title : ValueObject
         yield return _value;
     }
 }
-
-public interface ITitleError
-{
-}
-
-public record TitleEmptyOrWhitespaceError : ITitleError;

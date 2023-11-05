@@ -23,7 +23,9 @@ indent_size = 4
 # Disabled StyleCop Analyzers
 dotnet_diagnostic.SA0001.severity = none # XmlCommentAnalysisDisabled
 dotnet_diagnostic.SA1101.severity = none # PrefixLocalCallsWithThis
+dotnet_diagnostic.SA1201.severity = none # ElementsMustAppearInTheCorrectOrder
 dotnet_diagnostic.SA1309.severity = none # FieldNamesMustNotBeginWithUnderscore
+dotnet_diagnostic.SA1402.severity = none # FileMayOnlyContainASingleType
 dotnet_diagnostic.SA1413.severity = none # UseTrailingCommasInMultiLineInitializers
 dotnet_diagnostic.SA1600.severity = none # ElementsMustBeDocumented
 dotnet_diagnostic.SA1601.severity = none # PartialElementsMustBeDocumented
