@@ -4,10 +4,6 @@ using Giddup.ApplicationCore.Domain.PullRequests;
 using Giddup.Presentation.Api.Mutations;
 using Giddup.Presentation.Api.Queries;
 
-// This is necessary to generate a more descriptive method name for registering GraphQL types. The default uses the
-// last part of the assembly name for the method name resulting in .AddApiTypes().
-[assembly: Module("GiddupTypes")]
-
 namespace Giddup.Presentation.Api.AppStartup;
 
 public static class GraphQL

@@ -13,9 +13,6 @@ public static class Swagger
             .AddEndpointsApiExplorer()
             .AddSwaggerGen(options =>
             {
-                options.MapType(typeof(BranchName), () => new OpenApiSchema { Type = "string" });
-                options.MapType(typeof(Title), () => new OpenApiSchema { Type = "string" });
-
                 options.SupportNonNullableReferenceTypes();
 
                 options.SwaggerDoc("v1", new OpenApiInfo { Version = "v1", Title = "Giddup API" });
