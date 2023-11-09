@@ -3,14 +3,20 @@
 using System.Collections.Immutable;
 using System.Text.Json;
 using Giddup.ApplicationCore.Domain.PullRequests;
+using Giddup.Infrastructure.JsonConverters;
 
 namespace Giddup.Infrastructure.PullRequests;
 
 public static class PullRequestEventSerializer
 {
     private static readonly Lazy<ImmutableList<Type>> PullRequestEventTypes = new(GetPullRequestEventTypes);
-
     private static readonly JsonSerializerOptions JsonSerializerOptions = new();
+
+    static PullRequestEventSerializer()
+    {
+        JsonSerializerOptions.Converters.Add(new BranchNameJsonConverter());
+        JsonSerializerOptions.Converters.Add(new TitleJsonConverter());
+    }
 
     public static IPullRequestEvent Deserialize(Event @event)
     {

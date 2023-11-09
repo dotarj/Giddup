@@ -3,6 +3,7 @@
 using System.Collections.Immutable;
 using Giddup.ApplicationCore.Application.PullRequests;
 using Giddup.ApplicationCore.Domain.PullRequests;
+using Giddup.Infrastructure.PullRequests.QueryModel.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Giddup.Infrastructure.PullRequests.CommandModel;
@@ -30,6 +31,7 @@ public class PullRequestEventProcessor : IPullRequestEventProcessor
                 .Select(@event => new Event
                 {
                     AggregateId = pullRequestId,
+                    AggregateType = nameof(PullRequest),
                     AggregateVersion = ++version,
                     Type = @event.GetType().Name,
                     Data = PullRequestEventSerializer.Serialize(@event)

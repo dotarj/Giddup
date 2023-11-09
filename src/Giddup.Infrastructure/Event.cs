@@ -6,6 +6,7 @@ namespace Giddup.Infrastructure;
 
 public class Event
 {
+    [Key]
     public long Offset { get; set; }
 
     public Guid AggregateId { get; set; }
