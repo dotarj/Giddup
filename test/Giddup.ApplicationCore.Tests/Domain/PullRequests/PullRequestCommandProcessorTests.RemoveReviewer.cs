@@ -1,5 +1,6 @@
 // Copyright (c) Arjen Post. See LICENSE in the project root for license information.
 
+using System.Collections.Immutable;
 using Giddup.ApplicationCore.Domain.PullRequests;
 using Xunit;
 
@@ -64,7 +65,7 @@ public partial class PullRequestCommandProcessorTests
     {
         // Arrange
         var command = new RemoveReviewerCommand(Guid.NewGuid());
-        var reviewers = reviewerUserId != null ? GetReviewers((command.UserId, ReviewerType.Required, ReviewerFeedback.None), (Guid.Parse(reviewerUserId), reviewerType, reviewerFeedback)) : GetReviewers((command.UserId, ReviewerType.Required, ReviewerFeedback.None));
+        var reviewers = reviewerUserId != null ? GetReviewers((command.ReviewerId, ReviewerType.Required, ReviewerFeedback.None), (Guid.Parse(reviewerUserId), reviewerType, reviewerFeedback)) : GetReviewers((command.ReviewerId, ReviewerType.Required, ReviewerFeedback.None));
         var workItems = workItemId != null ? GetWorkItems(Guid.Parse(workItemId)) : GetWorkItems();
         var state = GetPullRequestState(checkForLinkedWorkItemsMode: checkForLinkedWorkItemsMode, autoCompleteMode: AutoCompleteMode.Enabled, reviewers: reviewers, workItems: workItems);
 
@@ -90,7 +91,7 @@ public partial class PullRequestCommandProcessorTests
     {
         // Arrange
         var command = new RemoveReviewerCommand(Guid.NewGuid());
-        var reviewers = reviewerUserId != null ? GetReviewers((command.UserId, ReviewerType.Required, ReviewerFeedback.None), (Guid.Parse(reviewerUserId), reviewerType, reviewerFeedback)) : GetReviewers((command.UserId, ReviewerType.Required, ReviewerFeedback.None));
+        var reviewers = reviewerUserId != null ? GetReviewers((command.ReviewerId, ReviewerType.Required, ReviewerFeedback.None), (Guid.Parse(reviewerUserId), reviewerType, reviewerFeedback)) : GetReviewers((command.ReviewerId, ReviewerType.Required, ReviewerFeedback.None));
         var state = GetPullRequestState(checkForLinkedWorkItemsMode: checkForLinkedWorkItemsMode, autoCompleteMode: autoCompleteMode, reviewers: reviewers);
 
         // Act

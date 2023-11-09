@@ -8,13 +8,13 @@ public interface IPullRequestCommand
 
 public record AbandonCommand : IPullRequestCommand;
 
-public record AddOptionalReviewerCommand(Guid UserId, Func<Guid, Task<bool>> IsValidReviewer) : IPullRequestCommand;
+public record AddOptionalReviewerCommand(Guid ReviewerId, Func<Guid, Task<bool>> IsValidReviewer) : IPullRequestCommand;
 
-public record AddRequiredReviewerCommand(Guid UserId, Func<Guid, Task<bool>> IsValidReviewer) : IPullRequestCommand;
+public record AddRequiredReviewerCommand(Guid ReviewerId, Func<Guid, Task<bool>> IsValidReviewer) : IPullRequestCommand;
 
-public record ApproveCommand(Guid UserId) : IPullRequestCommand;
+public record ApproveCommand(Guid ReviewerId) : IPullRequestCommand;
 
-public record ApproveWithSuggestionsCommand(Guid UserId) : IPullRequestCommand;
+public record ApproveWithSuggestionsCommand(Guid ReviewerId) : IPullRequestCommand;
 
 public record CancelAutoCompleteCommand : IPullRequestCommand;
 
@@ -26,24 +26,24 @@ public record ChangeTitleCommand(string Title) : IPullRequestCommand;
 
 public record CompleteCommand : IPullRequestCommand;
 
-public record CreateCommand(Guid Owner, string SourceBranch, string TargetBranch, string Title, Func<BranchName, Task<bool>> IsExistingBranch) : IPullRequestCommand;
+public record CreateCommand(Guid OwnerId, string SourceBranch, string TargetBranch, string Title, Func<BranchName, Task<bool>> IsExistingBranch) : IPullRequestCommand;
 
 public record LinkWorkItemCommand(Guid WorkItemId) : IPullRequestCommand;
 
-public record MakeReviewerOptionalCommand(Guid UserId) : IPullRequestCommand;
+public record MakeReviewerOptionalCommand(Guid ReviewerId) : IPullRequestCommand;
 
-public record MakeReviewerRequiredCommand(Guid UserId) : IPullRequestCommand;
+public record MakeReviewerRequiredCommand(Guid ReviewerId) : IPullRequestCommand;
 
 public record ReactivateCommand : IPullRequestCommand;
 
-public record RejectCommand(Guid UserId) : IPullRequestCommand;
+public record RejectCommand(Guid ReviewerId) : IPullRequestCommand;
 
-public record RemoveReviewerCommand(Guid UserId) : IPullRequestCommand;
+public record RemoveReviewerCommand(Guid ReviewerId) : IPullRequestCommand;
 
 public record RemoveWorkItemCommand(Guid WorkItemId) : IPullRequestCommand;
 
-public record ResetFeedbackCommand(Guid UserId) : IPullRequestCommand;
+public record ResetFeedbackCommand(Guid ReviewerId) : IPullRequestCommand;
 
 public record SetAutoCompleteCommand : IPullRequestCommand;
 
-public record WaitForAuthorCommand(Guid UserId) : IPullRequestCommand;
+public record WaitForAuthorCommand(Guid ReviewerId) : IPullRequestCommand;
