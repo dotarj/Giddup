@@ -7,7 +7,7 @@ using Giddup.ApplicationCore.Domain.PullRequests;
 using Giddup.Infrastructure.JsonConverters;
 using Microsoft.EntityFrameworkCore;
 
-namespace Giddup.Infrastructure.PullRequests;
+namespace Giddup.Infrastructure.PullRequests.CommandModel;
 
 public class PullRequestStateProvider : IPullRequestStateProvider
 {

@@ -1,5 +1,6 @@
 // Copyright (c) Arjen Post. See LICENSE in the project root for license information.
 
+using Giddup.Infrastructure.PullRequests.QueryModel.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Giddup.Infrastructure;
@@ -12,6 +13,8 @@ public class GiddupDbContext : DbContext
     }
 
     public DbSet<Event> Events { get; set; } = null!;
+
+    public DbSet<PullRequest> PullRequests { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
