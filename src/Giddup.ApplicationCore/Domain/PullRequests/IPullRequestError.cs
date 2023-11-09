@@ -36,6 +36,8 @@ public record NotFoundError : PullRequestError;
 
 public record NoWorkItemLinkedError : PullRequestError;
 
+public record OptimisticConcurrencyCheckError : PullRequestError;
+
 public record ReviewerNotFoundError(Guid UserId) : PullRequestError;
 
 public record TargetBranchEqualsSourceBranchError : PullRequestError;

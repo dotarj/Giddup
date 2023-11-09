@@ -5,7 +5,7 @@
       "commandName": "Project",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "EventStoreClientOptions__ConnectionString": "esdb+discover://localhost:2113?tls=false&keepAliveTimeout=10000&keepAliveInterval=10000"
+        "ConnectionStrings__Postgres": "Host=localhost; Port=5432; User ID=giddup; Password=giddup; Database=giddup; Pooling=true;"
       }
     }
   }

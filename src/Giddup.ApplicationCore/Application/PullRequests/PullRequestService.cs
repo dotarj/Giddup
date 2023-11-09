@@ -17,7 +17,7 @@ public class PullRequestService : IPullRequestService
 
     public async Task<IPullRequestError?> ProcessCommand(Guid pullRequestId, IPullRequestCommand command)
     {
-        var (state, revision) = await _stateProvider.Provide(pullRequestId);
+        var (state, version) = await _stateProvider.Provide(pullRequestId);
 
         var result = await PullRequestCommandProcessor.Process(state, command);
 
@@ -26,7 +26,10 @@ public class PullRequestService : IPullRequestService
             return error;
         }
 
-        await _eventProcessor.Process(pullRequestId, revision, events);
+        if (!await _eventProcessor.Process(pullRequestId, version, events))
+        {
+            return new OptimisticConcurrencyCheckError();
+        }
 
         return null;
     }

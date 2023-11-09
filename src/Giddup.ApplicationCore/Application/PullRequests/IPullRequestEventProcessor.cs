@@ -7,5 +7,5 @@ namespace Giddup.ApplicationCore.Application.PullRequests;
 
 public interface IPullRequestEventProcessor
 {
-    Task Process(Guid pullRequestId, ulong? revision, ImmutableList<IPullRequestEvent> events);
+    Task<bool> Process(Guid pullRequestId, long? expectedVersion, ImmutableList<IPullRequestEvent> events);
 }

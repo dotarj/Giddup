@@ -1,38 +1,32 @@
 version: '3.8'
 
 services:
-  eventstore:
+  postgres:
     environment:
-      EVENTSTORE_EXT_IP: 172.16.17.3
-      EVENTSTORE_HTTP_PORT: 2113
-      EVENTSTORE_INSECURE: 'true'
-    image: eventstore/eventstore:21.10.1-buster-slim
+      POSTGRES_USER: giddup
+      POSTGRES_PASSWORD: giddup
+      POSTGRES_DB: giddup
+    image: postgres:16.0
     networks:
-      giddup:
-        ipv4_address: 172.16.17.3
+      - giddup
     ports:
-      - '2113:2113'
+      - '5432:5432'
 
   giddup-api:
     build:
       context: .
       dockerfile: src/Giddup.Presentation.Api/Dockerfile
     depends_on:
-      - eventstore
+      - postgres
     environment:
       ASPNETCORE_ENVIRONMENT: 'Development'
-      EventStoreClientOptions__ConnectionString: 'esdb+discover://eventstore:2113?tls=false&keepAliveTimeout=10000&keepAliveInterval=10000'
+      ConnectionStrings__Postgres: 'Host=postgres; Port=5432; User ID=giddup; Password=giddup; Database=giddup; Pooling=true;'
     image: ${DOCKER_REGISTRY-}giddup-api
     networks:
-      giddup:
-        ipv4_address: 172.16.17.2
+      - giddup
     ports:
       - '5000:80'
 
 networks:
   giddup:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.16.17.0/24
-      driver: default
+    name: giddup

@@ -9,11 +9,16 @@
   <ItemGroup>
     <PackageReference Include="HotChocolate.AspNetCore" Version="13.7.0" />
     <PackageReference Include="HotChocolate.Data" Version="13.7.0" />
+    <PackageReference Include="HotChocolate.Data.EntityFramework" Version="13.7.0" />
     <PackageReference Include="HotChocolate.Types.Analyzers" Version="13.7.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.11">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.14.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.507">
       <PrivateAssets>all</PrivateAssets>
