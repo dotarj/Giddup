@@ -1,15 +1,17 @@
 // Copyright (c) Arjen Post. See LICENSE in the project root for license information.
 
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Giddup.Infrastructure;
 
 public class Event
 {
-    public long Id { get; set; }
+    public long Offset { get; set; }
 
     public Guid AggregateId { get; set; }
+
+    [StringLength(128)]
+    public string AggregateType { get; set; } = string.Empty;
 
     public long AggregateVersion { get; set; }
 

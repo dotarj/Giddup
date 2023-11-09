@@ -14,6 +14,8 @@ public class GiddupDbContext : DbContext
 
     public DbSet<Event> Events { get; set; } = null!;
 
+    public DbSet<EventProjectionOffset> EventProjectionOffsets { get; set; } = null!;
+
     public DbSet<PullRequest> PullRequests { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -23,7 +25,7 @@ public class GiddupDbContext : DbContext
             .IsUnique();
 
         _ = modelBuilder.Entity<Event>()
-            .Property(@event => @event.Id)
+            .Property(@event => @event.Offset)
             .UseIdentityAlwaysColumn();
     }
 }
