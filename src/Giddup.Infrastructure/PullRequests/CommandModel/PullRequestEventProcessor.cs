@@ -1,27 +1,18 @@
 // Copyright (c) Arjen Post. See LICENSE in the project root for license information.
 
 using System.Collections.Immutable;
-using System.Text.Json;
 using Giddup.ApplicationCore.Application.PullRequests;
 using Giddup.ApplicationCore.Domain.PullRequests;
-using Giddup.Infrastructure.JsonConverters;
 using Microsoft.EntityFrameworkCore;
 
 namespace Giddup.Infrastructure.PullRequests.CommandModel;
 
 public class PullRequestEventProcessor : IPullRequestEventProcessor
 {
-    private readonly JsonSerializerOptions _jsonSerializerOptions = new();
-
     private readonly GiddupDbContext _dbContext;
 
     public PullRequestEventProcessor(GiddupDbContext dbContext)
-    {
-        _jsonSerializerOptions.Converters.Add(new BranchNameJsonConverter());
-        _jsonSerializerOptions.Converters.Add(new TitleJsonConverter());
-
-        _dbContext = dbContext;
-    }
+        => _dbContext = dbContext;
 
     public async Task<bool> Process(Guid pullRequestId, long? expectedVersion, ImmutableList<IPullRequestEvent> events)
     {
@@ -41,7 +32,7 @@ public class PullRequestEventProcessor : IPullRequestEventProcessor
                     AggregateId = pullRequestId,
                     AggregateVersion = ++version,
                     Type = @event.GetType().Name,
-                    Data = JsonSerializer.Serialize(@event, @event.GetType(), _jsonSerializerOptions)
+                    Data = PullRequestEventSerializer.Serialize(@event)
                 }));
 
         _ = await _dbContext.SaveChangesAsync();
