@@ -6,5 +6,5 @@ namespace Giddup.ApplicationCore.Application.PullRequests;
 
 public interface IPullRequestStateProvider
 {
-    Task<(IPullRequestState State, ulong? Revision)> Provide(Guid pullRequestId);
+    Task<(IPullRequestState State, long? Version)> Provide(Guid pullRequestId);
 }
