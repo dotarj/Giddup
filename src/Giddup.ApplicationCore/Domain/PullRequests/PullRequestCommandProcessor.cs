@@ -1,7 +1,5 @@
 // Copyright (c) Arjen Post. See LICENSE in the project root for license information.
 
-using System.Collections.Immutable;
-
 namespace Giddup.ApplicationCore.Domain.PullRequests;
 
 public static class PullRequestCommandProcessor
