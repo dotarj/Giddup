@@ -18,22 +18,19 @@ _ = builder.Services
 
 _ = builder.Services
     .AddAppStartupAuthentication()
+    .AddAppStartupAspNetCore()
     .AddAppStartupEntityFrameworkCore(builder.Configuration)
     .AddAppStartupGraphQL()
-    .AddAppStartupSwagger()
-    .AddControllers();
+    .AddAppStartupSwagger();
 
 var app = builder.Build();
 
 _ = app
     .UseAppStartupAuthentication()
-    .UseAppStartupSwagger()
-    .UseAuthorization();
-
-_ = app.UseAppStartupEntityFrameworkCore(builder.Environment.IsDevelopment());
-
-_ = app.MapControllers();
-
-_ = app.MapAppStartupGraphQL();
+    .UseAppStartupAuthorization()
+    .UseAppStartupAspNetCore()
+    .UseAppStartupEntityFrameworkCore(builder.Environment.IsDevelopment())
+    .UseAppStartupGraphQL()
+    .UseAppStartupSwagger();
 
 app.Run();
