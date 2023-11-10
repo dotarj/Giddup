@@ -116,7 +116,7 @@ public class PullRequestProjectionWorker : BackgroundService
     {
         pullRequest.OptionalReviewers.Add(new OptionalReviewer
         {
-            Id = @event.ReviewerId
+            UserId = @event.ReviewerId
         });
 
         return pullRequest;
@@ -132,7 +132,7 @@ public class PullRequestProjectionWorker : BackgroundService
     {
         pullRequest.RequiredReviewers.Add(new RequiredReviewer
         {
-            Id = @event.ReviewerId
+            UserId = @event.ReviewerId
         });
 
         return pullRequest;
@@ -140,7 +140,7 @@ public class PullRequestProjectionWorker : BackgroundService
 
     private static PullRequest ReviewerMadeOptional(ReviewerMadeOptionalEvent @event, PullRequest pullRequest)
     {
-        var requiredReviewer = pullRequest.RequiredReviewers.FirstOrDefault(requiredReviewer => requiredReviewer.Id == @event.ReviewerId);
+        var requiredReviewer = pullRequest.RequiredReviewers.FirstOrDefault(requiredReviewer => requiredReviewer.UserId == @event.ReviewerId);
 
         if (requiredReviewer == null)
         {
@@ -151,7 +151,7 @@ public class PullRequestProjectionWorker : BackgroundService
 
         pullRequest.OptionalReviewers.Add(new OptionalReviewer
         {
-            Id = requiredReviewer.Id,
+            UserId = requiredReviewer.UserId,
             Feedback = requiredReviewer.Feedback
         });
 
@@ -160,7 +160,7 @@ public class PullRequestProjectionWorker : BackgroundService
 
     private static PullRequest ReviewerMadeRequired(ReviewerMadeRequiredEvent @event, PullRequest pullRequest)
     {
-        var optionalReviewer = pullRequest.OptionalReviewers.FirstOrDefault(optionalReviewer => optionalReviewer.Id == @event.ReviewerId);
+        var optionalReviewer = pullRequest.OptionalReviewers.FirstOrDefault(optionalReviewer => optionalReviewer.UserId == @event.ReviewerId);
 
         if (optionalReviewer == null)
         {
@@ -171,7 +171,7 @@ public class PullRequestProjectionWorker : BackgroundService
 
         pullRequest.RequiredReviewers.Add(new RequiredReviewer
         {
-            Id = optionalReviewer.Id,
+            UserId = optionalReviewer.UserId,
             Feedback = optionalReviewer.Feedback
         });
 
@@ -180,14 +180,14 @@ public class PullRequestProjectionWorker : BackgroundService
 
     private static PullRequest ReviewerRemoved(ReviewerRemovedEvent @event, PullRequest pullRequest)
     {
-        var optionalReviewer = pullRequest.OptionalReviewers.FirstOrDefault(optionalReviewer => optionalReviewer.Id == @event.ReviewerId);
+        var optionalReviewer = pullRequest.OptionalReviewers.FirstOrDefault(optionalReviewer => optionalReviewer.UserId == @event.ReviewerId);
 
         if (optionalReviewer != null)
         {
             _ = pullRequest.OptionalReviewers.Remove(optionalReviewer);
         }
 
-        var requiredReviewer = pullRequest.RequiredReviewers.FirstOrDefault(requiredReviewer => requiredReviewer.Id == @event.ReviewerId);
+        var requiredReviewer = pullRequest.RequiredReviewers.FirstOrDefault(requiredReviewer => requiredReviewer.UserId == @event.ReviewerId);
 
         if (requiredReviewer != null)
         {
@@ -234,7 +234,7 @@ public class PullRequestProjectionWorker : BackgroundService
     private static PullRequest SetReviewerFeedback(Guid userId, ReviewerFeedback feedback, PullRequest pullRequest)
     {
         var optionalReviewer = pullRequest.OptionalReviewers
-            .FirstOrDefault(reviewer => reviewer.Id == userId);
+            .FirstOrDefault(reviewer => reviewer.UserId == userId);
 
         if (optionalReviewer != null)
         {
@@ -242,7 +242,7 @@ public class PullRequestProjectionWorker : BackgroundService
         }
 
         var requiredReviewer = pullRequest.RequiredReviewers
-            .FirstOrDefault(reviewer => reviewer.Id == userId);
+            .FirstOrDefault(reviewer => reviewer.UserId == userId);
 
         if (requiredReviewer != null)
         {
