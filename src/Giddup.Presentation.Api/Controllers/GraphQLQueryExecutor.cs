@@ -22,26 +22,35 @@ public class GraphQLQueryExecutor
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public async Task<IActionResult> Execute(string queryType, string fields, int skip, int take, string order)
+    public async Task<IActionResult> Execute(string queryType, string fields, string where)
     {
-        if (!TryCreateQuery(queryType, fields, skip, take, order, out var query))
+        if (!TryCreateQuery(queryType, fields, 0, 1, string.Empty, where, out var query))
         {
             return new BadRequestResult();
         }
 
         void ConfigureRequest(IQueryRequestBuilder builder) => builder.SetQuery(query);
 
-        var user = _httpContextAccessor.HttpContext!.User;
-        var requestServices = _httpContextAccessor.HttpContext!.RequestServices;
-
-        return await ExecuteQuery(_requestExecutorProxy, user, requestServices, ConfigureRequest, ToActionResult);
+        return await ExecuteQuery(ConfigureRequest, CreateSingleResult);
     }
 
-    private static bool TryCreateQuery(string queryType, string fields, int skip, int take, string order, [NotNullWhen(true)] out DocumentNode? query)
+    public async Task<IActionResult> Execute(string queryType, string fields, int skip, int take, string order, string where)
+    {
+        if (!TryCreateQuery(queryType, fields, skip, take, order, where, out var query))
+        {
+            return new BadRequestResult();
+        }
+
+        void ConfigureRequest(IQueryRequestBuilder builder) => builder.SetQuery(query);
+
+        return await ExecuteQuery(ConfigureRequest, CreateListResult);
+    }
+
+    private static bool TryCreateQuery(string queryType, string fields, int skip, int take, string order, string where, [NotNullWhen(true)] out DocumentNode? query)
     {
         try
         {
-            query = Utf8GraphQLParser.Parse($"query {{ {queryType}(skip: {skip}, take: {take}, order: {{ {order} }}) {{ {fields} }} }}");
+            query = Utf8GraphQLParser.Parse($"query {{ {queryType}(skip: {skip}, take: {take}, order: {{ {order} }}, where: {{ {where} }}) {{ {fields} }} }}");
         }
         catch (SyntaxException)
         {
@@ -53,52 +62,82 @@ public class GraphQLQueryExecutor
         return true;
     }
 
-    private async Task<IActionResult> ExecuteQuery(RequestExecutorProxy executor, ClaimsPrincipal user, IServiceProvider serviceProvider, Action<IQueryRequestBuilder> configureRequest, Func<IQueryResult, IActionResult> toActionResult)
+    private async Task<IActionResult> ExecuteQuery(Action<IQueryRequestBuilder> configureRequest, Func<IQueryResult, IActionResult> toActionResult)
     {
+        var user = _httpContextAccessor.HttpContext!.User;
+        var requestServices = _httpContextAccessor.HttpContext!.RequestServices;
+
         var requestBuilder = new QueryRequestBuilder();
 
         _ = requestBuilder
-            .SetServices(serviceProvider)
+            .SetServices(requestServices)
             .SetGlobalState(nameof(ClaimsPrincipal), user);
 
         configureRequest(requestBuilder);
 
         var request = requestBuilder.Create();
 
-        await using var result = await executor.ExecuteAsync(request);
+        await using var result = await _requestExecutorProxy.ExecuteAsync(request);
 
         return toActionResult(result.ExpectQueryResult());
     }
 
-    private IActionResult ToActionResult(IQueryResult queryResult)
+    private IActionResult CreateSingleResult(IQueryResult queryResult)
     {
         if (queryResult.Errors is { Count: > 0 })
         {
-            var isNotAuthorized = queryResult.Errors
-                .Any(error => error.Code == "AUTH_NOT_AUTHORIZED");
+            return CreateErrorResult(queryResult.Errors);
+        }
 
-            if (isNotAuthorized)
-            {
-                return new ForbidResult();
-            }
+        var rootResult = (IReadOnlyDictionary<string, object?>)queryResult.Data!.First().Value!;
+        var itemsResult = (IReadOnlyList<object?>)rootResult.First().Value!;
 
-            const string fieldDoesNotExistPattern = "The field `\\w+` does not exist on the type `\\w+`\\.";
-
-            var hasInvalidFields = queryResult.Errors
-                .Any(error => Regex.Match(error.Message, fieldDoesNotExistPattern).Success);
-
-            if (hasInvalidFields)
-            {
-                return new BadRequestResult();
-            }
-
-            return new StatusCodeResult(500);
+        if (itemsResult.Count == 0)
+        {
+            return new NotFoundResult();
         }
 
         return new ContentResult
         {
-            Content = JsonSerializer.Serialize(queryResult.Data!.First().Value),
+            Content = JsonSerializer.Serialize(itemsResult.First()),
             ContentType = MediaTypeNames.Application.Json
         };
+    }
+
+    private IActionResult CreateListResult(IQueryResult queryResult)
+    {
+        if (queryResult.Errors is { Count: > 0 })
+        {
+            return CreateErrorResult(queryResult.Errors);
+        }
+
+        var rootResult = (IReadOnlyDictionary<string, object?>)queryResult.Data!.First().Value!;
+
+        return new ContentResult
+        {
+            Content = JsonSerializer.Serialize(rootResult),
+            ContentType = MediaTypeNames.Application.Json
+        };
+    }
+
+    private IActionResult CreateErrorResult(IReadOnlyList<IError> errors)
+    {
+        var isNotAuthorized = errors.Any(error => error.Code == "AUTH_NOT_AUTHORIZED");
+
+        if (isNotAuthorized)
+        {
+            return new ForbidResult();
+        }
+
+        const string fieldDoesNotExistPattern = "The field `\\w+` does not exist on the type `\\w+`\\.";
+
+        var hasInvalidFields = errors.Any(error => Regex.Match(error.Message, fieldDoesNotExistPattern).Success);
+
+        if (hasInvalidFields)
+        {
+            return new BadRequestResult();
+        }
+
+        return new StatusCodeResult(500);
     }
 }
