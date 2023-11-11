@@ -9,7 +9,7 @@ namespace Giddup.Presentation.Api.Queries;
 
 public class PullRequestQueries
 {
-    [UseOffsetPaging]
+    [UseOffsetPaging(IncludeTotalCount = true)]
     [UseProjection]
     [UseFiltering<PullRequestFilterInputType>]
     [UseSorting<PullRequestSortInputType>]
