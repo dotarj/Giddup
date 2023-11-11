@@ -24,7 +24,7 @@ public class PullRequestStateTests
 
         // Assert
         var existingState = Assert.IsType<ExistingPullRequestState>(result);
-        Assert.Equal(@event.Owner, existingState.Owner);
+        Assert.Equal(@event.OwnerId, existingState.OwnerId);
         Assert.Equal(@event.SourceBranch, existingState.SourceBranch);
         Assert.Equal(@event.TargetBranch, existingState.TargetBranch);
         Assert.Equal(@event.Title, existingState.Title);
@@ -74,7 +74,7 @@ public class PullRequestStateTests
         // Assert
         var existingState = Assert.IsType<ExistingPullRequestState>(result);
         var reviewer = Assert.Single(existingState.Reviewers);
-        Assert.Equal(@event.UserId, reviewer.UserId);
+        Assert.Equal(@event.ReviewerId, reviewer.ReviewerId);
         Assert.Equal(ReviewerType.Required, reviewer.Type);
         Assert.Equal(ReviewerFeedback.None, reviewer.Feedback);
     }
@@ -92,7 +92,7 @@ public class PullRequestStateTests
         // Assert
         var existingState = Assert.IsType<ExistingPullRequestState>(result);
         var reviewer = Assert.Single(existingState.Reviewers);
-        Assert.Equal(@event.UserId, reviewer.UserId);
+        Assert.Equal(@event.ReviewerId, reviewer.ReviewerId);
         Assert.Equal(ReviewerType.Optional, reviewer.Type);
         Assert.Equal(ReviewerFeedback.None, reviewer.Feedback);
     }
@@ -102,7 +102,7 @@ public class PullRequestStateTests
     {
         // Arrange
         var @event = new ReviewerMadeRequiredEvent(Guid.NewGuid());
-        var state = GetPullRequestState(reviewers: GetReviewers((@event.UserId, ReviewerType.Optional, ReviewerFeedback.None)));
+        var state = GetPullRequestState(reviewers: GetReviewers((@event.ReviewerId, ReviewerType.Optional, ReviewerFeedback.None)));
 
         // Act
         var result = IPullRequestState.ProcessEvent(state, @event);
@@ -117,7 +117,7 @@ public class PullRequestStateTests
     {
         // Arrange
         var @event = new ReviewerMadeOptionalEvent(Guid.NewGuid());
-        var state = GetPullRequestState(reviewers: GetReviewers((@event.UserId, ReviewerType.Required, ReviewerFeedback.None)));
+        var state = GetPullRequestState(reviewers: GetReviewers((@event.ReviewerId, ReviewerType.Required, ReviewerFeedback.None)));
 
         // Act
         var result = IPullRequestState.ProcessEvent(state, @event);
@@ -132,7 +132,7 @@ public class PullRequestStateTests
     {
         // Arrange
         var @event = new ReviewerRemovedEvent(Guid.NewGuid());
-        var state = GetPullRequestState(reviewers: GetReviewers((@event.UserId, ReviewerType.Required, ReviewerFeedback.None)));
+        var state = GetPullRequestState(reviewers: GetReviewers((@event.ReviewerId, ReviewerType.Required, ReviewerFeedback.None)));
 
         // Act
         var result = IPullRequestState.ProcessEvent(state, @event);
@@ -147,7 +147,7 @@ public class PullRequestStateTests
     {
         // Arrange
         var @event = new ApprovedEvent(Guid.NewGuid());
-        var state = GetPullRequestState(reviewers: GetReviewers((@event.UserId, ReviewerType.Required, ReviewerFeedback.None)));
+        var state = GetPullRequestState(reviewers: GetReviewers((@event.ReviewerId, ReviewerType.Required, ReviewerFeedback.None)));
 
         // Act
         var result = IPullRequestState.ProcessEvent(state, @event);
@@ -162,7 +162,7 @@ public class PullRequestStateTests
     {
         // Arrange
         var @event = new ApprovedWithSuggestionsEvent(Guid.NewGuid());
-        var state = GetPullRequestState(reviewers: GetReviewers((@event.UserId, ReviewerType.Required, ReviewerFeedback.None)));
+        var state = GetPullRequestState(reviewers: GetReviewers((@event.ReviewerId, ReviewerType.Required, ReviewerFeedback.None)));
 
         // Act
         var result = IPullRequestState.ProcessEvent(state, @event);
@@ -177,7 +177,7 @@ public class PullRequestStateTests
     {
         // Arrange
         var @event = new WaitingForAuthorEvent(Guid.NewGuid());
-        var state = GetPullRequestState(reviewers: GetReviewers((@event.UserId, ReviewerType.Required, ReviewerFeedback.None)));
+        var state = GetPullRequestState(reviewers: GetReviewers((@event.ReviewerId, ReviewerType.Required, ReviewerFeedback.None)));
 
         // Act
         var result = IPullRequestState.ProcessEvent(state, @event);
@@ -192,7 +192,7 @@ public class PullRequestStateTests
     {
         // Arrange
         var @event = new RejectedEvent(Guid.NewGuid());
-        var state = GetPullRequestState(reviewers: GetReviewers((@event.UserId, ReviewerType.Required, ReviewerFeedback.None)));
+        var state = GetPullRequestState(reviewers: GetReviewers((@event.ReviewerId, ReviewerType.Required, ReviewerFeedback.None)));
 
         // Act
         var result = IPullRequestState.ProcessEvent(state, @event);
@@ -207,7 +207,7 @@ public class PullRequestStateTests
     {
         // Arrange
         var @event = new FeedbackResetEvent(Guid.NewGuid());
-        var state = GetPullRequestState(reviewers: GetReviewers((@event.UserId, ReviewerType.Required, ReviewerFeedback.Approved)));
+        var state = GetPullRequestState(reviewers: GetReviewers((@event.ReviewerId, ReviewerType.Required, ReviewerFeedback.Approved)));
 
         // Act
         var result = IPullRequestState.ProcessEvent(state, @event);
@@ -323,7 +323,7 @@ public class PullRequestStateTests
         Assert.Equal(PullRequestStatus.Active, existingState.Status);
     }
 
-    private static IPullRequestState GetPullRequestState(Guid? owner = null, BranchName? sourceBranch = null, BranchName? targetBranch = null, Title? title = null, string? description = null, CheckForLinkedWorkItemsMode checkForLinkedWorkItemsMode = CheckForLinkedWorkItemsMode.Disabled, AutoCompleteMode autoCompleteMode = AutoCompleteMode.Disabled, PullRequestStatus status = PullRequestStatus.Active, ImmutableList<(Guid UserId, ReviewerType Type, ReviewerFeedback Feedback)>? reviewers = null, ImmutableList<Guid>? workItems = null)
+    private static IPullRequestState GetPullRequestState(Guid? owner = null, BranchName? sourceBranch = null, BranchName? targetBranch = null, Title? title = null, string? description = null, CheckForLinkedWorkItemsMode checkForLinkedWorkItemsMode = CheckForLinkedWorkItemsMode.Disabled, AutoCompleteMode autoCompleteMode = AutoCompleteMode.Disabled, PullRequestStatus status = PullRequestStatus.Active, ImmutableList<(Guid ReviewerId, ReviewerType Type, ReviewerFeedback Feedback)>? reviewers = null, ImmutableList<Guid>? workItems = null)
     {
         if (title is null)
         {
@@ -343,7 +343,7 @@ public class PullRequestStateTests
         return new ExistingPullRequestState(owner ?? Guid.NewGuid(), sourceBranch, targetBranch, title, description ?? "description", checkForLinkedWorkItemsMode, autoCompleteMode, status, reviewers ?? GetReviewers(), workItems ?? GetWorkItems());
     }
 
-    private static ImmutableList<(Guid UserId, ReviewerType Type, ReviewerFeedback Feedback)> GetReviewers(params (Guid UserId, ReviewerType Type, ReviewerFeedback Feedback)[] reviewers)
+    private static ImmutableList<(Guid ReviewerId, ReviewerType Type, ReviewerFeedback Feedback)> GetReviewers(params (Guid UserId, ReviewerType Type, ReviewerFeedback Feedback)[] reviewers)
         => reviewers
             .ToImmutableList();
 

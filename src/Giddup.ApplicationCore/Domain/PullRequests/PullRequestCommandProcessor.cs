@@ -70,17 +70,17 @@ public static class PullRequestCommandProcessor
             return new NotActiveError();
         }
 
-        if (state.Reviewers.Any(reviewer => reviewer.UserId == command.UserId))
+        if (state.Reviewers.Any(reviewer => reviewer.ReviewerId == command.ReviewerId))
         {
             return Array.Empty<IPullRequestEvent>();
         }
 
-        if (!await command.IsValidReviewer(command.UserId))
+        if (!await command.IsValidReviewer(command.ReviewerId))
         {
             return new InvalidReviewerError();
         }
 
-        return new OptionalReviewerAddedEvent(command.UserId);
+        return new OptionalReviewerAddedEvent(command.ReviewerId);
     }
 
     private static async Task<CommandProcessorResult<IPullRequestEvent, IPullRequestError>> AddRequiredReviewer(AddRequiredReviewerCommand command, ExistingPullRequestState state)
@@ -90,17 +90,17 @@ public static class PullRequestCommandProcessor
             return new NotActiveError();
         }
 
-        if (state.Reviewers.Any(reviewer => reviewer.UserId == command.UserId))
+        if (state.Reviewers.Any(reviewer => reviewer.ReviewerId == command.ReviewerId))
         {
             return Array.Empty<IPullRequestEvent>();
         }
 
-        if (!await command.IsValidReviewer(command.UserId))
+        if (!await command.IsValidReviewer(command.ReviewerId))
         {
             return new InvalidReviewerError();
         }
 
-        return new RequiredReviewerAddedEvent(command.UserId);
+        return new RequiredReviewerAddedEvent(command.ReviewerId);
     }
 
     private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> Approve(ApproveCommand command, ExistingPullRequestState state)
@@ -113,18 +113,18 @@ public static class PullRequestCommandProcessor
         var events = new List<IPullRequestEvent>();
         var reviewers = state.Reviewers;
 
-        if (reviewers.All(reviewer => reviewer.UserId != command.UserId))
+        if (reviewers.All(reviewer => reviewer.ReviewerId != command.ReviewerId))
         {
-            events.Add(new OptionalReviewerAddedEvent(command.UserId));
+            events.Add(new OptionalReviewerAddedEvent(command.ReviewerId));
 
-            reviewers = reviewers.WithReviewerAdded(command.UserId, ReviewerType.Optional);
+            reviewers = reviewers.WithReviewerAdded(command.ReviewerId, ReviewerType.Optional);
         }
         else
         {
-            reviewers = reviewers.WithReviewerFeedbackChanged(command.UserId, ReviewerFeedback.Approved);
+            reviewers = reviewers.WithReviewerFeedbackChanged(command.ReviewerId, ReviewerFeedback.Approved);
         }
 
-        events.Add(new ApprovedEvent(command.UserId));
+        events.Add(new ApprovedEvent(command.ReviewerId));
 
         if (ShouldAutoComplete(state with { Reviewers = reviewers }))
         {
@@ -144,18 +144,18 @@ public static class PullRequestCommandProcessor
         var events = new List<IPullRequestEvent>();
         var reviewers = state.Reviewers;
 
-        if (reviewers.All(reviewer => reviewer.UserId != command.UserId))
+        if (reviewers.All(reviewer => reviewer.ReviewerId != command.ReviewerId))
         {
-            events.Add(new OptionalReviewerAddedEvent(command.UserId));
+            events.Add(new OptionalReviewerAddedEvent(command.ReviewerId));
 
-            reviewers = reviewers.WithReviewerAdded(command.UserId, ReviewerType.Optional);
+            reviewers = reviewers.WithReviewerAdded(command.ReviewerId, ReviewerType.Optional);
         }
         else
         {
-            reviewers = reviewers.WithReviewerFeedbackChanged(command.UserId, ReviewerFeedback.ApprovedWithSuggestions);
+            reviewers = reviewers.WithReviewerFeedbackChanged(command.ReviewerId, ReviewerFeedback.ApprovedWithSuggestions);
         }
 
-        events.Add(new ApprovedWithSuggestionsEvent(command.UserId));
+        events.Add(new ApprovedWithSuggestionsEvent(command.ReviewerId));
 
         if (ShouldAutoComplete(state with { Reviewers = reviewers }))
         {
@@ -304,7 +304,7 @@ public static class PullRequestCommandProcessor
             return new InvalidTitleError();
         }
 
-        return new CreatedEvent(command.Owner, sourceBranch, targetBranch, title);
+        return new CreatedEvent(command.OwnerId, sourceBranch, targetBranch, title);
     }
 
     private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> LinkWorkItem(LinkWorkItemCommand command, ExistingPullRequestState state)
@@ -336,11 +336,11 @@ public static class PullRequestCommandProcessor
             return new NotActiveError();
         }
 
-        var reviewer = state.Reviewers.FirstOrDefault(reviewer => reviewer.UserId == command.UserId);
+        var reviewer = state.Reviewers.FirstOrDefault(reviewer => reviewer.ReviewerId == command.ReviewerId);
 
         if (reviewer == default)
         {
-            return new ReviewerNotFoundError(command.UserId);
+            return new ReviewerNotFoundError(command.ReviewerId);
         }
 
         if (reviewer.Type == ReviewerType.Optional)
@@ -348,9 +348,9 @@ public static class PullRequestCommandProcessor
             return Array.Empty<IPullRequestEvent>();
         }
 
-        var events = new List<IPullRequestEvent> { new ReviewerMadeOptionalEvent(command.UserId) };
+        var events = new List<IPullRequestEvent> { new ReviewerMadeOptionalEvent(command.ReviewerId) };
 
-        if (ShouldAutoComplete(state with { Reviewers = state.Reviewers.WithReviewerTypeChanged(reviewer.UserId, ReviewerType.Optional) }))
+        if (ShouldAutoComplete(state with { Reviewers = state.Reviewers.WithReviewerTypeChanged(reviewer.ReviewerId, ReviewerType.Optional) }))
         {
             events.Add(new CompletedEvent());
         }
@@ -365,11 +365,11 @@ public static class PullRequestCommandProcessor
             return new NotActiveError();
         }
 
-        var reviewer = state.Reviewers.FirstOrDefault(reviewer => reviewer.UserId == command.UserId);
+        var reviewer = state.Reviewers.FirstOrDefault(reviewer => reviewer.ReviewerId == command.ReviewerId);
 
         if (reviewer == default)
         {
-            return new ReviewerNotFoundError(command.UserId);
+            return new ReviewerNotFoundError(command.ReviewerId);
         }
 
         if (reviewer.Type == ReviewerType.Required)
@@ -377,7 +377,7 @@ public static class PullRequestCommandProcessor
             return Array.Empty<IPullRequestEvent>();
         }
 
-        return new ReviewerMadeRequiredEvent(command.UserId);
+        return new ReviewerMadeRequiredEvent(command.ReviewerId);
     }
 
     private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> Reactivate(ExistingPullRequestState state)
@@ -404,12 +404,12 @@ public static class PullRequestCommandProcessor
 
         var events = new List<IPullRequestEvent>();
 
-        if (state.Reviewers.All(reviewer => reviewer.UserId != command.UserId))
+        if (state.Reviewers.All(reviewer => reviewer.ReviewerId != command.ReviewerId))
         {
-            events.Add(new OptionalReviewerAddedEvent(command.UserId));
+            events.Add(new OptionalReviewerAddedEvent(command.ReviewerId));
         }
 
-        events.Add(new RejectedEvent(command.UserId));
+        events.Add(new RejectedEvent(command.ReviewerId));
 
         return events.ToArray();
     }
@@ -421,14 +421,14 @@ public static class PullRequestCommandProcessor
             return new NotActiveError();
         }
 
-        if (state.Reviewers.All(reviewer => reviewer.UserId != command.UserId))
+        if (state.Reviewers.All(reviewer => reviewer.ReviewerId != command.ReviewerId))
         {
             return Array.Empty<IPullRequestEvent>();
         }
 
-        var events = new List<IPullRequestEvent> { new ReviewerRemovedEvent(command.UserId) };
+        var events = new List<IPullRequestEvent> { new ReviewerRemovedEvent(command.ReviewerId) };
 
-        if (ShouldAutoComplete(state with { Reviewers = state.Reviewers.WithReviewerRemoved(command.UserId) }))
+        if (ShouldAutoComplete(state with { Reviewers = state.Reviewers.WithReviewerRemoved(command.ReviewerId) }))
         {
             events.Add(new CompletedEvent());
         }
@@ -458,14 +458,14 @@ public static class PullRequestCommandProcessor
             return new NotActiveError();
         }
 
-        if (state.Reviewers.All(reviewer => reviewer.UserId != command.UserId))
+        if (state.Reviewers.All(reviewer => reviewer.ReviewerId != command.ReviewerId))
         {
-            return new ReviewerNotFoundError(command.UserId);
+            return new ReviewerNotFoundError(command.ReviewerId);
         }
 
-        var events = new List<IPullRequestEvent> { new FeedbackResetEvent(command.UserId) };
+        var events = new List<IPullRequestEvent> { new FeedbackResetEvent(command.ReviewerId) };
 
-        if (ShouldAutoComplete(state with { Reviewers = state.Reviewers.WithReviewerFeedbackChanged(command.UserId, ReviewerFeedback.None) }))
+        if (ShouldAutoComplete(state with { Reviewers = state.Reviewers.WithReviewerFeedbackChanged(command.ReviewerId, ReviewerFeedback.None) }))
         {
             events.Add(new CompletedEvent());
         }
@@ -504,12 +504,12 @@ public static class PullRequestCommandProcessor
 
         var events = new List<IPullRequestEvent>();
 
-        if (state.Reviewers.All(reviewer => reviewer.UserId != command.UserId))
+        if (state.Reviewers.All(reviewer => reviewer.ReviewerId != command.ReviewerId))
         {
-            events.Add(new OptionalReviewerAddedEvent(command.UserId));
+            events.Add(new OptionalReviewerAddedEvent(command.ReviewerId));
         }
 
-        events.Add(new WaitingForAuthorEvent(command.UserId));
+        events.Add(new WaitingForAuthorEvent(command.ReviewerId));
 
         return events.ToArray();
     }

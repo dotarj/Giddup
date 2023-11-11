@@ -1,0 +1,13 @@
+﻿{
+  "$schema": "http://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "Giddup.Presentation.Projections": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development",
+        "ConnectionStrings__Postgres": "Host=localhost; Port=5432; User ID=giddup; Password=giddup; Database=giddup; Pooling=true;"
+      }
+    }
+  }
+}

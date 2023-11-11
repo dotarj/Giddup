@@ -61,7 +61,7 @@ public partial class PullRequestCommandProcessorTests
     {
         // Arrange
         var command = new RejectCommand(Guid.NewGuid());
-        var state = GetPullRequestState(reviewers: GetReviewers((command.UserId, ReviewerType.Optional, ReviewerFeedback.None)));
+        var state = GetPullRequestState(reviewers: GetReviewers((command.ReviewerId, ReviewerType.Optional, ReviewerFeedback.None)));
 
         // Act
         var result = await PullRequestCommandProcessor.Process(state, command);

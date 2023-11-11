@@ -11,11 +11,11 @@ namespace Giddup.Presentation.Api.Controllers;
 
 [Authorize]
 [ApiController]
-public class PullRequestsController : ControllerBase
+public class PullRequestMutationsController : ControllerBase
 {
     private readonly IPullRequestService _pullRequestService;
 
-    public PullRequestsController(IPullRequestService pullRequestService)
+    public PullRequestMutationsController(IPullRequestService pullRequestService)
         => _pullRequestService = pullRequestService;
 
     [HttpPost]

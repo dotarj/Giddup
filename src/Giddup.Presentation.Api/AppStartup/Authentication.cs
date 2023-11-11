@@ -29,5 +29,10 @@ public static class Authentication
         return services;
     }
 
-    public static IApplicationBuilder UseAppStartupAuthentication(this IApplicationBuilder app) => app.UseAuthentication();
+    public static WebApplication UseAppStartupAuthentication(this WebApplication app)
+    {
+        _ = app.UseAuthentication();
+
+        return app;
+    }
 }

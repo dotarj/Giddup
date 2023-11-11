@@ -3,6 +3,7 @@
   "profiles": {
     "Giddup.Presentation.Api": {
       "commandName": "Project",
+      "dotnetRunMessages": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "ConnectionStrings__Postgres": "Host=localhost; Port=5432; User ID=giddup; Password=giddup; Database=giddup; Pooling=true;"

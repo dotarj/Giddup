@@ -6,24 +6,24 @@ namespace Giddup.ApplicationCore.Domain.PullRequests;
 
 public static class ExtensionMethods
 {
-    internal static ImmutableList<(Guid UserId, ReviewerType Type, ReviewerFeedback Feedback)> WithReviewerAdded(this ImmutableList<(Guid UserId, ReviewerType Type, ReviewerFeedback Feedback)> reviewers, Guid userId, ReviewerType type)
+    internal static ImmutableList<(Guid ReviewerId, ReviewerType Type, ReviewerFeedback Feedback)> WithReviewerAdded(this ImmutableList<(Guid ReviewerId, ReviewerType Type, ReviewerFeedback Feedback)> reviewers, Guid userId, ReviewerType type)
         => reviewers
             .Append((userId, type, ReviewerFeedback.None))
             .ToImmutableList();
 
-    internal static ImmutableList<(Guid UserId, ReviewerType Type, ReviewerFeedback Feedback)> WithReviewerFeedbackChanged(this ImmutableList<(Guid UserId, ReviewerType Type, ReviewerFeedback Feedback)> reviewers, Guid userId, ReviewerFeedback feedback)
+    internal static ImmutableList<(Guid ReviewerId, ReviewerType Type, ReviewerFeedback Feedback)> WithReviewerFeedbackChanged(this ImmutableList<(Guid ReviewerId, ReviewerType Type, ReviewerFeedback Feedback)> reviewers, Guid userId, ReviewerFeedback feedback)
         => reviewers
-            .Select(reviewer => reviewer.UserId == userId ? new(reviewer.UserId, reviewer.Type, feedback) : reviewer)
+            .Select(reviewer => reviewer.ReviewerId == userId ? new(reviewer.ReviewerId, reviewer.Type, feedback) : reviewer)
             .ToImmutableList();
 
-    internal static ImmutableList<(Guid UserId, ReviewerType Type, ReviewerFeedback Feedback)> WithReviewerRemoved(this ImmutableList<(Guid UserId, ReviewerType Type, ReviewerFeedback Feedback)> reviewers, Guid userId)
+    internal static ImmutableList<(Guid ReviewerId, ReviewerType Type, ReviewerFeedback Feedback)> WithReviewerRemoved(this ImmutableList<(Guid ReviewerId, ReviewerType Type, ReviewerFeedback Feedback)> reviewers, Guid userId)
         => reviewers
-            .Where(reviewer => reviewer.UserId != userId)
+            .Where(reviewer => reviewer.ReviewerId != userId)
             .ToImmutableList();
 
-    internal static ImmutableList<(Guid UserId, ReviewerType Type, ReviewerFeedback Feedback)> WithReviewerTypeChanged(this ImmutableList<(Guid UserId, ReviewerType Type, ReviewerFeedback Feedback)> reviewers, Guid userId, ReviewerType type)
+    internal static ImmutableList<(Guid UserId, ReviewerType Type, ReviewerFeedback Feedback)> WithReviewerTypeChanged(this ImmutableList<(Guid ReviewerId, ReviewerType Type, ReviewerFeedback Feedback)> reviewers, Guid userId, ReviewerType type)
         => reviewers
-            .Select(reviewer => reviewer.UserId.Equals(userId) ? new(reviewer.UserId, type, reviewer.Feedback) : reviewer)
+            .Select(reviewer => reviewer.ReviewerId.Equals(userId) ? new(reviewer.ReviewerId, type, reviewer.Feedback) : reviewer)
             .ToImmutableList();
 
     internal static ImmutableList<Guid> WithWorkItemLinked(this ImmutableList<Guid> workItems, Guid workItemId)

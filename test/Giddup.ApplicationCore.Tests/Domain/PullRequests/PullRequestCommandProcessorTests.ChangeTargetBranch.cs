@@ -1,6 +1,5 @@
 // Copyright (c) Arjen Post. See LICENSE in the project root for license information.
 
-using System.Runtime.Serialization.Json;
 using Giddup.ApplicationCore.Domain;
 using Giddup.ApplicationCore.Domain.PullRequests;
 using Xunit;

@@ -6,6 +6,11 @@ services:
       POSTGRES_USER: giddup
       POSTGRES_PASSWORD: giddup
       POSTGRES_DB: giddup
+    healthcheck:
+      test: psql giddup giddup --command 'select 1;'
+      interval: 2s
+      timeout: 10s
+      retries: 5
     image: postgres:16.0
     networks:
       - giddup
@@ -17,7 +22,8 @@ services:
       context: .
       dockerfile: src/Giddup.Presentation.Api/Dockerfile
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     environment:
       ASPNETCORE_ENVIRONMENT: 'Development'
       ConnectionStrings__Postgres: 'Host=postgres; Port=5432; User ID=giddup; Password=giddup; Database=giddup; Pooling=true;'
@@ -26,6 +32,19 @@ services:
       - giddup
     ports:
       - '5000:80'
+
+  giddup-projections:
+    build:
+      context: .
+      dockerfile: src/Giddup.Presentation.Projections/Dockerfile
+    depends_on:
+      - giddup-api
+    environment:
+      DOTNET_ENVIRONMENT: 'Development'
+      ConnectionStrings__Postgres: 'Host=postgres; Port=5432; User ID=giddup; Password=giddup; Database=giddup; Pooling=true;'
+    image: ${DOCKER_REGISTRY-}giddup-projections
+    networks:
+      - giddup
 
 networks:
   giddup:

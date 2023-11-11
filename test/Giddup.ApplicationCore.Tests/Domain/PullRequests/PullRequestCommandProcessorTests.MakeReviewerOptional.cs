@@ -59,7 +59,7 @@ public partial class PullRequestCommandProcessorTests
     {
         // Arrange
         var command = new MakeReviewerOptionalCommand(Guid.NewGuid());
-        var state = GetPullRequestState(reviewers: GetReviewers((command.UserId, ReviewerType.Optional, ReviewerFeedback.None)));
+        var state = GetPullRequestState(reviewers: GetReviewers((command.ReviewerId, ReviewerType.Optional, ReviewerFeedback.None)));
 
         // Act
         var result = await PullRequestCommandProcessor.Process(state, command);
@@ -79,7 +79,7 @@ public partial class PullRequestCommandProcessorTests
     {
         // Arrange
         var command = new MakeReviewerOptionalCommand(Guid.NewGuid());
-        var reviewers = reviewerUserId != null ? GetReviewers((command.UserId, ReviewerType.Required, ReviewerFeedback.None), (Guid.Parse(reviewerUserId), reviewerType, reviewerFeedback)) : GetReviewers((command.UserId, ReviewerType.Required, ReviewerFeedback.None));
+        var reviewers = reviewerUserId != null ? GetReviewers((command.ReviewerId, ReviewerType.Required, ReviewerFeedback.None), (Guid.Parse(reviewerUserId), reviewerType, reviewerFeedback)) : GetReviewers((command.ReviewerId, ReviewerType.Required, ReviewerFeedback.None));
         var workItems = workItemId != null ? GetWorkItems(Guid.Parse(workItemId)) : GetWorkItems();
         var state = GetPullRequestState(checkForLinkedWorkItemsMode: checkForLinkedWorkItemsMode, autoCompleteMode: AutoCompleteMode.Enabled, reviewers: reviewers, workItems: workItems);
 
@@ -105,7 +105,7 @@ public partial class PullRequestCommandProcessorTests
     {
         // Arrange
         var command = new MakeReviewerOptionalCommand(Guid.NewGuid());
-        var reviewers = reviewerUserId != null ? GetReviewers((command.UserId, ReviewerType.Required, ReviewerFeedback.None), (Guid.Parse(reviewerUserId), reviewerType, reviewerFeedback)) : GetReviewers((command.UserId, ReviewerType.Required, ReviewerFeedback.None));
+        var reviewers = reviewerUserId != null ? GetReviewers((command.ReviewerId, ReviewerType.Required, ReviewerFeedback.None), (Guid.Parse(reviewerUserId), reviewerType, reviewerFeedback)) : GetReviewers((command.ReviewerId, ReviewerType.Required, ReviewerFeedback.None));
         var state = GetPullRequestState(checkForLinkedWorkItemsMode: checkForLinkedWorkItemsMode, autoCompleteMode: autoCompleteMode, reviewers: reviewers);
 
         // Act

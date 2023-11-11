@@ -25,7 +25,7 @@ public static class GraphQL
         return services;
     }
 
-    public static IEndpointRouteBuilder MapAppStartupGraphQL(this IEndpointRouteBuilder builder)
+    public static WebApplication UseAppStartupGraphQL(this WebApplication builder)
     {
         _ = builder.MapGraphQL();
 
