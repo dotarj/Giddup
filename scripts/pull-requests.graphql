@@ -2,7 +2,8 @@ query {
   pullRequests {
     items {
       id
-      owner {
+      createdAt
+      createdBy {
         ...UserFragment
       }
       sourceBranch
