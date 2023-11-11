@@ -10,6 +10,7 @@ public static class AspNetCore
     public static IServiceCollection AddAppStartupAspNetCore(this IServiceCollection services)
     {
         _ = services
+            .AddHttpContextAccessor()
             .AddControllers()
             .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)));
 

@@ -1,8 +1,6 @@
 // Copyright (c) Arjen Post. See LICENSE in the project root for license information.
 
 using Giddup.Infrastructure.PullRequests.QueryModel.Models;
-using HotChocolate.Execution;
-using HotChocolate.Language;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,62 +10,14 @@ namespace Giddup.Presentation.Api.Controllers;
 [ApiController]
 public class PullRequestQueriesController : ControllerBase
 {
-    private readonly RequestExecutorProxy _executor;
+    private readonly GraphQLQueryExecutor _graphQLQueryExecutor;
 
-    public PullRequestQueriesController(RequestExecutorProxy executor)
-        => _executor = executor;
+    public PullRequestQueriesController(GraphQLQueryExecutor graphQLQueryExecutor)
+        => _graphQLQueryExecutor = graphQLQueryExecutor;
 
     [HttpGet]
     [Route("/pull-requests")]
-    public Task<IActionResult> Get()
-    {
-        var query = CreateQuery();
-
-        void ConfigureRequest(IQueryRequestBuilder builder) => builder.SetQuery(CreateQuery());
-
-        return _executor.ExecuteQuery(User, HttpContext.RequestServices, ConfigureRequest, GraphQLQueryExecutor.ToActionResult);
-    }
-
-    private static DocumentNode CreateQuery()
-    {
-        return Utf8GraphQLParser.Parse(@"query {
-  pullRequests {
-    items {
-      id
-      owner {
-        ...UserFragment
-      }
-      sourceBranch
-      targetBranch
-      title
-      description
-      status
-      autoCompleteMode
-      checkForLinkedWorkItemsMode
-      optionalReviewers {
-        feedback
-        user {
-          ...UserFragment
-        }
-      }
-      requiredReviewers {
-        feedback
-        user {
-          ...UserFragment
-        }
-      }
-      workItems {
-        id
-        title
-      }
-    }
-  }
-}
-
-fragment UserFragment on User {
-  id
-  firstName
-  lastName
-}");
-    }
+    [ProducesResponseType(typeof(List<PullRequest>), 200)]
+    public Task<IActionResult> Get(string fields = "", int skip = 0, int take = 10)
+        => _graphQLQueryExecutor.Execute("pullRequests", fields, skip, take);
 }

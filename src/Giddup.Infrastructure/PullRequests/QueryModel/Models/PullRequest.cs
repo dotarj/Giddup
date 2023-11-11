@@ -1,6 +1,7 @@
 // Copyright (c) Arjen Post. See LICENSE in the project root for license information.
 
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using Giddup.ApplicationCore.Domain.PullRequests;
 using Giddup.Infrastructure.System.QueryModel;
 using Giddup.Infrastructure.WorkItems.QueryModel;
@@ -15,6 +16,7 @@ public class PullRequest
     public User Owner { get; set; } = null!;
 
     [GraphQLIgnore]
+    [JsonIgnore]
     public Guid OwnerId { get; set; }
 
     [StringLength(256)]

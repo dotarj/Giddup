@@ -1,16 +1,58 @@
 // Copyright (c) Arjen Post. See LICENSE in the project root for license information.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Mime;
 using System.Security.Claims;
 using System.Text.Json;
 using HotChocolate.Execution;
+using HotChocolate.Language;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Giddup.Presentation.Api.Controllers;
 
-public static class GraphQLQueryExecutor
+public class GraphQLQueryExecutor
 {
-    public static async Task<IActionResult> ExecuteQuery(this RequestExecutorProxy executor, ClaimsPrincipal user, IServiceProvider serviceProvider, Action<IQueryRequestBuilder> configureRequest, Func<IQueryResult, IActionResult> toActionResult)
+    private readonly RequestExecutorProxy _requestExecutorProxy;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
+    public GraphQLQueryExecutor(RequestExecutorProxy requestExecutorProxy, IHttpContextAccessor httpContextAccessor)
+    {
+        _requestExecutorProxy = requestExecutorProxy;
+        _httpContextAccessor = httpContextAccessor;
+    }
+
+    public async Task<IActionResult> Execute(string queryType, string fields, int skip, int take)
+    {
+        if (!TryCreateQuery(queryType, fields, skip, take, out var query))
+        {
+            return new BadRequestResult();
+        }
+
+        void ConfigureRequest(IQueryRequestBuilder builder) => builder.SetQuery(query);
+
+        var user = _httpContextAccessor.HttpContext!.User;
+        var requestServices = _httpContextAccessor.HttpContext!.RequestServices;
+
+        return await ExecuteQuery(_requestExecutorProxy, user, requestServices, ConfigureRequest, ToActionResult);
+    }
+
+    private static bool TryCreateQuery(string queryType, string fields, int skip, int take, [NotNullWhen(true)] out DocumentNode? query)
+    {
+        try
+        {
+            query = Utf8GraphQLParser.Parse($"query {{ {queryType}(skip: {skip}, take: {take}) {{ {fields} }} }}");
+        }
+        catch (SyntaxException)
+        {
+            query = null;
+
+            return false;
+        }
+
+        return true;
+    }
+
+    private async Task<IActionResult> ExecuteQuery(RequestExecutorProxy executor, ClaimsPrincipal user, IServiceProvider serviceProvider, Action<IQueryRequestBuilder> configureRequest, Func<IQueryResult, IActionResult> toActionResult)
     {
         var requestBuilder = new QueryRequestBuilder();
 
@@ -27,7 +69,7 @@ public static class GraphQLQueryExecutor
         return toActionResult(result.ExpectQueryResult());
     }
 
-    public static IActionResult ToActionResult(IQueryResult queryResult)
+    private IActionResult ToActionResult(IQueryResult queryResult)
     {
         if (queryResult.Errors is { Count: > 0 })
         {
@@ -37,6 +79,15 @@ public static class GraphQLQueryExecutor
             if (isNotAuthorized)
             {
                 return new ForbidResult();
+            }
+
+            // The field `[FIELD]` does not exist on the type `[TYPE]`.
+            var hasInvalidFields = queryResult.Errors
+                .Any(error => error.Message.Contains("does not exist on the type"));
+
+            if (hasInvalidFields)
+            {
+                return new BadRequestResult();
             }
 
             return new StatusCodeResult(500);

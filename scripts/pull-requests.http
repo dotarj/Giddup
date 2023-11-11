@@ -5,7 +5,7 @@
 
 ######
 # @name pullRequests
-GET {{host}}/pull-requests
+GET {{host}}/pull-requests?fields=items { id owner, sourceBranch { id firstName lastName } }
 Authorization: Bearer {{token}}
 
 ######

@@ -2,6 +2,7 @@
 
 using Giddup.ApplicationCore.Domain.PullRequests;
 using Giddup.Infrastructure;
+using Giddup.Presentation.Api.Controllers;
 using Giddup.Presentation.Api.Mutations;
 using Giddup.Presentation.Api.Queries;
 using HotChocolate.Execution;
@@ -24,6 +25,7 @@ public static class GraphQL
             .AddType<IPullRequestError>();
 
         _ = services
+            .AddScoped<GraphQLQueryExecutor>()
             .AddSingleton(serviceProvider =>
             {
                 var requestExecutorResolver = serviceProvider.GetRequiredService<IRequestExecutorResolver>();
