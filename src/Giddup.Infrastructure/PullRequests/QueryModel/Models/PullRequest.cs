@@ -13,11 +13,11 @@ public class PullRequest
 {
     public Guid Id { get; set; }
 
-    public User Owner { get; set; } = null!;
+    public User CreatedBy { get; set; } = null!;
 
     [GraphQLIgnore]
     [JsonIgnore]
-    public Guid OwnerId { get; set; }
+    public Guid CreatedById { get; set; }
 
     [StringLength(256)]
     public string SourceBranch { get; set; } = string.Empty;

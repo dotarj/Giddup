@@ -84,7 +84,7 @@ public partial class PullRequestCommandProcessorTests
         Assert.True(result.TryGetEvents(out var events, out _));
         var @event = Assert.Single(events);
         var createdEvent = Assert.IsType<CreatedEvent>(@event);
-        Assert.Equal(command.OwnerId, createdEvent.OwnerId);
+        Assert.Equal(command.CreatedById, createdEvent.CreatedById);
         Assert.Equal(sourceBranch, createdEvent.SourceBranch);
         Assert.Equal(targetBranch, createdEvent.TargetBranch);
         Assert.Equal(title, createdEvent.Title);

@@ -94,7 +94,7 @@ public class PullRequestProjectionWorker : BackgroundService
 
     private static PullRequest Created(CreatedEvent @event, PullRequest pullRequest)
     {
-        pullRequest.OwnerId = @event.OwnerId;
+        pullRequest.CreatedById = @event.CreatedById;
         pullRequest.SourceBranch = @event.SourceBranch.ToString();
         pullRequest.TargetBranch = @event.TargetBranch.ToString();
         pullRequest.Title = @event.Title.ToString();
