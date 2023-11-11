@@ -2,6 +2,8 @@
 
 using Giddup.Infrastructure.PullRequests.QueryModel;
 using Giddup.Infrastructure.PullRequests.QueryModel.Models;
+using Giddup.Presentation.Api.Queries.FilterInputTypes;
+using Giddup.Presentation.Api.Queries.SortInputTypes;
 
 namespace Giddup.Presentation.Api.Queries;
 
@@ -9,8 +11,8 @@ public class PullRequestQueries
 {
     [UseOffsetPaging]
     [UseProjection]
-    [UseFiltering]
-    [UseSorting]
+    [UseFiltering<PullRequestFilterInputType>]
+    [UseSorting<PullRequestSortInputType>]
     public IQueryable<PullRequest> GetPullRequests([Service] IPullRequestQueryProcessor queryProcessor)
         => queryProcessor.Process();
 }
