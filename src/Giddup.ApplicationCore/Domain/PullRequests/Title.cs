@@ -12,7 +12,7 @@ public class Title : ValueObject
 
     public static bool TryCreate(string value, [NotNullWhen(true)]out Title? title)
     {
-        if (value.All(char.IsWhiteSpace))
+        if (!IsValidTitle(value))
         {
             title = null;
 
@@ -29,5 +29,20 @@ public class Title : ValueObject
     protected override IEnumerable<object> GetEqualityComponents()
     {
         yield return _value;
+    }
+
+    private static bool IsValidTitle(string value)
+    {
+        if (value.Length > 256)
+        {
+            return false;
+        }
+
+        if (value.All(char.IsWhiteSpace))
+        {
+            return false;
+        }
+
+        return true;
     }
 }

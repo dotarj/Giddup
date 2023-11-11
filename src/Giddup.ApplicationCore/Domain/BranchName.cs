@@ -34,6 +34,11 @@ public class BranchName : ValueObject
 
     private static bool IsValidBranchName(string value)
     {
+        if (value.Length > 256)
+        {
+            return false;
+        }
+
         // Git imposes the following rules on how references are named (https://git-scm.com/docs/git-check-ref-format):
         char? previousCharacter = null;
 
