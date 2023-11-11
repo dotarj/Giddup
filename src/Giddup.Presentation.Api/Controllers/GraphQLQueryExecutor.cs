@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Net.Mime;
 using System.Security.Claims;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using HotChocolate.Execution;
 using HotChocolate.Language;
 using Microsoft.AspNetCore.Mvc;
@@ -81,9 +82,10 @@ public class GraphQLQueryExecutor
                 return new ForbidResult();
             }
 
-            // The field `[FIELD]` does not exist on the type `[TYPE]`.
+            const string fieldDoesNotExistPattern = "The field `\\w+` does not exist on the type `\\w+`\\.";
+
             var hasInvalidFields = queryResult.Errors
-                .Any(error => error.Message.Contains("does not exist on the type"));
+                .Any(error => Regex.Match(error.Message, fieldDoesNotExistPattern).Success);
 
             if (hasInvalidFields)
             {
