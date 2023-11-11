@@ -81,13 +81,13 @@ public class PullRequestProjectionWorker : BackgroundService
         => SetReviewerFeedback(@event.ReviewerId, ReviewerFeedback.Approved, pullRequest);
 
     private static PullRequest ApprovedWithSuggestions(ApprovedWithSuggestionsEvent @event, PullRequest pullRequest)
-        => SetReviewerFeedback(@event.ReviewerId, ReviewerFeedback.Approved, pullRequest);
+        => SetReviewerFeedback(@event.ReviewerId, ReviewerFeedback.ApprovedWithSuggestions, pullRequest);
 
     private static PullRequest AutoCompleteSet(PullRequest pullRequest)
         => SetAutoCompleteMode(AutoCompleteMode.Enabled, pullRequest);
 
     private static PullRequest AutoCompleteCancelled(PullRequest pullRequest)
-        => SetAutoCompleteMode(AutoCompleteMode.Enabled, pullRequest);
+        => SetAutoCompleteMode(AutoCompleteMode.Disabled, pullRequest);
 
     private static PullRequest Completed(PullRequest pullRequest)
         => SetStatus(PullRequestStatus.Completed, pullRequest);
