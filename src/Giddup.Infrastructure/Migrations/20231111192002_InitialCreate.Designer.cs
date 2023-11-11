@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Giddup.Infrastructure.Migrations
 {
     [DbContext(typeof(GiddupDbContext))]
-    [Migration("20231111185231_InitialCreate")]
+    [Migration("20231111192002_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
