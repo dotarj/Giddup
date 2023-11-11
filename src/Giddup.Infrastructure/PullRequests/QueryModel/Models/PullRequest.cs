@@ -2,7 +2,9 @@
 
 using System.ComponentModel.DataAnnotations;
 using Giddup.ApplicationCore.Domain.PullRequests;
+using Giddup.Infrastructure.System.QueryModel;
 using Giddup.Infrastructure.WorkItems.QueryModel;
+using HotChocolate;
 
 namespace Giddup.Infrastructure.PullRequests.QueryModel.Models;
 
@@ -10,6 +12,9 @@ public class PullRequest
 {
     public Guid Id { get; set; }
 
+    public User Owner { get; set; } = null!;
+
+    [GraphQLIgnore]
     public Guid OwnerId { get; set; }
 
     [StringLength(256)]

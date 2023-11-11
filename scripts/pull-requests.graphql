@@ -1,3 +1,43 @@
+query {
+  pullRequests {
+    items {
+      id
+      owner {
+        ...UserFragment
+      }
+      sourceBranch
+      targetBranch
+      title
+      description
+      status
+      autoCompleteMode
+      checkForLinkedWorkItemsMode
+      optionalReviewers {
+        feedback
+        user {
+          ...UserFragment
+        }
+      }
+      requiredReviewers {
+        feedback
+        user {
+          ...UserFragment
+        }
+      }
+      workItems {
+        id
+        title
+      }
+    }
+  }
+}
+
+fragment UserFragment on User {
+  id
+  firstName
+  lastName
+}
+
 mutation {
   create(
     input: {
