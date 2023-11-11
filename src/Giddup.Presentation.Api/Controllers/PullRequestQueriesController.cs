@@ -18,6 +18,6 @@ public class PullRequestQueriesController : ControllerBase
     [HttpGet]
     [Route("/pull-requests")]
     [ProducesResponseType(typeof(List<PullRequest>), 200)]
-    public Task<IActionResult> Get(string fields = "", int skip = 0, int take = 10)
-        => _graphQLQueryExecutor.Execute("pullRequests", fields, skip, take);
+    public Task<IActionResult> Get(string fields = "", int skip = 0, int take = 10, string order = "")
+        => _graphQLQueryExecutor.Execute("pullRequests", fields, skip, take, order);
 }

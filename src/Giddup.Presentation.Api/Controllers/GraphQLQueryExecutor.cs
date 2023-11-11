@@ -22,9 +22,9 @@ public class GraphQLQueryExecutor
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public async Task<IActionResult> Execute(string queryType, string fields, int skip, int take)
+    public async Task<IActionResult> Execute(string queryType, string fields, int skip, int take, string order)
     {
-        if (!TryCreateQuery(queryType, fields, skip, take, out var query))
+        if (!TryCreateQuery(queryType, fields, skip, take, order, out var query))
         {
             return new BadRequestResult();
         }
@@ -37,11 +37,11 @@ public class GraphQLQueryExecutor
         return await ExecuteQuery(_requestExecutorProxy, user, requestServices, ConfigureRequest, ToActionResult);
     }
 
-    private static bool TryCreateQuery(string queryType, string fields, int skip, int take, [NotNullWhen(true)] out DocumentNode? query)
+    private static bool TryCreateQuery(string queryType, string fields, int skip, int take, string order, [NotNullWhen(true)] out DocumentNode? query)
     {
         try
         {
-            query = Utf8GraphQLParser.Parse($"query {{ {queryType}(skip: {skip}, take: {take}) {{ {fields} }} }}");
+            query = Utf8GraphQLParser.Parse($"query {{ {queryType}(skip: {skip}, take: {take}, order: {{ {order} }}) {{ {fields} }} }}");
         }
         catch (SyntaxException)
         {
