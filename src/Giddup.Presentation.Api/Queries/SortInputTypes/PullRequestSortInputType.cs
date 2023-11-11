@@ -9,6 +9,6 @@ public class PullRequestSortInputType : SortInputType<PullRequest>
 {
     protected override void Configure(ISortInputTypeDescriptor<PullRequest> descriptor)
     {
-        descriptor.Field(sample => sample.Title);
+        _ = descriptor.Field(sample => sample.Title);
     }
 }

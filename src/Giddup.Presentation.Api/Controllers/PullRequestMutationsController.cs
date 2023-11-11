@@ -73,7 +73,7 @@ public class PullRequestMutationsController : ControllerBase
     {
         var pullRequestId = Guid.NewGuid();
 
-        var error = await _pullRequestService.ProcessCommand(pullRequestId, new CreateCommand(User.GetUserId(), input.SourceBranch, input.TargetBranch, input.Title, branchService.IsExistingBranch));
+        var error = await _pullRequestService.ProcessCommand(pullRequestId, new CreateCommand(DateTime.UtcNow, User.GetUserId(), input.SourceBranch, input.TargetBranch, input.Title, branchService.IsExistingBranch));
 
         return CreateResult(error, Request.Path, () => Created($"/pull-requests/{pullRequestId}", null));
     }

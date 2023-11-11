@@ -304,7 +304,7 @@ public static class PullRequestCommandProcessor
             return new InvalidTitleError();
         }
 
-        return new CreatedEvent(command.CreatedById, sourceBranch, targetBranch, title);
+        return new CreatedEvent(command.CreatedAt, command.CreatedById, sourceBranch, targetBranch, title);
     }
 
     private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> LinkWorkItem(LinkWorkItemCommand command, ExistingPullRequestState state)

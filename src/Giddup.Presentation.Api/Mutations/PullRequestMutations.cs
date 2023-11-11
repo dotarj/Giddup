@@ -78,7 +78,7 @@ public class PullRequestMutations
     {
         var pullRequestId = Guid.NewGuid();
 
-        return ProcessCommand(pullRequestService, pullRequestId, new CreateCommand(context.GetUser()!.GetUserId(), sourceBranch, targetBranch, title, branchService.IsExistingBranch));
+        return ProcessCommand(pullRequestService, pullRequestId, new CreateCommand(DateTime.UtcNow, context.GetUser()!.GetUserId(), sourceBranch, targetBranch, title, branchService.IsExistingBranch));
     }
 
     [Error<NotFoundError>]

@@ -9,9 +9,9 @@ public class PullRequestFilterInputType : FilterInputType<PullRequest>
 {
     protected override void Configure(IFilterInputTypeDescriptor<PullRequest> descriptor)
     {
-        descriptor.Field(pullRequest => pullRequest.CreatedBy);
-        descriptor.Field(pullRequest => pullRequest.Id);
-        descriptor.Field(pullRequest => pullRequest.Status);
-        descriptor.Field(pullRequest => pullRequest.TargetBranch);
+        _ = descriptor.Field(pullRequest => pullRequest.CreatedBy);
+        _ = descriptor.Field(pullRequest => pullRequest.Id);
+        _ = descriptor.Field(pullRequest => pullRequest.Status);
+        _ = descriptor.Field(pullRequest => pullRequest.TargetBranch);
     }
 }

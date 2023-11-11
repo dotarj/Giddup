@@ -26,7 +26,7 @@ public record ChangeTitleCommand(string Title) : IPullRequestCommand;
 
 public record CompleteCommand : IPullRequestCommand;
 
-public record CreateCommand(Guid CreatedById, string SourceBranch, string TargetBranch, string Title, Func<BranchName, Task<bool>> IsExistingBranch) : IPullRequestCommand;
+public record CreateCommand(DateTime CreatedAt, Guid CreatedById, string SourceBranch, string TargetBranch, string Title, Func<BranchName, Task<bool>> IsExistingBranch) : IPullRequestCommand;
 
 public record LinkWorkItemCommand(Guid WorkItemId) : IPullRequestCommand;
 

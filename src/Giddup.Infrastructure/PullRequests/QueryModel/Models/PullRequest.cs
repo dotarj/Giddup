@@ -13,6 +13,8 @@ public class PullRequest
 {
     public Guid Id { get; set; }
 
+    public DateTime CreatedAt { get; set; }
+
     public User CreatedBy { get; set; } = null!;
 
     [GraphQLIgnore]

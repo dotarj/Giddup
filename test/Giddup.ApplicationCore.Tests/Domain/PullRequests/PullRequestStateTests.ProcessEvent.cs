@@ -16,7 +16,7 @@ public class PullRequestStateTests
         _ = BranchName.TryCreate("refs/heads/foo", out var sourceBranch);
         _ = BranchName.TryCreate("refs/heads/bar", out var targetBranch);
         _ = Title.TryCreate("baz", out var title);
-        var @event = new CreatedEvent(Guid.NewGuid(), sourceBranch!, targetBranch!, title!);
+        var @event = new CreatedEvent(DateTime.UtcNow, Guid.NewGuid(), sourceBranch!, targetBranch!, title!);
         var state = IPullRequestState.InitialState;
 
         // Act

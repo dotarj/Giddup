@@ -18,7 +18,7 @@ public record AutoCompleteCancelledEvent : IPullRequestEvent;
 
 public record CompletedEvent : IPullRequestEvent;
 
-public record CreatedEvent(Guid CreatedById, BranchName SourceBranch, BranchName TargetBranch, Title Title) : IPullRequestEvent;
+public record CreatedEvent(DateTime CreatedAt, Guid CreatedById, BranchName SourceBranch, BranchName TargetBranch, Title Title) : IPullRequestEvent;
 
 public record DescriptionChangedEvent(string Description) : IPullRequestEvent;
 
