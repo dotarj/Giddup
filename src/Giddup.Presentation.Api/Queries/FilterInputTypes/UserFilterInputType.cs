@@ -9,6 +9,8 @@ public class UserFilterInputType : FilterInputType<User>
 {
     protected override void Configure(IFilterInputTypeDescriptor<User> descriptor)
     {
+        _ = descriptor.BindFieldsExplicitly();
+
         _ = descriptor.Field(user => user.Id);
     }
 }

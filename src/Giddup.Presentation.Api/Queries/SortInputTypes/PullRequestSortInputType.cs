@@ -9,6 +9,8 @@ public class PullRequestSortInputType : SortInputType<PullRequest>
 {
     protected override void Configure(ISortInputTypeDescriptor<PullRequest> descriptor)
     {
+        _ = descriptor.BindFieldsExplicitly();
+
         _ = descriptor.Field(pullRequest => pullRequest.CreatedAt);
     }
 }
