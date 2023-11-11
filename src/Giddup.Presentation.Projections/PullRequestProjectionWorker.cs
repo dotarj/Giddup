@@ -56,7 +56,7 @@ public class PullRequestProjectionWorker : BackgroundService
                     TargetBranchChangedEvent targetBranchChangedEvent => TargetBranchChanged(targetBranchChangedEvent, pullRequest),
                     TitleChangedEvent titleChangedEvent => TitleChanged(titleChangedEvent, pullRequest),
                     WaitingForAuthorEvent waitingForAuthorEvent => WaitingForAuthor(waitingForAuthorEvent, pullRequest),
-                    WorkItemLinkedEvent workItemLinkedEvent => WorkItemLinked(workItemLinkedEvent, pullRequest),
+                    WorkItemLinkedEvent workItemLinkedEvent => await WorkItemLinked(workItemLinkedEvent, pullRequest, dbContext),
                     WorkItemRemovedEvent workItemRemovedEvent => WorkItemRemoved(workItemRemovedEvent, pullRequest),
 
                     _ => throw new InvalidOperationException($"Event '{@event.Event.GetType().FullName}' not supported.")
@@ -214,13 +214,29 @@ public class PullRequestProjectionWorker : BackgroundService
     private static PullRequest WaitingForAuthor(WaitingForAuthorEvent @event, PullRequest pullRequest)
         => SetReviewerFeedback(@event.ReviewerId, ReviewerFeedback.WaitingForAuthor, pullRequest);
 
-    private static PullRequest WorkItemLinked(WorkItemLinkedEvent @event, PullRequest pullRequest)
+    private static async Task<PullRequest> WorkItemLinked(WorkItemLinkedEvent @event, PullRequest pullRequest, GiddupDbContext dbContext)
     {
+        var workItem = await dbContext.WorkItems.FirstOrDefaultAsync(workItem => workItem.Id == @event.WorkItemId);
+
+        if (workItem == null)
+        {
+            throw new InvalidOperationException();
+        }
+
+        pullRequest.WorkItems.Add(workItem);
+
         return pullRequest;
     }
 
     private static PullRequest WorkItemRemoved(WorkItemRemovedEvent @event, PullRequest pullRequest)
     {
+        var workItem = pullRequest.WorkItems.FirstOrDefault(workItem => workItem.Id == @event.WorkItemId);
+
+        if (workItem != null)
+        {
+            _ = pullRequest.WorkItems.Remove(workItem);
+        }
+
         return pullRequest;
     }
 

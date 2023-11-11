@@ -2,6 +2,7 @@
 
 using System.ComponentModel.DataAnnotations;
 using Giddup.ApplicationCore.Domain.PullRequests;
+using Giddup.Infrastructure.WorkItems.QueryModel;
 
 namespace Giddup.Infrastructure.PullRequests.QueryModel.Models;
 
@@ -31,4 +32,6 @@ public class PullRequest
     public List<OptionalReviewer> OptionalReviewers { get; set; } = new();
 
     public List<RequiredReviewer> RequiredReviewers { get; set; } = new();
+
+    public List<WorkItem> WorkItems { get; set; } = new();
 }
