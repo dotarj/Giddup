@@ -45,25 +45,6 @@ namespace Giddup.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PullRequests",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    OwnerId = table.Column<Guid>(type: "uuid", nullable: false),
-                    SourceBranch = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
-                    TargetBranch = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
-                    Title = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: false),
-                    Status = table.Column<int>(type: "integer", nullable: false),
-                    AutoCompleteMode = table.Column<int>(type: "integer", nullable: false),
-                    CheckForLinkedWorkItemsMode = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PullRequests", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
@@ -86,6 +67,32 @@ namespace Giddup.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_WorkItems", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PullRequests",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CreatedById = table.Column<Guid>(type: "uuid", nullable: false),
+                    SourceBranch = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    TargetBranch = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    Title = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    AutoCompleteMode = table.Column<int>(type: "integer", nullable: false),
+                    CheckForLinkedWorkItemsMode = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PullRequests", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PullRequests_Users_CreatedById",
+                        column: x => x.CreatedById,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -114,6 +121,30 @@ namespace Giddup.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PullRequestWorkItem",
+                columns: table => new
+                {
+                    PullRequestsId = table.Column<Guid>(type: "uuid", nullable: false),
+                    WorkItemsId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PullRequestWorkItem", x => new { x.PullRequestsId, x.WorkItemsId });
+                    table.ForeignKey(
+                        name: "FK_PullRequestWorkItem_PullRequests_PullRequestsId",
+                        column: x => x.PullRequestsId,
+                        principalTable: "PullRequests",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PullRequestWorkItem_WorkItems_WorkItemsId",
+                        column: x => x.WorkItemsId,
+                        principalTable: "WorkItems",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "RequiredReviewer",
                 columns: table => new
                 {
@@ -134,30 +165,6 @@ namespace Giddup.Infrastructure.Migrations
                         name: "FK_RequiredReviewer_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "PullRequestWorkItem",
-                columns: table => new
-                {
-                    PullRequestsId = table.Column<Guid>(type: "uuid", nullable: false),
-                    WorkItemsId = table.Column<Guid>(type: "uuid", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PullRequestWorkItem", x => new { x.PullRequestsId, x.WorkItemsId });
-                    table.ForeignKey(
-                        name: "FK_PullRequestWorkItem_PullRequests_PullRequestsId",
-                        column: x => x.PullRequestsId,
-                        principalTable: "PullRequests",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_PullRequestWorkItem_WorkItems_WorkItemsId",
-                        column: x => x.WorkItemsId,
-                        principalTable: "WorkItems",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -192,6 +199,11 @@ namespace Giddup.Infrastructure.Migrations
                 name: "IX_OptionalReviewer_PullRequestId",
                 table: "OptionalReviewer",
                 column: "PullRequestId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PullRequests_CreatedById",
+                table: "PullRequests",
+                column: "CreatedById");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PullRequestWorkItem_WorkItemsId",

@@ -16,7 +16,7 @@ public class PullRequestStateTests
         _ = BranchName.TryCreate("refs/heads/foo", out var sourceBranch);
         _ = BranchName.TryCreate("refs/heads/bar", out var targetBranch);
         _ = Title.TryCreate("baz", out var title);
-        var @event = new CreatedEvent(Guid.NewGuid(), sourceBranch!, targetBranch!, title!);
+        var @event = new CreatedEvent(DateTime.UtcNow, Guid.NewGuid(), sourceBranch!, targetBranch!, title!);
         var state = IPullRequestState.InitialState;
 
         // Act
@@ -24,7 +24,7 @@ public class PullRequestStateTests
 
         // Assert
         var existingState = Assert.IsType<ExistingPullRequestState>(result);
-        Assert.Equal(@event.OwnerId, existingState.OwnerId);
+        Assert.Equal(@event.CreatedById, existingState.CreatedById);
         Assert.Equal(@event.SourceBranch, existingState.SourceBranch);
         Assert.Equal(@event.TargetBranch, existingState.TargetBranch);
         Assert.Equal(@event.Title, existingState.Title);
@@ -323,7 +323,7 @@ public class PullRequestStateTests
         Assert.Equal(PullRequestStatus.Active, existingState.Status);
     }
 
-    private static IPullRequestState GetPullRequestState(Guid? owner = null, BranchName? sourceBranch = null, BranchName? targetBranch = null, Title? title = null, string? description = null, CheckForLinkedWorkItemsMode checkForLinkedWorkItemsMode = CheckForLinkedWorkItemsMode.Disabled, AutoCompleteMode autoCompleteMode = AutoCompleteMode.Disabled, PullRequestStatus status = PullRequestStatus.Active, ImmutableList<(Guid ReviewerId, ReviewerType Type, ReviewerFeedback Feedback)>? reviewers = null, ImmutableList<Guid>? workItems = null)
+    private static IPullRequestState GetPullRequestState(Guid? CreatedBy = null, BranchName? sourceBranch = null, BranchName? targetBranch = null, Title? title = null, string? description = null, CheckForLinkedWorkItemsMode checkForLinkedWorkItemsMode = CheckForLinkedWorkItemsMode.Disabled, AutoCompleteMode autoCompleteMode = AutoCompleteMode.Disabled, PullRequestStatus status = PullRequestStatus.Active, ImmutableList<(Guid ReviewerId, ReviewerType Type, ReviewerFeedback Feedback)>? reviewers = null, ImmutableList<Guid>? workItems = null)
     {
         if (title is null)
         {
@@ -340,7 +340,7 @@ public class PullRequestStateTests
             _ = BranchName.TryCreate("refs/heads/target", out targetBranch!);
         }
 
-        return new ExistingPullRequestState(owner ?? Guid.NewGuid(), sourceBranch, targetBranch, title, description ?? "description", checkForLinkedWorkItemsMode, autoCompleteMode, status, reviewers ?? GetReviewers(), workItems ?? GetWorkItems());
+        return new ExistingPullRequestState(CreatedBy ?? Guid.NewGuid(), sourceBranch, targetBranch, title, description ?? "description", checkForLinkedWorkItemsMode, autoCompleteMode, status, reviewers ?? GetReviewers(), workItems ?? GetWorkItems());
     }
 
     private static ImmutableList<(Guid ReviewerId, ReviewerType Type, ReviewerFeedback Feedback)> GetReviewers(params (Guid UserId, ReviewerType Type, ReviewerFeedback Feedback)[] reviewers)

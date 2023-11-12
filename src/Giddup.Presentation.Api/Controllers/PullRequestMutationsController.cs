@@ -1,7 +1,6 @@
 // Copyright (c) Arjen Post. See LICENSE in the project root for license information.
 
 using Giddup.ApplicationCore.Application.PullRequests;
-using Giddup.ApplicationCore.Domain;
 using Giddup.ApplicationCore.Domain.PullRequests;
 using Giddup.Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -74,7 +73,7 @@ public class PullRequestMutationsController : ControllerBase
     {
         var pullRequestId = Guid.NewGuid();
 
-        var error = await _pullRequestService.ProcessCommand(pullRequestId, new CreateCommand(User.GetUserId(), input.SourceBranch, input.TargetBranch, input.Title, branchService.IsExistingBranch));
+        var error = await _pullRequestService.ProcessCommand(pullRequestId, new CreateCommand(DateTime.UtcNow, User.GetUserId(), input.SourceBranch, input.TargetBranch, input.Title, branchService.IsExistingBranch));
 
         return CreateResult(error, Request.Path, () => Created($"/pull-requests/{pullRequestId}", null));
     }
@@ -147,7 +146,7 @@ public class PullRequestMutationsController : ControllerBase
         {
             return error switch
             {
-                AlreadyExistsError => ProblemDetailsResult("A Pull request with the same ID already exsists.", "already-exists"),
+                AlreadyExistsError => ProblemDetailsResult("A Pull request with the same ID already exists.", "already-exists"),
                 FeedbackContainsWaitForAuthorOrRejectError => ProblemDetailsResult("Pull request blocked by one or more reviewers.", "feedback-contains-wait-for-author-or-reject"),
                 InvalidReviewerError => ProblemDetailsResult("The given reviewer is invalid.", "invalid-reviewer"),
                 InvalidBranchNameError => ProblemDetailsResult("The given branch name is invalid.", "invalid-branch-name"),

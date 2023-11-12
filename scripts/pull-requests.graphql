@@ -1,3 +1,54 @@
+query {
+  pullRequests(
+    where: {
+      # createdBy: { id: { eq: "6e76dc39-633a-422d-a922-626c3c220e6b" } }
+      # status: { eq: ACTIVE }
+      # targetBranch: { eq: "refs/heads/bar" }
+      # id: { eq: "1ff6bfa6-035b-4d0d-9932-62b41238fb03" }
+    }
+    skip: 0
+    take: 10
+    order: { createdAt: ASC }
+  ) {
+    items {
+      id
+      createdAt
+      createdBy {
+        ...UserFragment
+      }
+      sourceBranch
+      targetBranch
+      title
+      description
+      status
+      autoCompleteMode
+      checkForLinkedWorkItemsMode
+      optionalReviewers {
+        feedback
+        user {
+          ...UserFragment
+        }
+      }
+      requiredReviewers {
+        feedback
+        user {
+          ...UserFragment
+        }
+      }
+      workItems {
+        id
+        title
+      }
+    }
+  }
+}
+
+fragment UserFragment on User {
+  id
+  firstName
+  lastName
+}
+
 mutation {
   create(
     input: {

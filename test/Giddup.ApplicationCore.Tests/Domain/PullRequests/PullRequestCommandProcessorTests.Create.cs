@@ -16,7 +16,7 @@ public partial class PullRequestCommandProcessorTests
         _ = BranchName.TryCreate("refs/heads/bar", out var targetBranch);
         _ = Title.TryCreate("baz", out var title);
         Task<bool> IsExistingBranch(BranchName branch) => Task.FromResult(false);
-        var command = new CreateCommand(Guid.NewGuid(), sourceBranch!.ToString(), targetBranch!.ToString(), title!.ToString(), IsExistingBranch);
+        var command = new CreateCommand(DateTime.UtcNow, Guid.NewGuid(), sourceBranch!.ToString(), targetBranch!.ToString(), title!.ToString(), IsExistingBranch);
         var state = IPullRequestState.InitialState;
 
         // Act
@@ -36,7 +36,7 @@ public partial class PullRequestCommandProcessorTests
         _ = Title.TryCreate("baz", out var title);
         var count = 0;
         Task<bool> IsExistingBranch(BranchName branch) => Task.FromResult(count++ % 2 == 0);
-        var command = new CreateCommand(Guid.NewGuid(), sourceBranch!.ToString(), targetBranch!.ToString(), title!.ToString(), IsExistingBranch);
+        var command = new CreateCommand(DateTime.UtcNow, Guid.NewGuid(), sourceBranch!.ToString(), targetBranch!.ToString(), title!.ToString(), IsExistingBranch);
         var state = IPullRequestState.InitialState;
 
         // Act
@@ -55,7 +55,7 @@ public partial class PullRequestCommandProcessorTests
         _ = BranchName.TryCreate("refs/heads/foo", out var targetBranch);
         _ = Title.TryCreate("baz", out var title);
         Task<bool> IsExistingBranch(BranchName branch) => Task.FromResult(true);
-        var command = new CreateCommand(Guid.NewGuid(), sourceBranch!.ToString(), targetBranch!.ToString(), title!.ToString(), IsExistingBranch);
+        var command = new CreateCommand(DateTime.UtcNow, Guid.NewGuid(), sourceBranch!.ToString(), targetBranch!.ToString(), title!.ToString(), IsExistingBranch);
         var state = IPullRequestState.InitialState;
 
         // Act
@@ -74,7 +74,7 @@ public partial class PullRequestCommandProcessorTests
         _ = BranchName.TryCreate("refs/heads/bar", out var targetBranch);
         _ = Title.TryCreate("baz", out var title);
         Task<bool> IsExistingBranch(BranchName branch) => Task.FromResult(true);
-        var command = new CreateCommand(Guid.NewGuid(), sourceBranch!.ToString(), targetBranch!.ToString(), title!.ToString(), IsExistingBranch);
+        var command = new CreateCommand(DateTime.UtcNow, Guid.NewGuid(), sourceBranch!.ToString(), targetBranch!.ToString(), title!.ToString(), IsExistingBranch);
         var state = IPullRequestState.InitialState;
 
         // Act
@@ -84,7 +84,7 @@ public partial class PullRequestCommandProcessorTests
         Assert.True(result.TryGetEvents(out var events, out _));
         var @event = Assert.Single(events);
         var createdEvent = Assert.IsType<CreatedEvent>(@event);
-        Assert.Equal(command.OwnerId, createdEvent.OwnerId);
+        Assert.Equal(command.CreatedById, createdEvent.CreatedById);
         Assert.Equal(sourceBranch, createdEvent.SourceBranch);
         Assert.Equal(targetBranch, createdEvent.TargetBranch);
         Assert.Equal(title, createdEvent.Title);

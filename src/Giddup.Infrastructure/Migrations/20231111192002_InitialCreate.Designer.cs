@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Giddup.Infrastructure.Migrations
 {
     [DbContext(typeof(GiddupDbContext))]
-    [Migration("20231111075533_InitialCreate")]
+    [Migration("20231111192002_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -104,12 +104,15 @@ namespace Giddup.Infrastructure.Migrations
                     b.Property<int>("CheckForLinkedWorkItemsMode")
                         .HasColumnType("integer");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedById")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<Guid>("OwnerId")
-                        .HasColumnType("uuid");
 
                     b.Property<string>("SourceBranch")
                         .IsRequired()
@@ -130,6 +133,8 @@ namespace Giddup.Infrastructure.Migrations
                         .HasColumnType("character varying(256)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
 
                     b.ToTable("PullRequests");
                 });
@@ -257,6 +262,17 @@ namespace Giddup.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Giddup.Infrastructure.PullRequests.QueryModel.Models.PullRequest", b =>
+                {
+                    b.HasOne("Giddup.Infrastructure.System.QueryModel.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
                 });
 
             modelBuilder.Entity("Giddup.Infrastructure.PullRequests.QueryModel.Models.RequiredReviewer", b =>

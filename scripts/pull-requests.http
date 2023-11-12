@@ -4,6 +4,11 @@
 @token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJnaWRkdXAuYXBpIiwiZXhwIjoyMTQ1OTE2ODAwLCJzdWIiOiI2ZTc2ZGMzOS02MzNhLTQyMmQtYTkyMi02MjZjM2MyMjBlNmIifQ.xj5EZCihbnt1n1v32zANVim5cvBvvz_j6f9dJ2DA8lA
 
 ######
+# @name pullRequests
+GET {{host}}/pull-requests?fields=totalCount items { id sourceBranch createdAt createdBy { id firstName lastName } }&order=createdAt: DESC
+Authorization: Bearer {{token}}
+
+######
 # @name createPullRequest
 POST {{host}}/pull-requests/create
 Authorization: Bearer {{token}}
@@ -14,6 +19,11 @@ Content-Type: application/json
     "TargetBranch": "refs/heads/bar",
     "Title": "baz"
 }
+
+######
+# @name pullRequests
+GET {{host}}{{createPullRequest.response.headers.Location}}?fields=items { id sourceBranch targetBranch createdAt createdBy { id firstName lastName } }
+Authorization: Bearer {{token}}
 
 ######
 # @name changeTargetBranch
@@ -62,7 +72,7 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-    "UserId": "769f1cfe-eaab-4a4f-9776-755b89dfb973"
+    "UserId": "6e76dc39-633a-422d-a922-626c3c220e6b"
 }
 
 ######
@@ -72,7 +82,7 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-    "UserId": "769f1cfe-eaab-4a4f-9776-755b89dfb973"
+    "UserId": "6e76dc39-633a-422d-a922-626c3c220e6b"
 }
 
 ######
