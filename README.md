@@ -1,6 +1,6 @@
 # Giddup reference architecture
 
-This repository contains a reference architecture using ports and adapters, domain-driven design (DDD), command query responsibility segregation (CQRS) and event sourcing (ES). It is written in C# using ASP.NET Core as web application framework and EventStore as data store.
+This repository contains a reference architecture using ports and adapters, domain-driven design (DDD), command query responsibility segregation (CQRS) and event sourcing (ES). It is written in C# using ASP.NET Core as web application framework and PostgreSQL as data store.
 
 ## Table of contents<!-- omit in toc -->
 
@@ -18,7 +18,7 @@ Once you have cloned or downloaded the project you can run (and debug) the appli
 docker-compose up --build
 ```
 
-By running the Docker Compose file, an EventStore instance is started and the solution is build and started. When the services have started, you can make HTTP requests using http://localhost:5000/swagger/ or GraphQL requests using http://localhost:5000/graphql/ui.
+By running the Docker Compose file, an PostgreSQL instance is started and the solution is build and started. When the services have started, you can make HTTP requests using http://localhost:5000/swagger/ or GraphQL requests using http://localhost:5000/graphql/.
 
 Sample HTTP requests of all available endpoints are provided in the file scripts/pull-requests.http. The HTTP requests in this file can be executed in Visual Studio Code using the REST Client extension by Huachao Mao [[1]](https://marketplace.visualstudio.com/items?itemName=humao.rest-client "REST Client").
 
