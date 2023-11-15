@@ -46,6 +46,13 @@ public class GraphQLQueryExecutor
         return await ExecuteQuery(ConfigureRequest, CreateListResult);
     }
 
+    public async Task<IActionResult> Execute(DocumentNode query)
+    {
+        void ConfigureRequest(IQueryRequestBuilder builder) => builder.SetQuery(query);
+
+        return await ExecuteQuery(ConfigureRequest, CreateListResult);
+    }
+
     private static bool TryCreateQuery(string queryType, string fields, int skip, int take, string order, string where, [NotNullWhen(true)] out DocumentNode? query)
     {
         try

@@ -19,26 +19,19 @@ public class PullRequestQueriesController : ControllerBase
     [HttpGet]
     [Route("/pull-requests")]
     [ProducesResponseType(typeof(ListResult<PullRequest>), 200)]
-    public Task<IActionResult> Get(string fields = "", int skip = 0, int take = 10, string order = "", int? createdBy = null, PullRequestStatus? status = null, string? targetBranch = null)
+    public async Task<IActionResult> Get(string fields = "", int skip = 0, int take = 10, string order = "", Guid? createdBy = null, PullRequestStatus? status = null, string? targetBranch = null)
     {
-        var where = string.Empty;
+        var queryBuilder = GraphQLQueryBuilder<PullRequest>.Create("pullRequests", fields, skip, take, order)
+            .WhereEquals(pullRequest => pullRequest.CreatedBy.Id, createdBy)
+            .WhereEquals(pullRequest => pullRequest.Status, status)
+            .WhereEquals(pullRequest => pullRequest.TargetBranch, targetBranch);
 
-        if (createdBy.HasValue)
+        if (!queryBuilder.TryCreateQuery(out var query))
         {
-            where += $"createdBy: {{ id: {{ eq: \"{createdBy.Value}\" }} }} ";
+            return new BadRequestResult();
         }
 
-        if (status.HasValue)
-        {
-            where += $"status: {{ eq: \"{status.Value}\" }} ";
-        }
-
-        if (targetBranch != null)
-        {
-            where += $"targetBranch: {{ eq: \"{targetBranch}\" }} ";
-        }
-
-        return _graphQLQueryExecutor.Execute("pullRequests", fields, skip, take, order, where);
+        return await _graphQLQueryExecutor.Execute(query);
     }
 
     [HttpGet]
