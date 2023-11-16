@@ -9,51 +9,38 @@ namespace Giddup.Presentation.Api.Controllers;
 
 public class GraphQLQueryBuilder<T>
 {
-    private string _queryType;
-    private string _fields;
-    private string _paging;
-    private string _order;
-    private StringBuilder _where = new();
+    private readonly string _queryType;
+    private readonly string _fields;
 
-    private GraphQLQueryBuilder(string queryType, string fields, int skip, int take, string order)
+    private string _paging = string.Empty;
+    private string _order = string.Empty;
+    private StringBuilder? _where;
+
+    private GraphQLQueryBuilder(string queryType, string fields)
     {
         _queryType = queryType;
         _fields = fields;
-        _paging = $"skip: {skip}, take: {take},";
-        _order = order;
     }
 
-    public static GraphQLQueryBuilder<T> Create(string queryType, string fields, int skip, int take, string order)
-        => new(queryType, fields, skip, take, order);
+    public static GraphQLQueryBuilder<T> Create(string queryType, string fields)
+        => new(queryType, fields);
 
-    public GraphQLQueryBuilder<T> WhereEquals<TValue>(Expression<Func<T, TValue>> expression, TValue value)
+    public GraphQLQueryBuilder<T> WithOffsetPaging(int skip, int take)
     {
-        if (value != null)
-        {
-            // where += $"createdBy: {{ id: {{ eq: \"{createdBy.Value}\" }} }} ";
-            var propertyNames = GetPropertyPath(expression)
-                .Reverse()
-                .Select(StringExtensions.ToLowerFirstChar)
-                .ToList();
-
-            foreach (var propertyName in propertyNames)
-            {
-                _ = _where.Append(propertyName);
-                _ = _where.Append(": { ");
-            }
-
-            _ = _where.Append("eq: \"");
-            _ = _where.Append(value);
-            _ = _where.Append("\" ");
-
-            foreach (var propertyName in propertyNames)
-            {
-                _ = _where.Append("} ");
-            }
-        }
+        _paging = $"skip: {skip}, take: {take},";
 
         return this;
     }
+
+    public GraphQLQueryBuilder<T> WithSorting(string order)
+    {
+        _order = order;
+
+        return this;
+    }
+
+    public GraphQLQueryBuilder<T> WithWhereEquals<TValue>(Expression<Func<T, TValue>> expression, TValue value)
+        => Where(expression, value, "eq");
 
     public bool TryCreateQuery([NotNullWhen(true)] out DocumentNode? query)
     {
@@ -69,6 +56,37 @@ public class GraphQLQueryBuilder<T>
         }
 
         return true;
+    }
+
+    private GraphQLQueryBuilder<T> Where<TValue>(Expression<Func<T, TValue>> expression, TValue value, string operation)
+    {
+        if (value != null)
+        {
+            _where ??= new StringBuilder();
+
+            var propertyNames = GetPropertyPath(expression)
+                .Reverse()
+                .Select(StringExtensions.ToLowerFirstChar)
+                .ToList();
+
+            foreach (var propertyName in propertyNames)
+            {
+                _ = _where.Append(propertyName);
+                _ = _where.Append(": { ");
+            }
+
+            _ = _where.Append(operation);
+            _ = _where.Append(": \"");
+            _ = _where.Append(value);
+            _ = _where.Append("\" ");
+
+            foreach (var propertyName in propertyNames)
+            {
+                _ = _where.Append("} ");
+            }
+        }
+
+        return this;
     }
 
     private IEnumerable<string> GetPropertyPath<TValue>(Expression<Func<T, TValue>> expression)
