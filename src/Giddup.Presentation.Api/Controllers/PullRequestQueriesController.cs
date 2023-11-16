@@ -1,5 +1,6 @@
 // Copyright (c) Arjen Post. See LICENSE in the project root for license information.
 
+using System.ComponentModel.DataAnnotations;
 using Giddup.ApplicationCore.Domain.PullRequests;
 using Giddup.Infrastructure.PullRequests.QueryModel.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -11,6 +12,8 @@ namespace Giddup.Presentation.Api.Controllers;
 [ApiController]
 public class PullRequestQueriesController : ControllerBase
 {
+    private const string GraphQLQueryType = "pullRequests";
+
     private readonly GraphQLQueryExecutor _graphQLQueryExecutor;
 
     public PullRequestQueriesController(GraphQLQueryExecutor graphQLQueryExecutor)
@@ -19,35 +22,26 @@ public class PullRequestQueriesController : ControllerBase
     [HttpGet]
     [Route("/pull-requests")]
     [ProducesResponseType(typeof(ListResult<PullRequest>), 200)]
-    public Task<IActionResult> Get(string fields = "", int skip = 0, int take = 10, string order = "", int? createdBy = null, PullRequestStatus? status = null, string? targetBranch = null)
+    public async Task<IActionResult> Get([Required] string fields = "", int skip = 0, int take = 10, string order = "", Guid? createdBy = null, PullRequestStatus? status = null, string? targetBranch = null)
     {
-        var where = string.Empty;
+        var queryBuilder = GraphQLQueryBuilder<PullRequest>.Create(GraphQLQueryType, fields)
+            .WithOffsetPaging(skip, take)
+            .WithSorting(order)
+            .WithWhereEquals(pullRequest => pullRequest.CreatedBy.Id, createdBy)
+            .WithWhereEquals(pullRequest => pullRequest.Status, status)
+            .WithWhereEquals(pullRequest => pullRequest.TargetBranch, targetBranch);
 
-        if (createdBy.HasValue)
-        {
-            where += $"createdBy: {{ id: {{ eq: \"{createdBy.Value}\" }} }} ";
-        }
-
-        if (status.HasValue)
-        {
-            where += $"status: {{ eq: \"{status.Value}\" }} ";
-        }
-
-        if (targetBranch != null)
-        {
-            where += $"targetBranch: {{ eq: \"{targetBranch}\" }} ";
-        }
-
-        return _graphQLQueryExecutor.Execute("pullRequests", fields, skip, take, order, where);
+        return await _graphQLQueryExecutor.ExecuteList(queryBuilder);
     }
 
     [HttpGet]
     [Route("/pull-requests/{pullRequestId:guid}")]
     [ProducesResponseType(typeof(PullRequest), 200)]
-    public Task<IActionResult> Get(Guid pullRequestId, string fields = "")
+    public Task<IActionResult> Get(Guid pullRequestId, [Required] string fields = "")
     {
-        var where = $"id: {{ eq: \"{pullRequestId}\" }} ";
+        var queryBuilder = GraphQLQueryBuilder<PullRequest>.Create(GraphQLQueryType, fields)
+            .WithWhereEquals(pullRequest => pullRequest.Id, pullRequestId);
 
-        return _graphQLQueryExecutor.Execute("pullRequests", fields, where);
+        return _graphQLQueryExecutor.ExecuteSingle(queryBuilder);
     }
 }

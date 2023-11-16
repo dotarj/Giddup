@@ -1,12 +1,10 @@
 // Copyright (c) Arjen Post. See LICENSE in the project root for license information.
 
-using System.Diagnostics.CodeAnalysis;
 using System.Net.Mime;
 using System.Security.Claims;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using HotChocolate.Execution;
-using HotChocolate.Language;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Giddup.Presentation.Api.Controllers;
@@ -22,21 +20,9 @@ public class GraphQLQueryExecutor
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public async Task<IActionResult> Execute(string queryType, string fields, string where)
+    public async Task<IActionResult> ExecuteList<TResult>(GraphQLQueryBuilder<TResult> queryBuilder)
     {
-        if (!TryCreateQuery(queryType, fields, 0, 1, string.Empty, where, out var query))
-        {
-            return new BadRequestResult();
-        }
-
-        void ConfigureRequest(IQueryRequestBuilder builder) => builder.SetQuery(query);
-
-        return await ExecuteQuery(ConfigureRequest, CreateSingleResult);
-    }
-
-    public async Task<IActionResult> Execute(string queryType, string fields, int skip, int take, string order, string where)
-    {
-        if (!TryCreateQuery(queryType, fields, skip, take, order, where, out var query))
+        if (!queryBuilder.TryCreateQuery(out var query))
         {
             return new BadRequestResult();
         }
@@ -46,20 +32,16 @@ public class GraphQLQueryExecutor
         return await ExecuteQuery(ConfigureRequest, CreateListResult);
     }
 
-    private static bool TryCreateQuery(string queryType, string fields, int skip, int take, string order, string where, [NotNullWhen(true)] out DocumentNode? query)
+    public async Task<IActionResult> ExecuteSingle<TResult>(GraphQLQueryBuilder<TResult> queryBuilder)
     {
-        try
+        if (!queryBuilder.TryCreateQuery(out var query))
         {
-            query = Utf8GraphQLParser.Parse($"query {{ {queryType}(skip: {skip}, take: {take}, order: {{ {order} }}, where: {{ {where} }}) {{ {fields} }} }}");
-        }
-        catch (SyntaxException)
-        {
-            query = null;
-
-            return false;
+            return new BadRequestResult();
         }
 
-        return true;
+        void ConfigureRequest(IQueryRequestBuilder builder) => builder.SetQuery(query);
+
+        return await ExecuteQuery(ConfigureRequest, CreateSingleResult);
     }
 
     private async Task<IActionResult> ExecuteQuery(Action<IQueryRequestBuilder> configureRequest, Func<IQueryResult, IActionResult> toActionResult)
