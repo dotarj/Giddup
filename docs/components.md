@@ -6,8 +6,7 @@
 
 There are two types of state, state for an existing aggregate and initial state for a new aggregate. State for an existing aggregate contains the current values of the aggregate which are retrieved from the data store. Initial state for a new aggregate contains the default values for the aggregate.
 
-> [!TIP]
-> See [IPullRequestState.cs](https://github.com/dotarj/Giddup/blob/master/src/Giddup.ApplicationCore/Domain/PullRequests/IPullRequestState.cs) for an example implementation.
+See [IPullRequestState.cs](https://github.com/dotarj/Giddup/blob/master/src/Giddup.ApplicationCore/Domain/PullRequests/IPullRequestState.cs) for an example implementation.
 
 ## Commands
 
@@ -16,10 +15,9 @@ There are two types of state, state for an existing aggregate and initial state 
 
 A command contains all information required for command processing and the resulting event processing. For example, `AddOptionalReviewerCommand` contains the ID of the optional reviewer, `LinkWorkItemCommand` contains the ID of the work item and `CompletePullRequestCommand` requires no extra information for command processing.
 
-When processing of a command requires external information (information beyond the scope of the current aggregate), delegates (`Func<>`) can be added to a command which can be used by the command processor. For example, `AddOptionalReviewerCommand` contains a method which can validate whether the given reviewer exists.
+When processing of a command requires external information (information beyond the scope of the current aggregate), delegates (`Func<>`) can be added to a command which can be used by the command processor. For example, `AddOptionalReviewerCommand` contains a delegate which can validate whether the given reviewer exists.
 
-> [!TIP]
-> See [IPullRequestCommand.cs](https://github.com/dotarj/Giddup/blob/master/src/Giddup.ApplicationCore/Domain/PullRequests/IPullRequestCommand.cs) for an example implementation.
+See [IPullRequestCommand.cs](https://github.com/dotarj/Giddup/blob/master/src/Giddup.ApplicationCore/Domain/PullRequests/IPullRequestCommand.cs) for an example implementation.
 
 ## Events
 
@@ -28,16 +26,14 @@ When processing of a command requires external information (information beyond t
 
 An event contains all information required for event processing. For example, `OptionalReviewerAddedEvent` contains the ID of the optional reviewer, `WorkItemLinkedEvent` contains the ID of the work item and `PullRequestCompletedEvent` requires no extra information for event processing.
 
-> [!TIP]
-> See [IPullRequestEvent.cs](https://github.com/dotarj/Giddup/blob/master/src/Giddup.ApplicationCore/Domain/PullRequests/IPullRequestEvent.cs) for an example implementation.
+See [IPullRequestEvent.cs](https://github.com/dotarj/Giddup/blob/master/src/Giddup.ApplicationCore/Domain/PullRequests/IPullRequestEvent.cs) for an example implementation.
 
 ## Errors
 
 > [!IMPORTANT]
 > An error describes the fact that the processing of a command failed due to the current state of the aggregate. An error is immutable and descriptively named using the suffix `Error`. Errors are defined in application core (domain), grouped by aggregate and implement a common (aggregate specific) interface, for example `IPullRequestError`.
 
-> [!TIP]
-> See [IPullRequestError.cs](https://github.com/dotarj/Giddup/blob/master/src/Giddup.ApplicationCore/Domain/PullRequests/IPullRequestError.cs) for an example implementation.
+See [IPullRequestError.cs](https://github.com/dotarj/Giddup/blob/master/src/Giddup.ApplicationCore/Domain/PullRequests/IPullRequestError.cs) for an example implementation.
 
 ## GraphQL mutations and mutation controllers
 
@@ -49,8 +45,8 @@ An event contains all information required for event processing. For example, `O
 Optimistic concurrency!
 
 1. Retrieve the current aggregate state using the state provider.
-2. Process the command using the command processor.
-3. Depending on the outcome:
+1. Process the command using the command processor.
+1. Depending on the outcome:
    1. When a concurrency conflict error is returned, retry the command processing.
    1. When another error is returned, return the error.
    1. When events are returned, process the events using the event processor.
@@ -64,6 +60,8 @@ Optimistic concurrency!
 
 > [!IMPORTANT]
 > A command processors sole purpose is to process all business rules using the given command and state. A command processor is static, has one public method (`Process`), does not rely on external services (apart from the delegates provided in commands) and is named using the aggregate name and the suffix `CommandProcessor`. Command processors are defined in application core (domain).
+
+Processing of a command can either result in errors or events. One or more errors if business rules prevent the change due to the current state of the aggregate, or zero or more events if business rules were successfully processed. When the current state of the aggregate equals the desired state of the aggregate (described by the command), processing of the command should be considered successful and zero events are returned (robustness principle).
 
 ## Domain services
 
