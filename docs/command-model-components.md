@@ -1,5 +1,8 @@
 # Command model components
 
+:heavy_check_mark:
+:x:
+
 ```
                      │ PRESENTATION            │ APPLICATION CORE                            │ INFRASTRUCTURE          │
 
@@ -30,18 +33,44 @@
 ## Commands
 
 > [!IMPORTANT]
-> A command describes the intention to change something in the system. It reflects a business process as close as possible. A command is immutable and descriptively named using a verb, a noun and the suffix `Command`. Commands are defined in application core (domain), grouped by aggregate and implement a common (aggregate specific) interface, for example `IPullRequestCommand`.
+> A command describes the intention to change something in the system. It reflects a business process as close as possible.
 
-A command contains all information required for command processing and the resulting event processing. For example, `AddOptionalReviewerCommand` contains the ID of the optional reviewer, `LinkWorkItemCommand` contains the ID of the work item and `CompletePullRequestCommand` requires no extra information for command processing.
+:heavy_check_mark: DO use immutable records.  
+:heavy_check_mark: DO use descriptive names using a verb, a noun and the suffix `Command`.
 
-When processing of a command requires external information (information beyond the scope of the current aggregate), delegates (`Func<>`) can be added to a command which can be used by the command processor. For example, `AddOptionalReviewerCommand` contains a delegate which can validate whether the given reviewer exists.
+For example, `AddOptionalReviewerCommand`, `LinkWorkItemCommand` or `CompletePullRequestCommand`.
+
+:heavy_check_mark: DO implement a common (aggregate specific) interface.
+
+For example, `IPullRequestCommand`.
+
+:heavy_check_mark: DO place implementations in application core (domain).  
+
+:heavy_check_mark: DO only add information required for command processing and the resulting event processing.
+
+For example, `AddOptionalReviewerCommand` contains the ID of the optional reviewer, `LinkWorkItemCommand` contains the ID of the work item and `CompletePullRequestCommand` requires no extra information for command processing.
+
+:heavy_check_mark: DO add delegates (`Func<>`) to a command when processing requires external information (information beyond the scope of the current aggregate).
+
+For example, `AddOptionalReviewerCommand` contains a delegate which can validate whether the given reviewer exists.
 
 See [IPullRequestCommand.cs](https://github.com/dotarj/Giddup/blob/master/src/Giddup.ApplicationCore/Domain/PullRequests/IPullRequestCommand.cs) for an example implementation.
 
 ## Events
 
 > [!IMPORTANT]
-> An event describes the fact that something has happened in the system. An event is immutable and descriptively named using a noun, a past tense verb and the suffix `Event`. Events are defined in application core (domain), grouped by aggregate and implement a common (aggregate specific) interface, for example `IPullRequestEvent`.
+> An event describes the fact that something has happened in the system.
+
+:heavy_check_mark: DO use immutable records for events.  
+:heavy_check_mark: DO use descriptive names using a noun, a past tense verb and the suffix `Event`.
+
+For example, `OptionalReviewerAddedEvent`.
+
+:heavy_check_mark: DO implement a common (aggregate specific) interface.
+
+For example `IPullRequestEvent`.
+
+:heavy_check_mark: DO place implementations in application core (domain).
 
 An event contains all information required for event processing. For example, `OptionalReviewerAddedEvent` contains the ID of the optional reviewer, `WorkItemLinkedEvent` contains the ID of the work item and `PullRequestCompletedEvent` requires no extra information for event processing.
 
