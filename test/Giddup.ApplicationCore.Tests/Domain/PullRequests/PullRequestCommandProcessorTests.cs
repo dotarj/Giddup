@@ -25,7 +25,7 @@ public partial class PullRequestCommandProcessorTests
             _ = BranchName.TryCreate("refs/heads/target", out targetBranch!);
         }
 
-        return new ExistingPullRequestState(CreatedById ?? Guid.NewGuid(), sourceBranch, targetBranch, title, description ?? "description", checkForLinkedWorkItemsMode, autoCompleteMode, status, reviewers ?? GetReviewers(), workItems ?? GetWorkItems());
+        return new PullRequestState(CreatedById ?? Guid.NewGuid(), sourceBranch, targetBranch, title, description ?? "description", checkForLinkedWorkItemsMode, autoCompleteMode, status, reviewers ?? GetReviewers(), workItems ?? GetWorkItems());
     }
 
     private static ImmutableList<(Guid ReviewerId, ReviewerType Type, ReviewerFeedback Feedback)> GetReviewers(params (Guid ReviewerId, ReviewerType Type, ReviewerFeedback Feedback)[] reviewers)
