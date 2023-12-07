@@ -6,7 +6,7 @@ public static class PullRequestCommandProcessor
 {
     public static async Task<CommandProcessorResult<IPullRequestEvent, IPullRequestError>> Process(IPullRequestState state, IPullRequestCommand command)
     {
-        if (command is CreateCommand createCommand)
+        if (command is CreatePullRequestCommand createCommand)
         {
             if (state is not InitialPullRequestState)
             {
@@ -23,21 +23,21 @@ public static class PullRequestCommandProcessor
 
         return command switch
         {
-            AbandonCommand => Abandon(existingState),
+            AbandonPullRequestCommand => AbandonPullRequest(existingState),
             AddOptionalReviewerCommand addOptionalReviewerCommand => await AddOptionalReviewer(addOptionalReviewerCommand, existingState),
             AddRequiredReviewerCommand addRequiredReviewerCommand => await AddRequiredReviewer(addRequiredReviewerCommand, existingState),
-            ApproveCommand approveCommand => Approve(approveCommand, existingState),
-            ApproveWithSuggestionsCommand approveWithSuggestionsCommand => ApproveWithSuggestions(approveWithSuggestionsCommand, existingState),
+            ApprovePullRequestCommand approvePullRequestCommand => ApprovePullRequest(approvePullRequestCommand, existingState),
+            ApprovePullRequestWithSuggestionsCommand approvePullRequestWithSuggestionsCommand => ApprovePullRequestWithSuggestions(approvePullRequestWithSuggestionsCommand, existingState),
             CancelAutoCompleteCommand => CancelAutoComplete(existingState),
             ChangeDescriptionCommand changeDescriptionCommand => ChangeDescription(changeDescriptionCommand, existingState),
             ChangeTargetBranchCommand changeTargetBranchCommand => await ChangeTargetBranch(changeTargetBranchCommand, existingState),
             ChangeTitleCommand changeTitleCommand => ChangeTitle(changeTitleCommand, existingState),
-            CompleteCommand => Complete(existingState),
+            CompletePullRequestCommand => CompletePullRequest(existingState),
             LinkWorkItemCommand linkWorkItemCommand => LinkWorkItem(linkWorkItemCommand, existingState),
             MakeReviewerOptionalCommand makeReviewerOptionalCommand => MakeReviewerOptional(makeReviewerOptionalCommand, existingState),
             MakeReviewerRequiredCommand makeReviewerRequiredCommand => MakeReviewerRequired(makeReviewerRequiredCommand, existingState),
-            ReactivateCommand => Reactivate(existingState),
-            RejectCommand rejectCommand => Reject(rejectCommand, existingState),
+            ReactivatePullRequestCommand => ReactivatePullRequest(existingState),
+            RejectPullRequestCommand rejectPullRequestCommand => RejectPullRequest(rejectPullRequestCommand, existingState),
             RemoveReviewerCommand removeReviewerCommand => RemoveReviewer(removeReviewerCommand, existingState),
             RemoveWorkItemCommand removeWorkItemCommand => RemoveWorkItem(removeWorkItemCommand, existingState),
             ResetFeedbackCommand resetFeedbackCommand => ResetFeedback(resetFeedbackCommand, existingState),
@@ -48,7 +48,7 @@ public static class PullRequestCommandProcessor
         };
     }
 
-    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> Abandon(PullRequestState state)
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> AbandonPullRequest(PullRequestState state)
     {
         if (state.Status == PullRequestStatus.Abandoned)
         {
@@ -103,7 +103,7 @@ public static class PullRequestCommandProcessor
         return new RequiredReviewerAddedEvent(command.ReviewerId);
     }
 
-    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> Approve(ApproveCommand command, PullRequestState state)
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> ApprovePullRequest(ApprovePullRequestCommand command, PullRequestState state)
     {
         if (state.Status != PullRequestStatus.Active)
         {
@@ -134,7 +134,7 @@ public static class PullRequestCommandProcessor
         return events.ToArray();
     }
 
-    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> ApproveWithSuggestions(ApproveWithSuggestionsCommand command, PullRequestState state)
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> ApprovePullRequestWithSuggestions(ApprovePullRequestWithSuggestionsCommand command, PullRequestState state)
     {
         if (state.Status != PullRequestStatus.Active)
         {
@@ -245,7 +245,7 @@ public static class PullRequestCommandProcessor
         return new TitleChangedEvent(title);
     }
 
-    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> Complete(PullRequestState state)
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> CompletePullRequest(PullRequestState state)
     {
         if (state.Status != PullRequestStatus.Active)
         {
@@ -272,7 +272,7 @@ public static class PullRequestCommandProcessor
         return new CompletedEvent();
     }
 
-    private static async Task<CommandProcessorResult<IPullRequestEvent, IPullRequestError>> Create(CreateCommand command)
+    private static async Task<CommandProcessorResult<IPullRequestEvent, IPullRequestError>> Create(CreatePullRequestCommand command)
     {
         if (!BranchName.TryCreate(command.SourceBranch, out var sourceBranch))
         {
@@ -380,7 +380,7 @@ public static class PullRequestCommandProcessor
         return new ReviewerMadeRequiredEvent(command.ReviewerId);
     }
 
-    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> Reactivate(PullRequestState state)
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> ReactivatePullRequest(PullRequestState state)
     {
         if (state.Status == PullRequestStatus.Active)
         {
@@ -395,7 +395,7 @@ public static class PullRequestCommandProcessor
         return new ReactivatedEvent();
     }
 
-    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> Reject(RejectCommand command, PullRequestState state)
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> RejectPullRequest(RejectPullRequestCommand command, PullRequestState state)
     {
         if (state.Status != PullRequestStatus.Active)
         {

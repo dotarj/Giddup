@@ -20,7 +20,7 @@ public class PullRequestMutationsController : ControllerBase
     [HttpPost]
     [Route("/pull-requests/{pullRequestId:guid}/abandon")]
     public Task<IActionResult> Abandon(Guid pullRequestId)
-        => ProcessCommand(pullRequestId, new AbandonCommand());
+        => ProcessCommand(pullRequestId, new AbandonPullRequestCommand());
 
     [HttpPost]
     [Route("/pull-requests/{pullRequestId:guid}/add-optional-reviewer")]
@@ -35,12 +35,12 @@ public class PullRequestMutationsController : ControllerBase
     [HttpPost]
     [Route("/pull-requests/{pullRequestId:guid}/approve")]
     public Task<IActionResult> Approve(Guid pullRequestId)
-        => ProcessCommand(pullRequestId, new ApproveCommand(User.GetUserId()));
+        => ProcessCommand(pullRequestId, new ApprovePullRequestCommand(User.GetUserId()));
 
     [HttpPost]
     [Route("/pull-requests/{pullRequestId:guid}/approve-with-suggestions")]
     public Task<IActionResult> ApproveWithSuggestions(Guid pullRequestId)
-        => ProcessCommand(pullRequestId, new ApproveWithSuggestionsCommand(User.GetUserId()));
+        => ProcessCommand(pullRequestId, new ApprovePullRequestWithSuggestionsCommand(User.GetUserId()));
 
     [HttpPost]
     [Route("/pull-requests/{pullRequestId:guid}/cancel-auto-complete")]
@@ -65,7 +65,7 @@ public class PullRequestMutationsController : ControllerBase
     [HttpPost]
     [Route("/pull-requests/{pullRequestId:guid}/complete")]
     public Task<IActionResult> Complete(Guid pullRequestId)
-        => ProcessCommand(pullRequestId, new CompleteCommand());
+        => ProcessCommand(pullRequestId, new CompletePullRequestCommand());
 
     [HttpPost]
     [Route("/pull-requests/create")]
@@ -73,7 +73,7 @@ public class PullRequestMutationsController : ControllerBase
     {
         var pullRequestId = Guid.NewGuid();
 
-        var error = await _pullRequestService.ProcessCommand(pullRequestId, new CreateCommand(DateTime.UtcNow, User.GetUserId(), input.SourceBranch, input.TargetBranch, input.Title, branchService.IsExistingBranch));
+        var error = await _pullRequestService.ProcessCommand(pullRequestId, new CreatePullRequestCommand(DateTime.UtcNow, User.GetUserId(), input.SourceBranch, input.TargetBranch, input.Title, branchService.IsExistingBranch));
 
         return CreateResult(error, Request.Path, () => Created($"/pull-requests/{pullRequestId}", null));
     }
@@ -96,12 +96,12 @@ public class PullRequestMutationsController : ControllerBase
     [HttpPost]
     [Route("/pull-requests/{pullRequestId:guid}/reactivate")]
     public Task<IActionResult> Reactivate(Guid pullRequestId)
-        => ProcessCommand(pullRequestId, new ReactivateCommand());
+        => ProcessCommand(pullRequestId, new ReactivatePullRequestCommand());
 
     [HttpPost]
     [Route("/pull-requests/{pullRequestId:guid}/reject")]
     public Task<IActionResult> Reject(Guid pullRequestId)
-        => ProcessCommand(pullRequestId, new RejectCommand(User.GetUserId()));
+        => ProcessCommand(pullRequestId, new RejectPullRequestCommand(User.GetUserId()));
 
     [HttpPost]
     [Route("/pull-requests/{pullRequestId:guid}/remove-reviewer")]

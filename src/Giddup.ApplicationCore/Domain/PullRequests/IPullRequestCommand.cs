@@ -6,15 +6,15 @@ public interface IPullRequestCommand
 {
 }
 
-public record AbandonCommand : IPullRequestCommand;
+public record AbandonPullRequestCommand : IPullRequestCommand;
 
 public record AddOptionalReviewerCommand(Guid ReviewerId, Func<Guid, Task<bool>> IsValidReviewer) : IPullRequestCommand;
 
 public record AddRequiredReviewerCommand(Guid ReviewerId, Func<Guid, Task<bool>> IsValidReviewer) : IPullRequestCommand;
 
-public record ApproveCommand(Guid ReviewerId) : IPullRequestCommand;
+public record ApprovePullRequestCommand(Guid ReviewerId) : IPullRequestCommand;
 
-public record ApproveWithSuggestionsCommand(Guid ReviewerId) : IPullRequestCommand;
+public record ApprovePullRequestWithSuggestionsCommand(Guid ReviewerId) : IPullRequestCommand;
 
 public record CancelAutoCompleteCommand : IPullRequestCommand;
 
@@ -24,9 +24,9 @@ public record ChangeTargetBranchCommand(string TargetBranch, Func<BranchName, Ta
 
 public record ChangeTitleCommand(string Title) : IPullRequestCommand;
 
-public record CompleteCommand : IPullRequestCommand;
+public record CompletePullRequestCommand : IPullRequestCommand;
 
-public record CreateCommand(DateTime CreatedAt, Guid CreatedById, string SourceBranch, string TargetBranch, string Title, Func<BranchName, Task<bool>> IsExistingBranch) : IPullRequestCommand;
+public record CreatePullRequestCommand(DateTime CreatedAt, Guid CreatedById, string SourceBranch, string TargetBranch, string Title, Func<BranchName, Task<bool>> IsExistingBranch) : IPullRequestCommand;
 
 public record LinkWorkItemCommand(Guid WorkItemId) : IPullRequestCommand;
 
@@ -34,9 +34,9 @@ public record MakeReviewerOptionalCommand(Guid ReviewerId) : IPullRequestCommand
 
 public record MakeReviewerRequiredCommand(Guid ReviewerId) : IPullRequestCommand;
 
-public record ReactivateCommand : IPullRequestCommand;
+public record ReactivatePullRequestCommand : IPullRequestCommand;
 
-public record RejectCommand(Guid ReviewerId) : IPullRequestCommand;
+public record RejectPullRequestCommand(Guid ReviewerId) : IPullRequestCommand;
 
 public record RemoveReviewerCommand(Guid ReviewerId) : IPullRequestCommand;
 

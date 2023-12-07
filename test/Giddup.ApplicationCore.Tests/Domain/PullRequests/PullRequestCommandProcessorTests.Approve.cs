@@ -11,7 +11,7 @@ public partial class PullRequestCommandProcessorTests
     public async Task Approve_NotFound_ReturnsNotFoundError()
     {
         // Arrange
-        var command = new ApproveCommand(Guid.NewGuid());
+        var command = new ApprovePullRequestCommand(Guid.NewGuid());
         var state = IPullRequestState.InitialState;
 
         // Act
@@ -28,7 +28,7 @@ public partial class PullRequestCommandProcessorTests
     public async Task Approve_InvalidStatus_ReturnsNotActiveError(PullRequestStatus status)
     {
         // Arrange
-        var command = new ApproveCommand(Guid.NewGuid());
+        var command = new ApprovePullRequestCommand(Guid.NewGuid());
         var state = GetPullRequestState(status: status);
 
         // Act
@@ -43,7 +43,7 @@ public partial class PullRequestCommandProcessorTests
     public async Task Approve_NotExistingReviewer_ReturnsOptionalReviewerAddedEventAndApprovedEvent()
     {
         // Arrange
-        var command = new ApproveCommand(Guid.NewGuid());
+        var command = new ApprovePullRequestCommand(Guid.NewGuid());
         var state = GetPullRequestState();
 
         // Act
@@ -65,7 +65,7 @@ public partial class PullRequestCommandProcessorTests
     public async Task Approve_ReturnsApprovedEventAndCompletedEvent(string? reviewerUserId, ReviewerType reviewerType, ReviewerFeedback reviewerFeedback, CheckForLinkedWorkItemsMode checkForLinkedWorkItemsMode, string? workItemId)
     {
         // Arrange
-        var command = new ApproveCommand(Guid.NewGuid());
+        var command = new ApprovePullRequestCommand(Guid.NewGuid());
         var reviewers = reviewerUserId != null ? GetReviewers((command.ReviewerId, ReviewerType.Required, ReviewerFeedback.None), (Guid.Parse(reviewerUserId), reviewerType, reviewerFeedback)) : GetReviewers((command.ReviewerId, ReviewerType.Required, ReviewerFeedback.None));
         var workItems = workItemId != null ? GetWorkItems(Guid.Parse(workItemId)) : GetWorkItems();
         var state = GetPullRequestState(checkForLinkedWorkItemsMode: checkForLinkedWorkItemsMode, autoCompleteMode: AutoCompleteMode.Enabled, reviewers: reviewers, workItems: workItems);
@@ -91,7 +91,7 @@ public partial class PullRequestCommandProcessorTests
     public async Task Approve_ReturnsApprovedEvent(AutoCompleteMode autoCompleteMode, string? reviewerUserId, ReviewerType reviewerType, ReviewerFeedback reviewerFeedback, CheckForLinkedWorkItemsMode checkForLinkedWorkItemsMode)
     {
         // Arrange
-        var command = new ApproveCommand(Guid.NewGuid());
+        var command = new ApprovePullRequestCommand(Guid.NewGuid());
         var reviewers = reviewerUserId != null ? GetReviewers((command.ReviewerId, ReviewerType.Required, ReviewerFeedback.None), (Guid.Parse(reviewerUserId), reviewerType, reviewerFeedback)) : GetReviewers((command.ReviewerId, ReviewerType.Required, ReviewerFeedback.None));
         var state = GetPullRequestState(checkForLinkedWorkItemsMode: checkForLinkedWorkItemsMode, autoCompleteMode: autoCompleteMode, reviewers: reviewers);
 

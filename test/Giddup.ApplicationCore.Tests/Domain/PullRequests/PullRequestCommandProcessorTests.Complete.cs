@@ -11,7 +11,7 @@ public partial class PullRequestCommandProcessorTests
     public async Task Complete_NotFound_ReturnsNotFoundError()
     {
         // Arrange
-        var command = new CompleteCommand();
+        var command = new CompletePullRequestCommand();
         var state = IPullRequestState.InitialState;
 
         // Act
@@ -28,7 +28,7 @@ public partial class PullRequestCommandProcessorTests
     public async Task Complete_InvalidStatus_ReturnsNotActiveError(PullRequestStatus status)
     {
         // Arrange
-        var command = new CompleteCommand();
+        var command = new CompletePullRequestCommand();
         var state = GetPullRequestState(status: status);
 
         // Act
@@ -45,7 +45,7 @@ public partial class PullRequestCommandProcessorTests
     public async Task Complete_ReviewerFeedbackWaitForAuthorOrReject_ReturnsFeedbackContainsWaitForAuthorOrRejectError(ReviewerFeedback feedback)
     {
         // Arrange
-        var command = new CompleteCommand();
+        var command = new CompletePullRequestCommand();
         var state = GetPullRequestState(reviewers: GetReviewers((Guid.NewGuid(), ReviewerType.Optional, feedback)));
 
         // Act
@@ -60,7 +60,7 @@ public partial class PullRequestCommandProcessorTests
     public async Task Complete_RequiredReviewerFeedbackNotApproveOrApproveWithSuggestions_ReturnsNotAllRequiredReviewersApprovedError()
     {
         // Arrange
-        var command = new CompleteCommand();
+        var command = new CompletePullRequestCommand();
         var state = GetPullRequestState(reviewers: GetReviewers((Guid.NewGuid(), ReviewerType.Required, ReviewerFeedback.None)));
 
         // Act
@@ -75,7 +75,7 @@ public partial class PullRequestCommandProcessorTests
     public async Task Complete_NoWorkItemLinked_ReturnsNoWorkItemLinkedError()
     {
         // Arrange
-        var command = new CompleteCommand();
+        var command = new CompletePullRequestCommand();
         var state = GetPullRequestState(checkForLinkedWorkItemsMode: CheckForLinkedWorkItemsMode.Enabled);
 
         // Act
@@ -90,7 +90,7 @@ public partial class PullRequestCommandProcessorTests
     public async Task Complete_NoWorkItemLinked_ReturnsCompletedEvent()
     {
         // Arrange
-        var command = new CompleteCommand();
+        var command = new CompletePullRequestCommand();
         var state = GetPullRequestState();
 
         // Act
@@ -106,7 +106,7 @@ public partial class PullRequestCommandProcessorTests
     public async Task Complete_WorkItemLinked_ReturnsCompletedEvent()
     {
         // Arrange
-        var command = new CompleteCommand();
+        var command = new CompletePullRequestCommand();
         var state = GetPullRequestState(checkForLinkedWorkItemsMode: CheckForLinkedWorkItemsMode.Enabled, workItems: GetWorkItems(Guid.NewGuid()));
 
         // Act
