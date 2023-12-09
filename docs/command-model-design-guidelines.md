@@ -1,6 +1,8 @@
-# Command model components
+# Command model design guidelines 
 
-The command model consists of different components, each component having its own distinct responsibility (SRP, single responsibility principle).
+The command model consists of different components, each having its own distinct responsibility (SRP, single responsibility principle). This section  provides guidelines for developing command model components. The goal is to help developers ensure consistency and ease of use by providing a unified programming model.
+
+The guidelines are organized as simple recommendations prefixed with the terms *Do*, *Consider*, *Avoid*, and *Do not*. There might be situations where good design requires that you violate these design guidelines. Such cases should be rare, and it is important that you have a clear and compelling reason for your decision.
 
 ## Table of contents<!-- omit in toc -->
 
@@ -16,6 +18,8 @@ The command model consists of different components, each component having its ow
 - [Event processors](#event-processors)
 
 ## Data architecture diagram
+
+An overview of the command model components and the related data flow results in the following data architecture diagram:
 
 ```
                   │ PRSENTATION         │ APPLICATION CORE                      │ INFRASTRUCTURE      │
@@ -43,6 +47,14 @@ The command model consists of different components, each component having its ow
 ``` 
 
 *Data architecture diagram describing the data flow of the Giddup application command model.*
+
+1. Client sends mutation to GraphQL mutation or mutation controller.
+1. GraphQL mutation or mutation controller converts input into command and sends command to application service.
+1. Application service retrieves aggregate state using state provider.
+1. State provider retrieves current aggregate state.
+1. Application service sends command and current state to command processor. Command processor evaluates business rules and returns event(s) if successful.
+1. Application service sends events to events processor.
+1. Event processor stores event(s) and/or current aggregate state in data store.
 
 ## Commands
 
