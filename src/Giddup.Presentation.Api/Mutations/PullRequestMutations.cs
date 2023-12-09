@@ -13,7 +13,7 @@ public class PullRequestMutations
     [Error<NotFoundError>]
     [Error<NotActiveError>]
     public Task<MutationResult<PullRequestMutationResult>> Abandon([Service] IPullRequestService pullRequestService, Guid pullRequestId)
-        => ProcessCommand(pullRequestService, pullRequestId, new AbandonCommand());
+        => ProcessCommand(pullRequestService, pullRequestId, new AbandonPullRequestCommand());
 
     [Error<NotFoundError>]
     [Error<NotActiveError>]
@@ -30,12 +30,12 @@ public class PullRequestMutations
     [Error<NotFoundError>]
     [Error<NotActiveError>]
     public Task<MutationResult<PullRequestMutationResult>> Approve([Service] IPullRequestService pullRequestService, IResolverContext context, Guid pullRequestId)
-        => ProcessCommand(pullRequestService, pullRequestId, new ApproveCommand(context.GetUser()!.GetUserId()));
+        => ProcessCommand(pullRequestService, pullRequestId, new ApprovePullRequestCommand(context.GetUser()!.GetUserId()));
 
     [Error<NotFoundError>]
     [Error<NotActiveError>]
     public Task<MutationResult<PullRequestMutationResult>> ApproveWithSuggestions([Service] IPullRequestService pullRequestService, IResolverContext context, Guid pullRequestId)
-        => ProcessCommand(pullRequestService, pullRequestId, new ApproveWithSuggestionsCommand(context.GetUser()!.GetUserId()));
+        => ProcessCommand(pullRequestService, pullRequestId, new ApprovePullRequestWithSuggestionsCommand(context.GetUser()!.GetUserId()));
 
     [Error<NotFoundError>]
     [Error<NotActiveError>]
@@ -67,7 +67,7 @@ public class PullRequestMutations
     [Error<NotAllRequiredReviewersApprovedError>]
     [Error<NoWorkItemLinkedError>]
     public Task<MutationResult<PullRequestMutationResult>> Complete([Service] IPullRequestService pullRequestService, Guid pullRequestId)
-        => ProcessCommand(pullRequestService, pullRequestId, new CompleteCommand());
+        => ProcessCommand(pullRequestService, pullRequestId, new CompletePullRequestCommand());
 
     [Error<InvalidBranchNameError>]
     [Error<InvalidSourceBranchError>]
@@ -78,7 +78,7 @@ public class PullRequestMutations
     {
         var pullRequestId = Guid.NewGuid();
 
-        return ProcessCommand(pullRequestService, pullRequestId, new CreateCommand(DateTime.UtcNow, context.GetUser()!.GetUserId(), sourceBranch, targetBranch, title, branchService.IsExistingBranch));
+        return ProcessCommand(pullRequestService, pullRequestId, new CreatePullRequestCommand(DateTime.UtcNow, context.GetUser()!.GetUserId(), sourceBranch, targetBranch, title, branchService.IsExistingBranch));
     }
 
     [Error<NotFoundError>]
@@ -101,12 +101,12 @@ public class PullRequestMutations
     [Error<NotFoundError>]
     [Error<NotAbandonedError>]
     public Task<MutationResult<PullRequestMutationResult>> Reactivate([Service] IPullRequestService pullRequestService, Guid pullRequestId)
-        => ProcessCommand(pullRequestService, pullRequestId, new ReactivateCommand());
+        => ProcessCommand(pullRequestService, pullRequestId, new ReactivatePullRequestCommand());
 
     [Error<NotFoundError>]
     [Error<NotActiveError>]
     public Task<MutationResult<PullRequestMutationResult>> Reject([Service] IPullRequestService pullRequestService, IResolverContext context, Guid pullRequestId)
-        => ProcessCommand(pullRequestService, pullRequestId, new RejectCommand(context.GetUser()!.GetUserId()));
+        => ProcessCommand(pullRequestService, pullRequestId, new RejectPullRequestCommand(context.GetUser()!.GetUserId()));
 
     [Error<NotFoundError>]
     [Error<NotActiveError>]

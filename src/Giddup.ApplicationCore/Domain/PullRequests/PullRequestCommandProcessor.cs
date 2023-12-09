@@ -6,7 +6,7 @@ public static class PullRequestCommandProcessor
 {
     public static async Task<CommandProcessorResult<IPullRequestEvent, IPullRequestError>> Process(IPullRequestState state, IPullRequestCommand command)
     {
-        if (command is CreateCommand createCommand)
+        if (command is CreatePullRequestCommand createCommand)
         {
             if (state is not InitialPullRequestState)
             {
@@ -16,28 +16,28 @@ public static class PullRequestCommandProcessor
             return await Create(createCommand);
         }
 
-        if (state is not ExistingPullRequestState existingState)
+        if (state is not PullRequestState existingState)
         {
             return new NotFoundError();
         }
 
         return command switch
         {
-            AbandonCommand => Abandon(existingState),
+            AbandonPullRequestCommand => AbandonPullRequest(existingState),
             AddOptionalReviewerCommand addOptionalReviewerCommand => await AddOptionalReviewer(addOptionalReviewerCommand, existingState),
             AddRequiredReviewerCommand addRequiredReviewerCommand => await AddRequiredReviewer(addRequiredReviewerCommand, existingState),
-            ApproveCommand approveCommand => Approve(approveCommand, existingState),
-            ApproveWithSuggestionsCommand approveWithSuggestionsCommand => ApproveWithSuggestions(approveWithSuggestionsCommand, existingState),
+            ApprovePullRequestCommand approvePullRequestCommand => ApprovePullRequest(approvePullRequestCommand, existingState),
+            ApprovePullRequestWithSuggestionsCommand approvePullRequestWithSuggestionsCommand => ApprovePullRequestWithSuggestions(approvePullRequestWithSuggestionsCommand, existingState),
             CancelAutoCompleteCommand => CancelAutoComplete(existingState),
             ChangeDescriptionCommand changeDescriptionCommand => ChangeDescription(changeDescriptionCommand, existingState),
             ChangeTargetBranchCommand changeTargetBranchCommand => await ChangeTargetBranch(changeTargetBranchCommand, existingState),
             ChangeTitleCommand changeTitleCommand => ChangeTitle(changeTitleCommand, existingState),
-            CompleteCommand => Complete(existingState),
+            CompletePullRequestCommand => CompletePullRequest(existingState),
             LinkWorkItemCommand linkWorkItemCommand => LinkWorkItem(linkWorkItemCommand, existingState),
             MakeReviewerOptionalCommand makeReviewerOptionalCommand => MakeReviewerOptional(makeReviewerOptionalCommand, existingState),
             MakeReviewerRequiredCommand makeReviewerRequiredCommand => MakeReviewerRequired(makeReviewerRequiredCommand, existingState),
-            ReactivateCommand => Reactivate(existingState),
-            RejectCommand rejectCommand => Reject(rejectCommand, existingState),
+            ReactivatePullRequestCommand => ReactivatePullRequest(existingState),
+            RejectPullRequestCommand rejectPullRequestCommand => RejectPullRequest(rejectPullRequestCommand, existingState),
             RemoveReviewerCommand removeReviewerCommand => RemoveReviewer(removeReviewerCommand, existingState),
             RemoveWorkItemCommand removeWorkItemCommand => RemoveWorkItem(removeWorkItemCommand, existingState),
             ResetFeedbackCommand resetFeedbackCommand => ResetFeedback(resetFeedbackCommand, existingState),
@@ -48,7 +48,7 @@ public static class PullRequestCommandProcessor
         };
     }
 
-    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> Abandon(ExistingPullRequestState state)
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> AbandonPullRequest(PullRequestState state)
     {
         if (state.Status == PullRequestStatus.Abandoned)
         {
@@ -63,7 +63,7 @@ public static class PullRequestCommandProcessor
         return new AbandonedEvent();
     }
 
-    private static async Task<CommandProcessorResult<IPullRequestEvent, IPullRequestError>> AddOptionalReviewer(AddOptionalReviewerCommand command, ExistingPullRequestState state)
+    private static async Task<CommandProcessorResult<IPullRequestEvent, IPullRequestError>> AddOptionalReviewer(AddOptionalReviewerCommand command, PullRequestState state)
     {
         if (state.Status != PullRequestStatus.Active)
         {
@@ -83,7 +83,7 @@ public static class PullRequestCommandProcessor
         return new OptionalReviewerAddedEvent(command.ReviewerId);
     }
 
-    private static async Task<CommandProcessorResult<IPullRequestEvent, IPullRequestError>> AddRequiredReviewer(AddRequiredReviewerCommand command, ExistingPullRequestState state)
+    private static async Task<CommandProcessorResult<IPullRequestEvent, IPullRequestError>> AddRequiredReviewer(AddRequiredReviewerCommand command, PullRequestState state)
     {
         if (state.Status != PullRequestStatus.Active)
         {
@@ -103,7 +103,7 @@ public static class PullRequestCommandProcessor
         return new RequiredReviewerAddedEvent(command.ReviewerId);
     }
 
-    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> Approve(ApproveCommand command, ExistingPullRequestState state)
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> ApprovePullRequest(ApprovePullRequestCommand command, PullRequestState state)
     {
         if (state.Status != PullRequestStatus.Active)
         {
@@ -134,7 +134,7 @@ public static class PullRequestCommandProcessor
         return events.ToArray();
     }
 
-    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> ApproveWithSuggestions(ApproveWithSuggestionsCommand command, ExistingPullRequestState state)
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> ApprovePullRequestWithSuggestions(ApprovePullRequestWithSuggestionsCommand command, PullRequestState state)
     {
         if (state.Status != PullRequestStatus.Active)
         {
@@ -165,7 +165,7 @@ public static class PullRequestCommandProcessor
         return events.ToArray();
     }
 
-    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> CancelAutoComplete(ExistingPullRequestState state)
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> CancelAutoComplete(PullRequestState state)
     {
         if (state.Status != PullRequestStatus.Active)
         {
@@ -180,7 +180,7 @@ public static class PullRequestCommandProcessor
         return new AutoCompleteCancelledEvent();
     }
 
-    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> ChangeDescription(ChangeDescriptionCommand command, ExistingPullRequestState state)
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> ChangeDescription(ChangeDescriptionCommand command, PullRequestState state)
     {
         if (state.Status != PullRequestStatus.Active)
         {
@@ -195,7 +195,7 @@ public static class PullRequestCommandProcessor
         return new DescriptionChangedEvent(command.Description);
     }
 
-    private static async Task<CommandProcessorResult<IPullRequestEvent, IPullRequestError>> ChangeTargetBranch(ChangeTargetBranchCommand command, ExistingPullRequestState state)
+    private static async Task<CommandProcessorResult<IPullRequestEvent, IPullRequestError>> ChangeTargetBranch(ChangeTargetBranchCommand command, PullRequestState state)
     {
         if (state.Status != PullRequestStatus.Active)
         {
@@ -225,7 +225,7 @@ public static class PullRequestCommandProcessor
         return new TargetBranchChangedEvent(targetBranch);
     }
 
-    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> ChangeTitle(ChangeTitleCommand command, ExistingPullRequestState state)
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> ChangeTitle(ChangeTitleCommand command, PullRequestState state)
     {
         if (state.Status != PullRequestStatus.Active)
         {
@@ -245,7 +245,7 @@ public static class PullRequestCommandProcessor
         return new TitleChangedEvent(title);
     }
 
-    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> Complete(ExistingPullRequestState state)
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> CompletePullRequest(PullRequestState state)
     {
         if (state.Status != PullRequestStatus.Active)
         {
@@ -272,7 +272,7 @@ public static class PullRequestCommandProcessor
         return new CompletedEvent();
     }
 
-    private static async Task<CommandProcessorResult<IPullRequestEvent, IPullRequestError>> Create(CreateCommand command)
+    private static async Task<CommandProcessorResult<IPullRequestEvent, IPullRequestError>> Create(CreatePullRequestCommand command)
     {
         if (!BranchName.TryCreate(command.SourceBranch, out var sourceBranch))
         {
@@ -307,7 +307,7 @@ public static class PullRequestCommandProcessor
         return new CreatedEvent(command.CreatedAt, command.CreatedById, sourceBranch, targetBranch, title);
     }
 
-    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> LinkWorkItem(LinkWorkItemCommand command, ExistingPullRequestState state)
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> LinkWorkItem(LinkWorkItemCommand command, PullRequestState state)
     {
         if (state.Status != PullRequestStatus.Active)
         {
@@ -329,7 +329,7 @@ public static class PullRequestCommandProcessor
         return events.ToArray();
     }
 
-    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> MakeReviewerOptional(MakeReviewerOptionalCommand command, ExistingPullRequestState state)
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> MakeReviewerOptional(MakeReviewerOptionalCommand command, PullRequestState state)
     {
         if (state.Status != PullRequestStatus.Active)
         {
@@ -358,7 +358,7 @@ public static class PullRequestCommandProcessor
         return events.ToArray();
     }
 
-    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> MakeReviewerRequired(MakeReviewerRequiredCommand command, ExistingPullRequestState state)
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> MakeReviewerRequired(MakeReviewerRequiredCommand command, PullRequestState state)
     {
         if (state.Status != PullRequestStatus.Active)
         {
@@ -380,7 +380,7 @@ public static class PullRequestCommandProcessor
         return new ReviewerMadeRequiredEvent(command.ReviewerId);
     }
 
-    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> Reactivate(ExistingPullRequestState state)
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> ReactivatePullRequest(PullRequestState state)
     {
         if (state.Status == PullRequestStatus.Active)
         {
@@ -395,7 +395,7 @@ public static class PullRequestCommandProcessor
         return new ReactivatedEvent();
     }
 
-    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> Reject(RejectCommand command, ExistingPullRequestState state)
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> RejectPullRequest(RejectPullRequestCommand command, PullRequestState state)
     {
         if (state.Status != PullRequestStatus.Active)
         {
@@ -414,7 +414,7 @@ public static class PullRequestCommandProcessor
         return events.ToArray();
     }
 
-    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> RemoveReviewer(RemoveReviewerCommand command, ExistingPullRequestState state)
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> RemoveReviewer(RemoveReviewerCommand command, PullRequestState state)
     {
         if (state.Status != PullRequestStatus.Active)
         {
@@ -436,7 +436,7 @@ public static class PullRequestCommandProcessor
         return events.ToArray();
     }
 
-    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> RemoveWorkItem(RemoveWorkItemCommand command, ExistingPullRequestState state)
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> RemoveWorkItem(RemoveWorkItemCommand command, PullRequestState state)
     {
         if (state.Status != PullRequestStatus.Active)
         {
@@ -451,7 +451,7 @@ public static class PullRequestCommandProcessor
         return new WorkItemRemovedEvent(command.WorkItemId);
     }
 
-    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> ResetFeedback(ResetFeedbackCommand command, ExistingPullRequestState state)
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> ResetFeedback(ResetFeedbackCommand command, PullRequestState state)
     {
         if (state.Status != PullRequestStatus.Active)
         {
@@ -473,7 +473,7 @@ public static class PullRequestCommandProcessor
         return events.ToArray();
     }
 
-    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> SetAutoComplete(ExistingPullRequestState state)
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> SetAutoComplete(PullRequestState state)
     {
         if (state.Status != PullRequestStatus.Active)
         {
@@ -495,7 +495,7 @@ public static class PullRequestCommandProcessor
         return events.ToArray();
     }
 
-    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> WaitForAuthor(WaitForAuthorCommand command, ExistingPullRequestState state)
+    private static CommandProcessorResult<IPullRequestEvent, IPullRequestError> WaitForAuthor(WaitForAuthorCommand command, PullRequestState state)
     {
         if (state.Status != PullRequestStatus.Active)
         {
@@ -514,7 +514,7 @@ public static class PullRequestCommandProcessor
         return events.ToArray();
     }
 
-    private static bool ShouldAutoComplete(ExistingPullRequestState state)
+    private static bool ShouldAutoComplete(PullRequestState state)
     {
         if (state.AutoCompleteMode == AutoCompleteMode.Disabled)
         {

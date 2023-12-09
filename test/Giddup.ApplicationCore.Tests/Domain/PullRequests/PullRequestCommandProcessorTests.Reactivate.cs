@@ -11,7 +11,7 @@ public partial class PullRequestCommandProcessorTests
     public async Task Reactivate_NotFound_ReturnsNotFoundError()
     {
         // Arrange
-        var command = new ReactivateCommand();
+        var command = new ReactivatePullRequestCommand();
         var state = IPullRequestState.InitialState;
 
         // Act
@@ -26,7 +26,7 @@ public partial class PullRequestCommandProcessorTests
     public async Task Reactivate_AlreadyActive_ReturnsNoEvents()
     {
         // Arrange
-        var command = new ReactivateCommand();
+        var command = new ReactivatePullRequestCommand();
         var state = GetPullRequestState();
 
         // Act
@@ -41,7 +41,7 @@ public partial class PullRequestCommandProcessorTests
     public async Task Reactivate_Completed_ReturnsNotAbandonedError()
     {
         // Arrange
-        var command = new ReactivateCommand();
+        var command = new ReactivatePullRequestCommand();
         var state = GetPullRequestState(status: PullRequestStatus.Completed);
 
         // Act
@@ -56,7 +56,7 @@ public partial class PullRequestCommandProcessorTests
     public async Task Reactivate_ReturnsReactivatedEvent()
     {
         // Arrange
-        var command = new ReactivateCommand();
+        var command = new ReactivatePullRequestCommand();
         var state = GetPullRequestState(status: PullRequestStatus.Abandoned);
 
         // Act

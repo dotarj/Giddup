@@ -1,6 +1,6 @@
-# Giddup reference architecture
+# Giddup reference application
 
-This repository contains a reference architecture using ports and adapters, domain-driven design (DDD), command query responsibility segregation (CQRS) and event sourcing (ES). It is written in C# using ASP.NET Core as web application framework and PostgreSQL as data store.
+Giddup is a reference application using hexagonal architecture (ports and adapters architecture), domain-driven design (DDD), command query responsibility segregation (CQRS) and event sourcing (ES). It is written in C# using ASP.NET Core as web application framework and PostgreSQL as data store.
 
 ## Table of contents<!-- omit in toc -->
 
@@ -34,9 +34,9 @@ There are all kinds of tasks that can be performed in the Azure DevOps pull requ
 
 ## Technical overview
 
-### Ports and adapters architecture (hexagonal architecture)
+### Hexagonal architecture (ports and adapters architecture)
 
-The structure of the solution conforms to the ports and adapters architecture (hexagonal architecture) introduced by Alistair Cockburn [[2]](https://alistair.cockburn.us/hexagonal-architecture/ "Hexagonal architecture"). In this architecture three main components are identified, each with their respective responsibility:
+The structure of the solution conforms to the hexagonal architecture (ports and adapters architecture) introduced by Alistair Cockburn [[2]](https://alistair.cockburn.us/hexagonal-architecture/ "Hexagonal architecture"). In this architecture three main components are identified, each with their respective responsibility:
 
 * Application core
 Application core is divided in the domain and application layer. Application core has no references to other projects in the solution and references to third party libraries should be avoided as much as possible.
@@ -55,7 +55,7 @@ Infrastructure enables the application core to interact with external systems. T
 
 #### Compared to three-tier architecture
 
-In a 'classic' three-tier architecture, presentation (UI) references application core (business logic) and application core references infrastructure (persistence). In a ports and adapters architecture all references are inwards, presentation and infrastructure reference application core and application core does not have any references.
+In a 'classic' three-tier architecture, presentation (UI) references application core (business logic) and application core references infrastructure (persistence). In a hexagonal architecture all references are inwards, presentation and infrastructure reference application core and application core does not have any references.
 
 ```
 ┌──────────────────┐        ┌──────────────────┐
@@ -79,9 +79,13 @@ In a 'classic' three-tier architecture, presentation (UI) references application
 └──────────────────┘        └──────────────────┘
 ```
 
-*Difference in references between three-tier architecture (left) and ports and adapters architecture (right).*
+*Difference in references between three-tier architecture (left) and hexagonal architecture (right).*
 
-This might seem like a subtle difference, but it is significant. In a three-tier architecture, the infrastructure layer dictates how data should be retrieved and persisted. In a ports and adapters architecture, the application core dictates how data should be retrieved and persisted. When another adapter is used, a Postgres adapter instead of Microsoft SQL Server adapter for example, this does not affect the application core in any way.
+This might seem like a subtle difference, but it is significant. In a three-tier architecture, the infrastructure layer dictates how data should be retrieved and persisted. In a hexagonal architecture, the application core dictates how data should be retrieved and persisted. When another adapter is used, a Postgres adapter instead of Microsoft SQL Server adapter for example, this does not affect the application core in any way.
+
+### Presentation
+
+
 
 ### Application core
 
@@ -108,10 +112,10 @@ The samples used in the blog post are created using F#, which has support for la
 
 In contrast to the method names (decide and evolve) employed in Jérémie's blog post, Giddup utilizes different names. Commands are processed in a command processor, events are processed in an event processor and a separate interface is introduced for retrieving the current state of the aggregate, the state provider. The application service is coordinating the execution of commands. The command processor, event processor and application service are the 'ports' that will be used by the presentation layer and infrastructure layer.
 
-When it comes to errors arising from the validation of business rules within the application core, a deliberate decision has been made to avoid using exceptions, as they can lead to less readable code due to the method signature not clearly indicating potential outcomes.
+When it comes to errors arising from the validation of business rules within the application core, a deliberate decision has been made to avoid using exceptions, as they can lead to less readable code due to the method signature not clearly indicating potential outcomes [[5]](https://wiki.c2.com/?DontUseExceptionsForFlowControl "Dont Use Exceptions For Flow Control").
 
 ### Data architecture diagram
-Combining the approach of functional event sourcing deciders with ports and adapters architecture and command query responsibility segregation (CQRS) results in the following data architecture diagram:
+Combining the approach of functional event sourcing deciders with hexagonal architecture and command query responsibility segregation (CQRS) results in the following data architecture diagram:
 
 ```
                      │ PRESENTATION            │ APPLICATION CORE                            │ INFRASTRUCTURE          │
@@ -133,11 +137,11 @@ Combining the approach of functional event sourcing deciders with ports and adap
                   │               │                                                                       │                     "───────"
                   │               │                                                                       │                         ▲
                   │  │            │            │                                             │            │            │            │
- ┌─────────────┐  │               │                                                                       │                         │
- │             │◄─┘               └───────────────────────────────────────────────────────────────────────┘                         │
- │   client    │     │              COMMAND MODEL                                            │                         │           (8)
- │             ├──┐               ┌───────────────────────────────────────────────────────────────────────┐                         │
- └─────────────┘  │               │                         ┌──────────────────(3)──────────────┐  ┌──────┴──────┐                  │
+ ┌─────────────┐  │               │                                                                       │                  ┌──────┴──────┐
+ │             │◄─┘               └───────────────────────────────────────────────────────────────────────┘                  │             │
+ │   client    │     │              COMMAND MODEL                                            │                         │     │  projector  │
+ │             ├──┐               ┌───────────────────────────────────────────────────────────────────────┐                  │             │
+ └─────────────┘  │               │                         ┌──────────────────(3)──────────────┐  ┌──────┴──────┐           └──────┬──────┘
                   │  │            │            │            │            ┌─────────────┐     │  │  │    state    │     │            │
                   │               │                         │            │   command   │        └──┤  provider   │◄──(4)──┐         │
                   │               │                         ▼         ┌─►│  processor  │           │             │        │    _.───┴───._
@@ -181,3 +185,4 @@ Combining the approach of functional event sourcing deciders with ports and adap
 > - [2] Alistair Cockburn. [Hexagonal architecture](https://alistair.cockburn.us/hexagonal-architecture/).
 > - [3] Jérémie Chassaing. [Functional Event Sourcing Decider](https://thinkbeforecoding.com/post/2021/12/17/functional-event-sourcing-decider).
 > - [4] Microsoft. [Discriminated unions / enum class](https://github.com/dotnet/csharplang/blob/main/proposals/discriminated-unions.md).
+> - [5] Ward Cunningham [Dont Use Exceptions For Flow Control](https://wiki.c2.com/?DontUseExceptionsForFlowControl)

@@ -11,7 +11,7 @@ public partial class PullRequestCommandProcessorTests
     public async Task Abandon_NotFound_ReturnsNotFoundError()
     {
         // Arrange
-        var command = new AbandonCommand();
+        var command = new AbandonPullRequestCommand();
         var state = IPullRequestState.InitialState;
 
         // Act
@@ -26,7 +26,7 @@ public partial class PullRequestCommandProcessorTests
     public async Task Abandon_AlreadyAbandoned_ReturnsNoEvents()
     {
         // Arrange
-        var command = new AbandonCommand();
+        var command = new AbandonPullRequestCommand();
         var state = GetPullRequestState(status: PullRequestStatus.Abandoned);
 
         // Act
@@ -41,7 +41,7 @@ public partial class PullRequestCommandProcessorTests
     public async Task Abandon_Completed_ReturnsNotActiveError()
     {
         // Arrange
-        var command = new AbandonCommand();
+        var command = new AbandonPullRequestCommand();
         var state = GetPullRequestState(status: PullRequestStatus.Completed);
 
         // Act
@@ -56,7 +56,7 @@ public partial class PullRequestCommandProcessorTests
     public async Task Abandon_ReturnsAbandonedEvent()
     {
         // Arrange
-        var command = new AbandonCommand();
+        var command = new AbandonPullRequestCommand();
         var state = GetPullRequestState();
 
         // Act

@@ -11,7 +11,7 @@ public partial class PullRequestCommandProcessorTests
     public async Task Reject_NotFound_ReturnsNotFoundError()
     {
         // Arrange
-        var command = new RejectCommand(Guid.NewGuid());
+        var command = new RejectPullRequestCommand(Guid.NewGuid());
         var state = IPullRequestState.InitialState;
 
         // Act
@@ -28,7 +28,7 @@ public partial class PullRequestCommandProcessorTests
     public async Task Reject_InvalidStatus_ReturnsNotActiveError(PullRequestStatus status)
     {
         // Arrange
-        var command = new RejectCommand(Guid.NewGuid());
+        var command = new RejectPullRequestCommand(Guid.NewGuid());
         var state = GetPullRequestState(status: status);
 
         // Act
@@ -43,7 +43,7 @@ public partial class PullRequestCommandProcessorTests
     public async Task Reject_NotExistingReviewer_ReturnsOptionalReviewerAddedEventAndRejectedEvent()
     {
         // Arrange
-        var command = new RejectCommand(Guid.NewGuid());
+        var command = new RejectPullRequestCommand(Guid.NewGuid());
         var state = GetPullRequestState();
 
         // Act
@@ -60,7 +60,7 @@ public partial class PullRequestCommandProcessorTests
     public async Task Reject_ReturnsRejectedEvent()
     {
         // Arrange
-        var command = new RejectCommand(Guid.NewGuid());
+        var command = new RejectPullRequestCommand(Guid.NewGuid());
         var state = GetPullRequestState(reviewers: GetReviewers((command.ReviewerId, ReviewerType.Optional, ReviewerFeedback.None)));
 
         // Act

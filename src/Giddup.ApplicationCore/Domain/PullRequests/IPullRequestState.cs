@@ -12,10 +12,10 @@ public interface IPullRequestState
     {
         if (@event is CreatedEvent createdEvent)
         {
-            return new ExistingPullRequestState(createdEvent.CreatedById, createdEvent.SourceBranch, createdEvent.TargetBranch, createdEvent.Title, string.Empty, CheckForLinkedWorkItemsMode.Disabled, AutoCompleteMode.Disabled, PullRequestStatus.Active, ImmutableList<(Guid UserId, ReviewerType Type, ReviewerFeedback Feedback)>.Empty, ImmutableList<Guid>.Empty);
+            return new PullRequestState(createdEvent.CreatedById, createdEvent.SourceBranch, createdEvent.TargetBranch, createdEvent.Title, string.Empty, CheckForLinkedWorkItemsMode.Disabled, AutoCompleteMode.Disabled, PullRequestStatus.Active, ImmutableList<(Guid UserId, ReviewerType Type, ReviewerFeedback Feedback)>.Empty, ImmutableList<Guid>.Empty);
         }
 
-        if (state is not ExistingPullRequestState existingState)
+        if (state is not PullRequestState existingState)
         {
             throw new InvalidOperationException($"State '{state.GetType().FullName}' and event '{@event.GetType().FullName}' not supported.");
         }
@@ -50,7 +50,7 @@ public interface IPullRequestState
 
 public record InitialPullRequestState : IPullRequestState;
 
-public record ExistingPullRequestState(Guid CreatedById, BranchName SourceBranch, BranchName TargetBranch, Title Title, string Description, CheckForLinkedWorkItemsMode CheckForLinkedWorkItemsMode, AutoCompleteMode AutoCompleteMode, PullRequestStatus Status, ImmutableList<(Guid ReviewerId, ReviewerType Type, ReviewerFeedback Feedback)> Reviewers, ImmutableList<Guid> WorkItems) : IPullRequestState;
+public record PullRequestState(Guid CreatedById, BranchName SourceBranch, BranchName TargetBranch, Title Title, string Description, CheckForLinkedWorkItemsMode CheckForLinkedWorkItemsMode, AutoCompleteMode AutoCompleteMode, PullRequestStatus Status, ImmutableList<(Guid ReviewerId, ReviewerType Type, ReviewerFeedback Feedback)> Reviewers, ImmutableList<Guid> WorkItems) : IPullRequestState;
 
 public enum CheckForLinkedWorkItemsMode
 {
