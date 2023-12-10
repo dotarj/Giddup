@@ -22,28 +22,28 @@ The guidelines are organized as simple recommendations prefixed with the terms *
 An overview of the command model components and the related data flow results in the following data architecture diagram:
 
 ```
-                  │ PRSENTATION         │ APPLICATION CORE                      │ INFRASTRUCTURE      │
-                                                                                  
-                                                                                  
-                  │            COMMAND MODEL                                    │                     │
-                             ┌─────────────────────────────────────────────────────────────┐
-                             │                     ┌────────────────(3)───────────┐ ┌──────┴──────┐
-                  │          │          │          │          ┌─────────────┐   │ │ │    state    │   │
-                             │                     │          │   command   │     └─┤  provider   │◄(4)─┐
-                             │                     ▼        ┌►│  processor  │       │             │     │   _.───────._
-┌─────────────┐   │   ┌──────┴──────┐   │   ┌─────────────┐ │ │             │   │   └──────┬──────┘   │ │ .-           -.
-│             │       │ controller  │       │ application │(5)└─────────────┘              │            └─┤-_         _-│
-│   client    ├──(1)─►│ or graphql  ├──(2)─►│   service   ├─┘        ▲                     │              │  ~───────~  │
-│             │   │   │  mutation   │   │   │             │   ┌──────┴──────┐   │          │          │ ┌►│    data     │
-└─────────────┘       └──────┬──────┘       └──────┬──────┘   │   domain    │       ┌──────┴──────┐     │ `._  store  _.'
-                             │                     │          │   service   │       │    event    │     │    "───────"
-                  │          │          │          │          │             │   │ ┌►│  processor  ├─(7)─┘
-                             │                     │          └─────────────┘     │ │             │
-                             │                     └────────────────(6)───────────┘ └──────┬──────┘
-                  │          └─────────────────────────────────────────────────────────────┘          │
-                                                                                  
-                                                                                  
-                  │                     │                                       │                     │
+                  │ PRESENTATION        │ APPLICATION CORE                          │ INFRASTRUCTURE      │
+
+
+                  │            COMMAND MODEL                                        │                     │
+                             ┌─────────────────────────────────────────────────────────────────┐
+                             │                     ┌────────────────────(3)───────────┐ ┌──────┴──────┐
+                  │          │          │          │              ┌─────────────┐   │ │ │    state    │   │
+                             │                     │              │   command   │     └─┤  provider   │◄(4)─┐
+                             │                     ▼          ┌──►│  processor  │       │             │     │   _.───────._
+┌─────────────┐   │   ┌──────┴──────┐   │   ┌─────────────┐   │   │             │   │   └──────┬──────┘   │ │ .-           -.
+│             │       │ controller  │       │ application │  (5)  └─────────────┘              │            └─┤-_         _-│
+│   client    ├──(1)─►│ or graphql  ├──(2)─►│   service   ├───┘          ▲                     │              │  ~───────~  │
+│             │   │   │  mutation   │   │   │             │       ┌──────┴──────┐   │          │          │ ┌►│    data     │
+└─────────────┘       └──────┬──────┘       └──────┬──────┘       │   domain    │       ┌──────┴──────┐     │ `._  store  _.'
+                             │                     │              │   service   │       │    event    │     │    "───────"
+                  │          │          │          │              │             │   │ ┌►│  processor  ├─(7)─┘
+                             │                     │              └─────────────┘     │ │             │
+                             │                     └────────────────────(6)───────────┘ └──────┬──────┘
+                  │          └─────────────────────────────────────────────────────────────────┘          │
+
+
+                  │                     │                                           │                     │
 ``` 
 
 *Data architecture diagram describing the data flow of the Giddup application command model.*
