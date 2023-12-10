@@ -1,6 +1,6 @@
-# Command model design guidelines 
+# Command model design guidelines
 
-The command model consists of different components, each having its own distinct responsibility (SRP, single responsibility principle). This section  provides guidelines for developing command model components. The goal is to help developers ensure consistency and ease of use by providing a unified programming model.
+The command model consists of different components, each having its own distinct responsibility (SRP, single responsibility principle). This section provides guidelines for developing command model components. The goal is to help developers ensure consistency and ease of use by providing a unified programming model.
 
 The guidelines are organized as simple recommendations prefixed with the terms *Do*, *Consider*, *Avoid*, and *Do not*. There might be situations where good design requires that you violate these design guidelines. Such cases should be rare, and it is important that you have a clear and compelling reason for your decision.
 
